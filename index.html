@@ -342,6 +342,36 @@
             font-size: 12px;
             cursor: pointer;
         }
+
+        .list-item-edit {
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .profile-upload-btn {
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .profile-upload-btn:hover::after {
+            content: "\f030";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
     </style>
 </head>
 <body>
@@ -389,7 +419,7 @@
                     <h3 style="font-size: 18px;" id="dash-nama-guru">Memuat...</h3>
                     <p class="text-muted" style="font-size: 12px;" id="dash-mapel">Memuat...</p>
                 </div>
-                <div style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                <div id="beranda-foto-profil" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 24px; overflow: hidden; background: rgba(255,255,255,0.05);">
                     <i class="fas fa-user-tie"></i>
                 </div>
             </div>
@@ -473,9 +503,12 @@
     <div id="view-pengaturan" class="page-view">
         
         <div class="glass-card text-center relative">
-            <div style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px;">
+            <div id="set-foto-profil" class="profile-upload-btn" onclick="document.getElementById('upload-foto-guru').click()" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; overflow: hidden; background: rgba(255,255,255,0.05);">
                 <i class="fas fa-user-tie"></i>
             </div>
+            <input type="file" id="upload-foto-guru" style="display: none;" accept="image/*" onchange="handleFotoUpload(event)">
+            <p style="font-size: 10px; color: var(--text-muted); margin-top: -10px; margin-bottom: 15px;">Ketuk foto untuk ganti</p>
+
             <h3 style="font-size: 18px; color: var(--primary);" id="set-nama-guru">Nama Guru</h3>
             <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">NIP: <span id="set-nip-guru"></span></p>
             <div style="display: inline-block; padding: 5px 15px; border: 1px solid var(--primary); border-radius: 20px; font-size: 11px; font-weight: 600;">
@@ -573,12 +606,29 @@
         </div>
     </div>
 
+    <!-- Modal Input Edit Master Data -->
+    <div class="modal-overlay" id="modal-edit-data">
+        <div class="modal-box">
+            <h3 style="margin-bottom: 20px;" id="modal-edit-title">Edit Data</h3>
+            <input type="hidden" id="modal-edit-type">
+            <input type="hidden" id="modal-edit-id">
+            
+            <input type="text" id="modal-edit-val1" placeholder="Nilai 1">
+            <input type="text" id="modal-edit-val2" placeholder="Nilai 2" style="display: none;">
+            
+            <div class="d-flex" style="gap: 10px;">
+                <button class="btn-outline" onclick="document.getElementById('modal-edit-data').style.display='none'">Batal</button>
+                <button class="btn-primary" onclick="simpanEditData()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
     <!-- --- STREAMING_CHUNK:Javascript Logic --- -->
     <script>
         // State Management
         let activeRoomKey = null;
         let DB = {
-            guru: { nama: "Guru Pengajar", nip: "-", mapel: "-" },
+            guru: { nama: "Guru Pengajar", nip: "-", mapel: "-", foto: "" },
             kelas: [],
             siswa: [],
             absensi: {},
@@ -700,6 +750,7 @@
 
         function onDataLoaded() {
             updateKelasDropdowns();
+            renderFotoProfil(); // Render foto dari DB
             
             // Ingat posisi tab terakhir sebelum refresh
             const lastTab = localStorage.getItem('presensi_last_tab') || 'beranda';
@@ -1086,7 +1137,10 @@
                 <div style="margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
                     <div class="d-flex justify-between align-center mb-15">
                         <h4 style="color: var(--accent);">${k} <span style="font-size:11px; color:var(--text-muted);">(${muridDiKelas.length} Siswa)</span></h4>
-                        <span class="list-item-delete" onclick="hapusKelas('${k}')"><i class="fas fa-trash"></i> Kelas</span>
+                        <div class="d-flex" style="gap: 5px;">
+                            <span class="list-item-edit" onclick="bukaModalEditKelas('${k}')"><i class="fas fa-edit"></i> Edit</span>
+                            <span class="list-item-delete" onclick="hapusKelas('${k}')"><i class="fas fa-trash"></i> Hapus</span>
+                        </div>
                     </div>
                 `;
                 
@@ -1094,13 +1148,156 @@
                     html += `
                     <div class="d-flex justify-between align-center" style="padding: 5px 0; font-size: 13px;">
                         <span>- ${s.nama} <span style="color:var(--text-muted); font-size:10px;">(${s.nis || 'No NIS'})</span></span>
-                        <span class="list-item-delete" style="padding: 2px 6px; font-size: 10px;" onclick="hapusSiswa(${s.id})"><i class="fas fa-times"></i></span>
+                        <div class="d-flex" style="gap: 5px;">
+                            <span class="list-item-edit" style="padding: 2px 6px; font-size: 10px;" onclick="bukaModalEditSiswa(${s.id})"><i class="fas fa-pencil-alt"></i></span>
+                            <span class="list-item-delete" style="padding: 2px 6px; font-size: 10px;" onclick="hapusSiswa(${s.id})"><i class="fas fa-times"></i></span>
+                        </div>
                     </div>`;
                 });
                 
                 html += `</div>`;
                 container.insertAdjacentHTML('beforeend', html);
             });
+        }
+
+        // --- STREAMING_CHUNK:Logika Foto Profil & Edit Master Data ---
+        function renderFotoProfil() {
+            const berandaFoto = document.getElementById('beranda-foto-profil');
+            const setFoto = document.getElementById('set-foto-profil');
+            
+            if (DB.guru.foto && DB.guru.foto !== "") {
+                const imgTag = `<img src="${DB.guru.foto}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                berandaFoto.innerHTML = imgTag;
+                setFoto.innerHTML = imgTag;
+            } else {
+                const iconTag = `<i class="fas fa-user-tie"></i>`;
+                berandaFoto.innerHTML = iconTag;
+                setFoto.innerHTML = iconTag;
+            }
+        }
+
+        function handleFotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Kompresi Gambar Menggunakan Canvas agar muat di LocalStorage
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_SIZE = 250; // Max lebar/tinggi pixel
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+                    } else {
+                        if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Simpan sebagai Base64 JPG kompresi 80%
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    DB.guru.foto = dataUrl;
+                    autoSaveLokal();
+                    renderFotoProfil();
+                    showToast('Foto profil berhasil diperbarui!');
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function bukaModalEditKelas(namaKelasLama) {
+            document.getElementById('modal-edit-title').innerText = "Edit Nama Kelas";
+            document.getElementById('modal-edit-type').value = "kelas";
+            document.getElementById('modal-edit-id').value = namaKelasLama; // ID diisi nama lama
+            
+            const inputVal1 = document.getElementById('modal-edit-val1');
+            inputVal1.placeholder = "Nama Kelas Baru";
+            inputVal1.value = namaKelasLama;
+            
+            document.getElementById('modal-edit-val2').style.display = 'none';
+            document.getElementById('modal-edit-data').style.display = 'flex';
+        }
+
+        function bukaModalEditSiswa(idSiswa) {
+            const siswa = DB.siswa.find(s => s.id === idSiswa);
+            if(!siswa) return;
+
+            document.getElementById('modal-edit-title').innerText = "Edit Data Siswa";
+            document.getElementById('modal-edit-type').value = "siswa";
+            document.getElementById('modal-edit-id').value = idSiswa;
+            
+            const inputVal1 = document.getElementById('modal-edit-val1');
+            inputVal1.placeholder = "Nama Lengkap Siswa";
+            inputVal1.value = siswa.nama;
+            
+            const inputVal2 = document.getElementById('modal-edit-val2');
+            inputVal2.placeholder = "NIS Siswa";
+            inputVal2.value = (siswa.nis === "-") ? "" : siswa.nis;
+            inputVal2.style.display = 'block';
+
+            document.getElementById('modal-edit-data').style.display = 'flex';
+        }
+
+        function simpanEditData() {
+            const type = document.getElementById('modal-edit-type').value;
+            const val1 = document.getElementById('modal-edit-val1').value.trim();
+            const val2 = document.getElementById('modal-edit-val2').value.trim();
+            const identifier = document.getElementById('modal-edit-id').value;
+
+            if(!val1) {
+                showToast("Nama tidak boleh kosong!");
+                return;
+            }
+
+            if (type === 'kelas') {
+                const namaKelasLama = identifier;
+                const namaKelasBaru = val1;
+                
+                // Cegah duplikasi jika bukan namanya sendiri
+                if (namaKelasLama !== namaKelasBaru && DB.kelas.includes(namaKelasBaru)) {
+                    showToast("Nama kelas sudah digunakan!"); return;
+                }
+
+                // Update Array Kelas
+                const index = DB.kelas.indexOf(namaKelasLama);
+                if (index !== -1) DB.kelas[index] = namaKelasBaru;
+
+                // Update data siswa yang menggunakan kelas ini
+                DB.siswa.forEach(s => {
+                    if (s.kelas === namaKelasLama) s.kelas = namaKelasBaru;
+                });
+
+                showToast("Nama kelas berhasil diubah!");
+            } 
+            else if (type === 'siswa') {
+                const idSiswa = parseInt(identifier);
+                const siswaIndex = DB.siswa.findIndex(s => s.id === idSiswa);
+                
+                if(siswaIndex !== -1) {
+                    DB.siswa[siswaIndex].nama = val1;
+                    DB.siswa[siswaIndex].nis = val2 || "-";
+                }
+                showToast("Data siswa berhasil diubah!");
+            }
+
+            autoSaveLokal();
+            updateKelasDropdowns();
+            renderPengaturanLists();
+            initBeranda();
+            
+            // Render ulang tab lain yang terkait (seperti daftar absen) jika perlu
+            renderAbsensiList(); 
+            
+            document.getElementById('modal-edit-data').style.display = 'none';
         }
 
         function bukaModalEditProfil() {
