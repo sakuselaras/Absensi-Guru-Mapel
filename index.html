@@ -1215,7 +1215,7 @@
                     ["NIP", ":", DB.guru.nip || "-"],
                     ["Tanggal", ":", date],
                     [],
-                    // Header Tabel
+                    // Header Tabel (Ditambahkan Waktu Hadir & Waktu Bolos)
                     ["No", "NIS", "Nama Lengkap Siswa", "L/P", "Kelas", "Status Kehadiran", "Waktu Hadir", "Waktu Bolos", "Keterangan Terlambat"]
                 ];
 
@@ -1270,14 +1270,14 @@
             try {
                 if(DB.siswa.length === 0) return showToast('Tidak ada data untuk diexport');
                 let csvContent = "data:text/csv;charset=utf-8,";
-                csvContent += "NIS,Nama,Kelas,Status,Waktu Hadir,Nilai Akhir\n";
+                csvContent += "NIS,Nama,Kelas,Status,Waktu Hadir,Waktu Bolos,Nilai Akhir\n";
                 const date = new Date().toISOString().split('T')[0];
                 
                 DB.siswa.forEach(s => {
                     const abs = DB.absensi[date]?.[s.id] || {};
                     const n = DB.nilai[s.id] || { tugas:0, uts:0, uas:0, praktik:0 };
                     const final = (n.tugas*0.2) + (n.uts*0.3) + (n.uas*0.3) + (n.praktik*0.2);
-                    csvContent += `${s.nis},${s.nama},${s.kelas},${abs.status||'-'},${abs.hadirTime||'-'},${final.toFixed(1)}\n`;
+                    csvContent += `${s.nis},${s.nama},${s.kelas},${abs.status||'-'},${abs.hadirTime||'-'},${abs.bolosTime||'-'},${final.toFixed(1)}\n`;
                 });
 
                 const encodedUri = encodeURI(csvContent);
@@ -1300,18 +1300,28 @@
             element.style.color = '#000';
             element.style.background = '#fff';
             element.innerHTML = `
-                <h2 style="text-align:center;">Laporan Presensi - ${DB.guru.nama}</h2>
+                <h2 style="text-align:center; margin-bottom:5px;">Laporan Presensi - ${DB.guru.nama}</h2>
+                <h4 style="text-align:center; margin-top:0;">Mata Pelajaran: ${DB.guru.mapel}</h4>
                 <p style="text-align:center;">Tanggal: ${new Date().toLocaleDateString('id-ID')}</p>
                 <hr style="margin:20px 0;">
             `;
             
-            let table = '<table border="1" width="100%" cellpadding="5" style="border-collapse:collapse; font-size:12px;">';
-            table += '<tr style="background:#eee;"><th>NIS</th><th>Nama</th><th>Kelas</th><th>Status Hadir</th></tr>';
+            let table = '<table border="1" width="100%" cellpadding="5" style="border-collapse:collapse; font-size:12px; text-align:center;">';
+            table += '<tr style="background:#eee;"><th>NIS</th><th>Nama Lengkap</th><th>Kelas</th><th>Status Hadir</th><th>Waktu Hadir</th><th>Waktu Bolos</th></tr>';
             
-            const date = new Date().toISOString().split('T')[0];
+            const dateEl = document.getElementById('absensi-date');
+            const date = dateEl && dateEl.value ? dateEl.value : new Date().toISOString().split('T')[0];
+            
             DB.siswa.forEach(s => {
-                const abs = DB.absensi[date]?.[s.id] || {};
-                table += `<tr><td>${s.nis}</td><td>${s.nama}</td><td>${s.kelas}</td><td align="center">${abs.status||'-'}</td></tr>`;
+                const abs = DB.absensi[date]?.[s.id] || { status: '-', hadirTime: '-', bolosTime: '-' };
+                table += `<tr>
+                    <td>${s.nis || '-'}</td>
+                    <td style="text-align:left;">${s.nama}</td>
+                    <td>${s.kelas}</td>
+                    <td><b>${abs.status||'-'}</b></td>
+                    <td>${abs.hadirTime||'-'}</td>
+                    <td>${abs.bolosTime||'-'}</td>
+                </tr>`;
             });
             table += '</table>';
             element.innerHTML += table;
