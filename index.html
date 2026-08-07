@@ -658,6 +658,13 @@
             const sanitizedRoom = 'presensi_db_' + roomInput.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
             localStorage.setItem('presensi_active_room', sanitizedRoom);
             activeRoomKey = sanitizedRoom;
+
+            // Simpan ke riwayat ruangan agar muncul sebagai tombol
+            let history = JSON.parse(localStorage.getItem('presensi_room_history') || '[]');
+            if (!history.find(h => h.key === sanitizedRoom)) {
+                history.push({ key: sanitizedRoom, nama: roomInput });
+                localStorage.setItem('presensi_room_history', JSON.stringify(history));
+            }
             
             loadDataRoom();
         }
