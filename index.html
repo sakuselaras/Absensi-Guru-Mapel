@@ -140,6 +140,12 @@
             transition: all 0.3s;
         }
         
+        /* Tambahan: Memaksa warna latar dropdown mengikuti tema aplikasi */
+        select option {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+        }
+
         input::placeholder {
             color: var(--text-muted);
             opacity: 0.8;
