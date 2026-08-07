@@ -1,72 +1,132 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="dark">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Presensi Siswa SMK</title>
-    
-    <!-- Google Fonts: Poppins -->
+    <title>Presensi Siswa SMKN 1 Marisa</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Libraries: Chart.js, SheetJS (Excel), html2pdf -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
     <style>
+        /* --- STREAMING_CHUNK:CSS Variables & Base --- */
         :root {
-            --bg-color: #111111;
-            --card-bg: rgba(25, 25, 25, 0.8);
+            --bg-main: #111111;
+            --bg-card: rgba(30, 30, 30, 0.7);
             --text-main: #ffffff;
             --text-muted: #aaaaaa;
-            --primary: #39FF14; /* Hijau Stabilo */
-            --primary-glow: rgba(57, 255, 20, 0.3);
+            --primary: #39FF14; /* Hijau Stabilo / Neon Green */
+            --primary-glow: rgba(57, 255, 20, 0.4);
             --secondary: #ffffff;
             --accent: #00e5ff;
-            --danger: #ff3366;
-            --warning: #ffcc00;
-            --purple: #b026ff;
-            --border: rgba(57, 255, 20, 0.2);
+            --danger: #ff4757;
+            --purple: #a55eea;
+            --warning: #ffa502;
+            --border: rgba(255, 255, 255, 0.1);
+            --nav-bg: rgba(17, 17, 17, 0.95);
             --input-bg: rgba(0, 0, 0, 0.5);
-            --placeholder-color: #888888;
+            --modal-bg: rgba(20, 20, 20, 0.95);
         }
 
         [data-theme="light"] {
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
+            --bg-main: #f0f2f5;
+            --bg-card: rgba(255, 255, 255, 0.9);
             --text-main: #333333;
             --text-muted: #666666;
-            --primary: #00b84c;
-            --primary-glow: rgba(0, 184, 76, 0.2);
-            --border: #e0e0e0;
-            --input-bg: #f9f9f9;
-            --placeholder-color: #999999;
+            --primary: #2ed573;
+            --primary-glow: rgba(46, 213, 115, 0.4);
+            --border: rgba(0, 0, 0, 0.1);
+            --nav-bg: rgba(255, 255, 255, 0.95);
+            --input-bg: rgba(240, 240, 240, 0.8);
+            --modal-bg: rgba(255, 255, 255, 0.95);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-main);
             color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
+            padding-bottom: 80px;
             transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
         }
 
+        /* --- STREAMING_CHUNK:Global Components --- */
         .glass-card {
-            background: var(--card-bg);
+            background: var(--bg-card);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--border);
             border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            transition: all 0.3s;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
         }
 
-        /* Form Inputs */
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            background: var(--bg-main);
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-title h1 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .header-title p {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .time-display {
+            text-align: right;
+        }
+        .time-display h2 {
+            font-size: 16px;
+            color: var(--primary);
+        }
+        .time-display p {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .network-status {
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
+            margin-top: 3px;
+        }
+        .status-online { color: var(--primary); }
+        .status-offline { color: var(--warning); }
+
+        .d-flex { display: flex; }
+        .align-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .mt-15 { margin-top: 15px; }
+        .mb-15 { margin-bottom: 15px; }
+        .text-center { text-align: center; }
+
+        /* --- STREAMING_CHUNK:Forms & Buttons --- */
         input, select {
             width: 100%;
             padding: 12px 15px;
@@ -74,387 +134,588 @@
             border: 1px solid var(--border);
             background: var(--input-bg);
             color: var(--text-main);
-            margin-bottom: 15px;
             font-size: 14px;
+            margin-bottom: 15px;
             outline: none;
             transition: all 0.3s;
         }
         
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
-        input::placeholder { color: var(--placeholder-color) !important; opacity: 1; }
+        input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.8;
+        }
 
-        /* Buttons */
-        .btn {
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        button.btn-primary {
+            background: var(--primary);
+            color: #000;
+            border: none;
             padding: 12px 20px;
             border-radius: 12px;
-            border: none;
             font-weight: 600;
-            cursor: pointer;
+            font-size: 14px;
             width: 100%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
+            cursor: pointer;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            transition: all 0.3s;
             position: relative;
             overflow: hidden;
         }
-        .btn-primary { background: var(--primary); color: #000; box-shadow: 0 4px 15px var(--primary-glow); }
-        .btn-primary:active { transform: scale(0.98); }
-        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
-        .btn-danger { background: var(--danger); color: #fff; }
-        
-        /* Layouts */
-        .header { display: flex; align-items: center; justify-content: space-between; padding: 20px; position: sticky; top: 0; z-index: 50; background: var(--bg-color); }
-        .header-title h1 { font-size: 18px; color: var(--primary); font-weight: 700; }
-        .header-title p { font-size: 12px; color: var(--text-muted); }
-        
-        .page-view { display: none; padding: 0 20px 80px 20px; animation: fadeIn 0.4s ease; }
-        .page-view.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Status Buttons */
-        .status-btn-group { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
-        .status-btn {
-            flex: 1; padding: 8px 5px; border-radius: 8px; border: 1px solid var(--border);
-            background: transparent; color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s;
+        button.btn-primary:active {
+            transform: scale(0.98);
         }
+
+        button.btn-outline {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 14px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        /* --- STREAMING_CHUNK:Absensi specific --- */
+        .status-btn-group {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .status-btn-group::-webkit-scrollbar {
+            display: none;
+        }
+
+        .status-btn {
+            flex: 1;
+            min-width: 60px;
+            padding: 10px 5px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-main);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
         .status-btn.active.s-H { background: var(--primary); color: #000; border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
         .status-btn.active.s-I { background: var(--accent); color: #000; border-color: var(--accent); }
         .status-btn.active.s-S { background: var(--warning); color: #000; border-color: var(--warning); }
         .status-btn.active.s-A { background: var(--danger); color: #fff; border-color: var(--danger); }
-        .status-btn.active.s-B { background: var(--purple); color: #fff; border-color: var(--purple); box-shadow: 0 0 10px rgba(176,38,255,0.4); }
+        .status-btn.active.s-B { background: var(--purple); color: #fff; border-color: var(--purple); box-shadow: 0 0 10px rgba(165, 94, 234, 0.5);}
 
-        /* Bottom Nav */
+        /* --- STREAMING_CHUNK:Navigation --- */
         .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg);
-            backdrop-filter: blur(15px); border-top: 1px solid var(--border);
-            display: flex; justify-content: space-around; padding: 15px 10px; z-index: 100;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--nav-bg);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0 15px 0;
+            z-index: 1000;
         }
-        .nav-item { text-align: center; color: var(--text-muted); cursor: pointer; transition: 0.3s; flex: 1; }
-        .nav-item i { font-size: 20px; margin-bottom: 5px; display: block; }
-        .nav-item span { font-size: 11px; font-weight: 500; }
-        .nav-item.active { color: var(--primary); transform: translateY(-3px); }
 
-        /* Utilities */
-        .text-primary { color: var(--primary) !important; }
-        .text-muted { color: var(--text-muted) !important; }
-        .text-white { color: var(--text-main) !important; font-weight: bold; }
-        .d-flex { display: flex; }
-        .justify-between { justify-content: space-between; }
-        .align-center { align-items: center; }
-        .mt-15 { margin-top: 15px; }
+        .nav-item {
+            text-align: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item.active i {
+            transform: translateY(-3px);
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .page-view {
+            display: none;
+            padding: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- STREAMING_CHUNK:Modals & Extras --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-box {
+            background: var(--modal-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .modal-box h3 { margin-bottom: 10px; color: var(--text-main); }
+        .modal-box p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 3000;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { top: -50px; opacity: 0; }
+            to { top: 20px; opacity: 1; }
+        }
+
+        .text-danger { color: var(--danger) !important; }
+        .text-success { color: var(--primary) !important; }
+        .font-weight-bold { font-weight: bold; }
         
-        /* Toast Notification */
-        #toast-message {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--primary); color: #000; padding: 12px 24px;
-            border-radius: 30px; font-weight: 600; font-size: 14px;
-            box-shadow: 0 4px 15px var(--primary-glow);
-            z-index: 9999; display: none; text-align: center;
+        .login-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-main);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-
-        /* Custom Modal */
-        .custom-modal-overlay {
-            position: fixed; top:0; left:0; right:0; bottom:0;
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
-            display: none; justify-content: center; align-items: center; z-index: 2000;
+        
+        .list-item-delete {
+            background: rgba(255, 71, 87, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
         }
-        .custom-modal { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 25px; width: 90%; max-width: 400px; }
     </style>
 </head>
 <body>
 
-    <div id="toast-message">Notifikasi</div>
-
-    <!-- Login Screen -->
-    <div id="login-screen" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <!-- --- STREAMING_CHUNK:Login Screen --- -->
+    <div class="login-screen" id="login-screen">
         <div class="glass-card" style="width: 100%; max-width: 400px; text-align: center;">
-            <i class="fas fa-fingerprint text-primary" style="font-size: 50px; margin-bottom: 20px;"></i>
-            <h3 class="text-primary" style="font-size: 16px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Absensi Kelas</h3>
-            <h4 class="text-white" style="font-size: 14px; font-weight: 400; margin-bottom: 25px; opacity: 0.9;">SMK NEGERI 1 MARISA</h4>
-            <h2 class="text-white">Login Ruang Guru</h2>
-            <p class="text-muted" style="margin-bottom: 20px; font-size: 13px;">Setiap guru memiliki ruang data tersendiri</p>
+            <div style="font-size: 40px; color: var(--primary); margin-bottom: 10px;">
+                <i class="fas fa-fingerprint"></i>
+            </div>
             
-            <input type="text" id="login-username" placeholder="Nama Guru (Misal: Pak_Budi)" autocomplete="off">
-            <button class="btn btn-primary mt-15" onclick="loginRoom()">Masuk Ruangan</button>
+            <h3 style="color: var(--primary); font-size: 18px; margin-bottom: 2px;">Absensi Kelas</h3>
+            <h4 style="color: var(--text-main); font-size: 14px; margin-bottom: 20px; letter-spacing: 1px;">SMK NEGERI 1 MARISA</h4>
+
+            <h2 style="margin-bottom: 5px;">Login Ruang Guru</h2>
+            <p class="text-muted" style="font-size: 12px; margin-bottom: 25px;">Setiap guru memiliki ruang data tersendiri</p>
+            
+            <input type="text" id="login-room" placeholder="Nama Guru (Misal: Pak_Budi)" style="text-align: center; font-weight: bold;">
+            <button class="btn-primary" onclick="loginRoom()">Masuk Ruangan</button>
         </div>
     </div>
 
-    <div id="main-app" style="display: none;">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-title">
-                <h1>PRESENSI SISWA</h1>
-                <p>SMK Negeri 1 Marisa</p>
+    <!-- --- STREAMING_CHUNK:Header --- -->
+    <div class="header-top">
+        <div class="header-title">
+            <h1>PRESENSI SISWA</h1>
+            <p>SMK Negeri 1 Marisa</p>
+        </div>
+        <div class="time-display">
+            <h2 id="clock">00:00:00</h2>
+            <p id="date">Memuat...</p>
+            <div class="network-status" id="network-status">
+                <i class="fas fa-wifi"></i> Online
             </div>
-            <div style="text-align: right;">
-                <div id="realtime-clock" style="font-weight: bold; color: var(--primary);">00:00:00</div>
-                <div id="current-date" class="text-muted" style="font-size: 11px;">Tanggal</div>
-                <div id="network-status" style="font-size: 10px; margin-top: 5px; display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 10px; font-weight: 500; transition: all 0.3s;"></div>
-            </div>
-        </header>
-
-        <main id="view-beranda" class="page-view active">
-            <div class="glass-card d-flex align-center" style="gap: 15px;">
-                <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 24px; color: #000; font-weight: bold;">
-                    <i class="fas fa-user-tie"></i>
-                </div>
-                <div>
-                    <h3 id="dash-guru-nama" class="text-white">Nama Guru</h3>
-                    <p id="dash-guru-mapel" class="text-primary" style="font-size: 13px; font-weight: 500;">Mata Pelajaran</p>
-                    <p class="text-muted" style="font-size: 11px;">Total Siswa: <span id="dash-total-siswa">0</span> Orang</p>
-                </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                <div class="glass-card" style="margin: 0; text-align: center; padding: 15px;">
-                    <i class="fas fa-user-check text-primary" style="font-size: 24px; margin-bottom: 10px;"></i>
-                    <div style="font-size: 24px; font-weight: bold; color: var(--text-main);" id="stat-hadir">0</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Hadir Hari Ini</div>
-                </div>
-                <div class="glass-card" style="margin: 0; text-align: center; padding: 15px;">
-                    <i class="fas fa-user-times text-danger" style="font-size: 24px; margin-bottom: 10px;"></i>
-                    <div style="font-size: 24px; font-weight: bold; color: var(--text-main);" id="stat-absen">0</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Absen/Izin/Sakit/Bolos</div>
-                </div>
-            </div>
-
-            <div class="glass-card">
-                <h3 class="text-white" style="font-size: 15px; margin-bottom: 15px;">Grafik Kehadiran (5 Hari Terakhir)</h3>
-                <canvas id="attendanceChart" height="200"></canvas>
-            </div>
-        </main>
-
-        <main id="view-absensi" class="page-view">
-            <div class="glass-card">
-                <div class="d-flex justify-between" style="gap: 10px;">
-                    <input type="date" id="absensi-date" class="form-control" style="margin:0;" onchange="renderAbsensiList()">
-                    <select id="absensi-kelas" class="form-control" style="margin:0;" onchange="renderAbsensiList()">
-                        <option value="SEMUA">Semua Kelas</option>
-                    </select>
-                </div>
-                <input type="text" id="absensi-search" placeholder="Cari nama siswa..." style="margin-top: 15px; margin-bottom: 0;" onkeyup="renderAbsensiList()">
-            </div>
-            
-            <div class="d-flex justify-between mb-3" style="gap: 10px; margin-bottom: 15px;">
-                <button class="btn btn-primary" style="padding: 10px;" onclick="markAll('H')"><i class="fas fa-check-double"></i> Hadir Semua</button>
-                <button class="btn btn-outline" style="padding: 10px;" onclick="resetAbsensi()"><i class="fas fa-undo"></i> Reset</button>
-            </div>
-
-            <div id="absensi-list-container">
-                <!-- Data siswa di-render disini -->
-            </div>
-        </main>
-
-        <main id="view-nilai" class="page-view">
-            <div class="glass-card">
-                <select id="nilai-kelas" class="form-control" style="margin:0;" onchange="renderNilaiList()">
-                    <option value="SEMUA">Semua Kelas</option>
-                </select>
-            </div>
-            <div id="nilai-list-container">
-                <!-- Data nilai di-render disini -->
-            </div>
-        </main>
-
-        <main id="view-pengaturan" class="page-view">
-            <!-- Profil Guru -->
-            <div class="glass-card">
-                <div class="d-flex justify-between align-center mb-3">
-                    <h3 class="text-white">Profil Guru</h3>
-                    <button class="btn btn-outline" style="width: auto; padding: 5px 15px;" onclick="bukaModalEditProfil()">Edit</button>
-                </div>
-                <p class="text-muted">Nama: <span id="set-guru-nama" class="text-white"></span></p>
-                <p class="text-muted">NIP: <span id="set-guru-nip" class="text-white"></span></p>
-                <p class="text-muted">Mapel: <span id="set-guru-mapel" class="text-white"></span></p>
-                
-                <hr style="border-color: var(--border); margin: 15px 0;">
-                <div class="d-flex justify-between align-center">
-                    <span class="text-white">Mode Terang</span>
-                    <label style="position:relative; display:inline-block; width:50px; height:24px;">
-                        <input type="checkbox" id="theme-toggle" onchange="toggleTheme()" style="opacity:0; width:0; height:0;">
-                        <span style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#ccc; transition:.4s; border-radius:34px;">
-                            <span id="theme-slider" style="position:absolute; content:''; height:16px; width:16px; left:4px; bottom:4px; background-color:white; transition:.4s; border-radius:50%;"></span>
-                        </span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Export Data -->
-            <div class="glass-card">
-                <h3 class="text-white" style="margin-bottom: 15px;">Export Laporan</h3>
-                <div class="d-flex" style="gap:10px; margin-bottom: 10px;">
-                    <button class="btn btn-outline" style="color:#00b84c; border-color:#00b84c;" onclick="exportExcel()"><i class="fas fa-file-excel"></i> Excel</button>
-                    <button class="btn btn-outline" style="color:#ff3366; border-color:#ff3366;" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
-                </div>
-            </div>
-
-            <!-- Master Data -->
-            <div class="glass-card">
-                <h3 class="text-white" style="margin-bottom: 15px;"><i class="fas fa-database text-primary"></i> Master Data</h3>
-                
-                <h4 class="text-primary mb-2" style="font-size: 14px; margin-bottom: 10px;">Tambah Kelas</h4>
-                <input type="text" id="input-kelas-baru" placeholder="Nama Kelas (Contoh: XII RPL 1)">
-                <button class="btn btn-outline" onclick="tambahKelas()">Simpan Kelas</button>
-
-                <h4 class="text-primary mb-2 mt-15" style="font-size: 14px; margin-bottom: 10px; margin-top: 20px;">Tambah Siswa Baru</h4>
-                <input type="text" id="input-nis-baru" placeholder="NIS (Opsional)">
-                <input type="text" id="input-nama-baru" placeholder="Nama Lengkap Siswa">
-                <div class="d-flex" style="gap: 10px;">
-                    <select id="select-kelas-baru"></select>
-                    <select id="select-gender-baru">
-                        <option value="L">Laki-laki</option>
-                        <option value="P">Perempuan</option>
-                    </select>
-                </div>
-                <button class="btn btn-primary" onclick="tambahSiswa()">Simpan Siswa</button>
-            </div>
-
-            <!-- List Data -->
-            <div class="glass-card">
-                <h3 class="text-white" style="margin-bottom: 10px;">Daftar Kelas</h3>
-                <div id="list-pengaturan-kelas" style="font-size: 13px; color: var(--text-muted);"></div>
-                
-                <h3 class="text-white" style="margin-bottom: 10px; margin-top: 20px;">Daftar Siswa</h3>
-                <div id="list-pengaturan-siswa" style="font-size: 13px; color: var(--text-muted);"></div>
-            </div>
-
-            <button class="btn btn-danger" onclick="logoutRoom()"><i class="fas fa-sign-out-alt"></i> Logout Ruangan</button>
-        </main>
-
-        <nav class="bottom-nav">
-            <div class="nav-item active" data-target="beranda" onclick="switchTab('beranda')">
-                <i class="fas fa-home"></i><span>Beranda</span>
-            </div>
-            <div class="nav-item" data-target="absensi" onclick="switchTab('absensi')">
-                <i class="fas fa-clipboard-list"></i><span>Absensi</span>
-            </div>
-            <div class="nav-item" data-target="nilai" onclick="switchTab('nilai')">
-                <i class="fas fa-graduation-cap"></i><span>Nilai</span>
-            </div>
-            <div class="nav-item" data-target="pengaturan" onclick="switchTab('pengaturan')">
-                <i class="fas fa-cog"></i><span>Pengaturan</span>
-            </div>
-        </nav>
+        </div>
     </div>
 
-    <div id="modal-edit-profil" class="custom-modal-overlay">
-        <div class="custom-modal">
-            <h3 class="text-white mb-3" style="margin-bottom: 15px;">Edit Profil Guru</h3>
+    <div id="toast-message" class="toast">Berhasil disimpan!</div>
+
+    <!-- --- STREAMING_CHUNK:View Beranda --- -->
+    <div id="view-beranda" class="page-view active">
+        <div class="glass-card">
+            <div class="d-flex align-center justify-between mb-15">
+                <div>
+                    <h3 style="font-size: 18px;" id="dash-nama-guru">Memuat...</h3>
+                    <p class="text-muted" style="font-size: 12px;" id="dash-mapel">Memuat...</p>
+                </div>
+                <div style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+            </div>
+            <div class="d-flex" style="gap: 10px;">
+                <div style="flex: 1; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px; text-align: center;">
+                    <h4 style="color: var(--primary); font-size: 20px;" id="dash-total-siswa">0</h4>
+                    <p style="font-size: 10px; color: var(--text-muted);">Total Siswa</p>
+                </div>
+                <div style="flex: 1; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px; text-align: center;">
+                    <h4 style="color: var(--accent); font-size: 20px;" id="dash-total-kelas">0</h4>
+                    <p style="font-size: 10px; color: var(--text-muted);">Total Kelas</p>
+                </div>
+            </div>
+        </div>
+
+        <h3 style="font-size: 14px; margin: 20px 0 10px 5px; color: var(--text-muted);">Statistik Hari Ini</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+            <div class="glass-card" style="padding: 15px; text-align: center; margin-bottom: 0;">
+                <h4 style="color: var(--primary); font-size: 24px;" id="stat-h">0</h4>
+                <p style="font-size: 11px;">Hadir</p>
+            </div>
+            <div class="glass-card" style="padding: 15px; text-align: center; margin-bottom: 0;">
+                <h4 style="color: var(--accent); font-size: 24px;" id="stat-i">0</h4>
+                <p style="font-size: 11px;">Izin</p>
+            </div>
+            <div class="glass-card" style="padding: 15px; text-align: center; margin-bottom: 0;">
+                <h4 style="color: var(--warning); font-size: 24px;" id="stat-s">0</h4>
+                <p style="font-size: 11px;">Sakit</p>
+            </div>
+            <div class="glass-card" style="padding: 15px; text-align: center; margin-bottom: 0;">
+                <h4 style="color: var(--danger); font-size: 24px;" id="stat-a">0</h4>
+                <p style="font-size: 11px;">Alfa / Bolos</p>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h3 style="font-size: 14px; margin-bottom: 15px;">Grafik Kehadiran 5 Hari Terakhir</h3>
+            <canvas id="kehadiranChart" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- --- STREAMING_CHUNK:View Absensi --- -->
+    <div id="view-absensi" class="page-view">
+        <div class="glass-card" style="padding: 15px;">
+            <input type="date" id="absensi-date" onchange="renderAbsensiList()" style="margin-bottom: 10px;">
+            <select id="absensi-kelas" onchange="renderAbsensiList()" style="margin-bottom: 10px;">
+                <option value="SEMUA">Semua Kelas</option>
+            </select>
+            <input type="text" id="absensi-search" placeholder="Cari nama siswa..." onkeyup="renderAbsensiList()" style="margin-bottom: 0;">
+        </div>
+
+        <div class="d-flex justify-between mb-15" style="gap: 10px;">
+            <button class="btn-primary" style="flex: 1; padding: 10px;" onclick="markAll('H')">Semua Hadir</button>
+            <button class="btn-outline" style="flex: 1; padding: 10px; color: var(--danger); border-color: rgba(255,71,87,0.3);" onclick="showModal('Reset absensi hari ini?', 'confirm', resetAbsensi)">Reset</button>
+        </div>
+
+        <div id="absensi-list-container">
+            <!-- List siswa dirender via JS -->
+        </div>
+
+        <!-- Tombol Simpan Presensi Harian -->
+        <button class="btn-primary mt-15" style="background: var(--primary); color: #000; font-size: 15px; padding: 15px; border-radius: 15px; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 5px 20px rgba(57, 255, 20, 0.3);" onclick="simpanPresensiManual()">
+            <i class="fas fa-save" style="font-size: 20px;"></i> <b>Simpan Data Absensi</b>
+        </button>
+    </div>
+
+    <!-- --- STREAMING_CHUNK:View Nilai --- -->
+    <div id="view-nilai" class="page-view">
+        <div class="glass-card" style="padding: 15px;">
+            <select id="nilai-kelas" onchange="renderNilaiList()" style="margin-bottom: 10px;">
+                <option value="SEMUA">Semua Kelas</option>
+            </select>
+            <input type="text" id="nilai-search" placeholder="Cari nama siswa..." onkeyup="renderNilaiList()" style="margin-bottom: 0;">
+        </div>
+        <div id="nilai-list-container">
+            <!-- List nilai dirender via JS -->
+        </div>
+    </div>
+
+    <!-- --- STREAMING_CHUNK:View Pengaturan --- -->
+    <div id="view-pengaturan" class="page-view">
+        
+        <div class="glass-card text-center relative">
+            <div style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px;">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <h3 style="font-size: 18px; color: var(--primary);" id="set-nama-guru">Nama Guru</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">NIP: <span id="set-nip-guru"></span></p>
+            <div style="display: inline-block; padding: 5px 15px; border: 1px solid var(--primary); border-radius: 20px; font-size: 11px; font-weight: 600;">
+                Guru <span id="set-mapel-guru"></span>
+            </div>
+            <button class="btn-outline mt-15" onclick="bukaModalEditProfil()" style="padding: 8px; font-size: 12px;">Edit Profil</button>
+        </div>
+
+        <h3 style="font-size: 14px; margin: 20px 0 10px 5px; color: #fff; font-weight: 600;">Input Master Data</h3>
+        
+        <div class="glass-card">
+            <h4 style="font-size: 14px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-layer-group"></i> Tambah Kelas</h4>
+            <input type="text" id="input-kelas-nama" placeholder="Nama Kelas (ex: XII RPL 1)">
+            <button class="btn-outline" style="border-color: var(--primary); color: var(--primary);" onclick="tambahKelas()">Simpan Kelas</button>
+            
+            <hr style="border-color: var(--border); margin: 20px 0;">
+            
+            <h4 style="font-size: 14px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-user-plus"></i> Tambah Siswa Baru</h4>
+            <input type="text" id="input-siswa-nis" placeholder="NIS (Opsional)">
+            <input type="text" id="input-siswa-nama" placeholder="Nama Lengkap Siswa">
+            <div class="d-flex" style="gap: 10px;">
+                <select id="input-siswa-kelas" style="flex: 1;">
+                    <option value="">Pilih Kelas</option>
+                </select>
+                <select id="input-siswa-gender" style="flex: 1;">
+                    <option value="L">Laki-laki</option>
+                    <option value="P">Perempuan</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="tambahSiswa()">Simpan Siswa</button>
+        </div>
+
+        <h3 style="font-size: 14px; margin: 20px 0 10px 5px; color: #fff; font-weight: 600;">Export Data (Laporan)</h3>
+        <div class="glass-card">
+            <div class="d-flex" style="gap: 10px; margin-bottom: 10px;">
+                <button class="btn-outline" style="flex: 1; border-color: var(--primary); color: var(--primary);" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Excel (.xlsx)</button>
+                <button class="btn-outline" style="flex: 1; border-color: var(--danger); color: var(--danger);" onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+            </div>
+            <button class="btn-outline" style="border-color: var(--accent); color: var(--accent);" onclick="exportToCSV()"><i class="fas fa-file-csv"></i> CSV (Untuk Google Sheet)</button>
+        </div>
+
+        <h3 style="font-size: 14px; margin: 20px 0 10px 5px; color: #fff; font-weight: 600;">Daftar Kelas & Siswa</h3>
+        <div class="glass-card" id="list-master-container" style="max-height: 300px; overflow-y: auto;">
+            <!-- Dirender via JS -->
+        </div>
+
+        <div class="glass-card mt-15">
+            <div class="d-flex justify-between align-center">
+                <span>Mode Tampilan</span>
+                <button class="btn-outline" style="width: auto; padding: 5px 15px;" onclick="toggleTheme()" id="btn-theme">Terang</button>
+            </div>
+        </div>
+
+        <button class="btn-primary mt-15 mb-15" style="background: var(--danger); color: #fff; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);" onclick="logoutRoom()">Logout Ruangan</button>
+    </div>
+
+    <!-- --- STREAMING_CHUNK:Bottom Navigation --- -->
+    <div class="bottom-nav">
+        <a class="nav-item active" data-target="beranda" onclick="switchTab('beranda')">
+            <i class="fas fa-home"></i> Beranda
+        </a>
+        <a class="nav-item" data-target="absensi" onclick="switchTab('absensi')">
+            <i class="fas fa-clipboard-list"></i> Absensi
+        </a>
+        <a class="nav-item" data-target="nilai" onclick="switchTab('nilai')">
+            <i class="fas fa-graduation-cap"></i> Nilai
+        </a>
+        <a class="nav-item" data-target="pengaturan" onclick="switchTab('pengaturan')">
+            <i class="fas fa-cog"></i> Pengaturan
+        </a>
+    </div>
+
+    <!-- --- STREAMING_CHUNK:Modals Container --- -->
+    <div class="modal-overlay" id="custom-modal">
+        <div class="modal-box">
+            <div id="modal-icon" style="font-size: 40px; margin-bottom: 10px; color: var(--warning);"><i class="fas fa-exclamation-circle"></i></div>
+            <h3 id="modal-title">Konfirmasi</h3>
+            <p id="modal-desc">Apakah Anda yakin?</p>
+            <div class="d-flex" style="gap: 10px;" id="modal-buttons">
+                <!-- Buttons injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-edit-profil">
+        <div class="modal-box">
+            <h3 style="margin-bottom: 20px;">Edit Profil Guru</h3>
             <input type="text" id="edit-nama-guru" placeholder="Nama Lengkap & Gelar">
             <input type="text" id="edit-nip-guru" placeholder="NIP">
             <input type="text" id="edit-mapel-guru" placeholder="Mata Pelajaran">
-            <div class="d-flex" style="gap: 10px; margin-top: 15px;">
-                <button class="btn btn-outline" onclick="tutupModalProfil()">Batal</button>
-                <button class="btn btn-primary" onclick="simpanProfilGuru()">Simpan</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- General Confirm Modal -->
-    <div id="modal-confirm" class="custom-modal-overlay">
-        <div class="custom-modal" style="text-align: center;">
-            <i class="fas fa-exclamation-triangle text-warning" style="font-size: 40px; margin-bottom: 15px;"></i>
-            <p id="confirm-msg" class="text-white" style="margin-bottom: 20px;"></p>
             <div class="d-flex" style="gap: 10px;">
-                <button class="btn btn-outline" onclick="tutupConfirm()">Batal</button>
-                <button class="btn btn-primary" id="btn-confirm-yes">Ya, Lanjutkan</button>
+                <button class="btn-outline" onclick="tutupModalProfil()">Batal</button>
+                <button class="btn-primary" onclick="simpanProfilGuru()">Simpan</button>
             </div>
         </div>
     </div>
 
+    <!-- --- STREAMING_CHUNK:Javascript Logic --- -->
     <script>
-        let DB = { guru: {}, kelas: [], siswa: [], absensi: {}, nilai: {} };
+        // State Management
         let activeRoomKey = null;
+        let DB = {
+            guru: { nama: "Guru Pengajar", nip: "-", mapel: "-" },
+            kelas: [],
+            siswa: [],
+            absensi: {},
+            nilai: {}
+        };
         let chartInstance = null;
 
-        // --- SISTEM UTILITAS ---
-        function showToast(message) {
-            const toast = document.getElementById('toast-message');
-            toast.innerText = message;
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 2000);
-        }
-
-        function autoSaveLokal() {
-            if (activeRoomKey) {
-                localStorage.setItem(activeRoomKey, JSON.stringify(DB));
-            }
-        }
-
-        function showConfirm(msg, onConfirm) {
-            document.getElementById('confirm-msg').innerText = msg;
-            document.getElementById('modal-confirm').style.display = 'flex';
-            document.getElementById('btn-confirm-yes').onclick = function() {
-                tutupConfirm();
-                onConfirm();
-            };
-        }
-        function tutupConfirm() { document.getElementById('modal-confirm').style.display = 'none'; }
-
-        // --- SISTEM LOGIN RUANGAN ---
-        function checkLoginSession() {
+        // Inisialisasi Aplikasi
+        window.onload = () => {
+            initClock();
+            initOfflineSupport();
+            
+            // Cek apakah sudah login di localStorage
             const savedRoom = localStorage.getItem('presensi_active_room');
             if(savedRoom) {
-                document.getElementById('login-username').value = savedRoom.replace('db_presensi_', '');
-                loginRoom();
+                activeRoomKey = savedRoom;
+                loadDataRoom();
+            } else {
+                document.getElementById('login-screen').style.display = 'flex';
+            }
+        };
+
+        // --- PWA & Offline Support ---
+        function initOfflineSupport() {
+            const updateOnlineStatus = () => {
+                const statusEl = document.getElementById('network-status');
+                if(navigator.onLine) {
+                    statusEl.innerHTML = '<i class="fas fa-wifi"></i> Online';
+                    statusEl.className = 'network-status status-online';
+                } else {
+                    statusEl.innerHTML = '<i class="fas fa-plane-slash"></i> Offline Mode';
+                    statusEl.className = 'network-status status-offline';
+                    showToast('Mode Offline: Data tetap tersimpan aman di perangkat Anda.');
+                }
+            };
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+            updateOnlineStatus();
+
+            // Register dummy service worker for PWA standard (with error catch for preview environments)
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    self.addEventListener('install', (e) => { e.waitUntil(self.skipWaiting()); });
+                    self.addEventListener('activate', (e) => { e.waitUntil(self.clients.claim()); });
+                    self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => new Response('Offline'))); });
+                `;
+                const blob = new Blob([swCode], {type: 'application/javascript'});
+                navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => {
+                    console.log("Service worker registration handled for preview mode.");
+                });
             }
         }
 
-        function loginRoom() {
-            const username = document.getElementById('login-username').value.trim();
-            if(!username) { showToast("Masukkan nama ruang guru!"); return; }
+        function initClock() {
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             
-            activeRoomKey = 'db_presensi_' + username;
-            localStorage.setItem('presensi_active_room', activeRoomKey);
-            
-            // Muat Data dari LocalStorage untuk Room ini
-            const savedData = localStorage.getItem(activeRoomKey);
-            if(savedData) {
-                DB = JSON.parse(savedData);
-            } else {
-                // Inisialisasi DB Baru jika belum ada
-                DB = {
-                    guru: { nama: username, nip: "-", mapel: "Belum diset" },
-                    kelas: [], siswa: [], absensi: {}, nilai: {}
-                };
-                autoSaveLokal();
-            }
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('clock').innerText = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/:/g, '.');
+                document.getElementById('date').innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+            }, 1000);
 
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
+            // Set default date input to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('absensi-date').value = today;
+        }
+
+        // --- Fitur Multi-User Room ---
+        function loginRoom() {
+            const roomInput = document.getElementById('login-room').value.trim();
+            if(!roomInput) {
+                showToast('Nama Guru tidak boleh kosong!');
+                return;
+            }
             
-            // Set input date default hari ini
-            document.getElementById('absensi-date').valueAsDate = new Date();
+            const sanitizedRoom = 'presensi_db_' + roomInput.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+            localStorage.setItem('presensi_active_room', sanitizedRoom);
+            activeRoomKey = sanitizedRoom;
             
-            // Render UI
-            updateKelasDropdowns();
-            
-            // Ingat tab
-            const lastTab = localStorage.getItem('presensi_last_tab') || 'beranda';
-            switchTab(lastTab);
-            
-            startClock();
-            showToast(`Selamat datang, ${DB.guru.nama}`);
+            loadDataRoom();
         }
 
         function logoutRoom() {
-            showConfirm("Keluar dari ruangan ini?", () => {
+            showModal('Yakin ingin keluar dari ruangan ini?', 'confirm', () => {
                 localStorage.removeItem('presensi_active_room');
                 localStorage.removeItem('presensi_last_tab');
                 window.location.reload();
             });
         }
 
-        // --- SISTEM NAVIGASI ---
+        function loadDataRoom() {
+            const savedData = localStorage.getItem(activeRoomKey);
+            if(savedData) {
+                DB = JSON.parse(savedData);
+            } else {
+                // Inisialisasi DB baru jika ruang kosong
+                DB.guru.nama = document.getElementById('login-room').value || "Guru Pengajar";
+                autoSaveLokal();
+            }
+            
+            document.getElementById('login-screen').style.display = 'none';
+            onDataLoaded();
+        }
+
+        // --- SISTEM AUTO-SAVE LOKAL ---
+        function autoSaveLokal() {
+            if(activeRoomKey) {
+                localStorage.setItem(activeRoomKey, JSON.stringify(DB));
+            }
+        }
+
+        function onDataLoaded() {
+            updateKelasDropdowns();
+            
+            // Ingat posisi tab terakhir sebelum refresh
+            const lastTab = localStorage.getItem('presensi_last_tab') || 'beranda';
+            switchTab(lastTab);
+
+            // Terapkan tema yang tersimpan
+            const savedTheme = localStorage.getItem('presensi_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('btn-theme').innerText = savedTheme === 'dark' ? 'Terang' : 'Gelap';
+
+            renderAbsensiList();
+            renderNilaiList();
+            renderPengaturanLists();
+        }
+
         function switchTab(tabId) {
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.querySelector(`.nav-item[data-target="${tabId}"]`).classList.add('active');
-
+            
             document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active'));
             document.getElementById(`view-${tabId}`).classList.add('active');
-
+            
+            // Simpan posisi tab saat ini
             localStorage.setItem('presensi_last_tab', tabId);
 
             if(tabId === 'beranda') initBeranda();
@@ -463,98 +724,119 @@
             if(tabId === 'pengaturan') renderPengaturanLists();
         }
 
-        // --- STREAMING_CHUNK:Logika Waktu dan Tema ---
-        function startClock() {
-            setInterval(() => {
-                const now = new Date();
-                document.getElementById('realtime-clock').innerText = now.toLocaleTimeString('id-ID', { hour12: false });
-                
-                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                document.getElementById('current-date').innerText = now.toLocaleDateString('id-ID', options);
-            }, 1000);
+        function showToast(message) {
+            const toast = document.getElementById('toast-message');
+            toast.innerText = message;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2000);
         }
 
-        function toggleTheme() {
-            const isLight = document.getElementById('theme-toggle').checked;
-            document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
+        function showModal(message, type = 'alert', onConfirm = null) {
+            const modal = document.getElementById('custom-modal');
+            document.getElementById('modal-desc').innerText = message;
+            const btnContainer = document.getElementById('modal-buttons');
             
-            const slider = document.getElementById('theme-slider');
-            if(isLight) {
-                slider.style.backgroundColor = 'var(--primary)';
-                slider.style.transform = 'translateX(26px)';
+            if(type === 'confirm') {
+                btnContainer.innerHTML = `
+                    <button class="btn-outline" style="flex:1;" onclick="closeModal()">Batal</button>
+                    <button class="btn-primary" style="flex:1;" onclick="executeModalAction()">Ya</button>
+                `;
+                window.modalConfirmAction = onConfirm;
             } else {
-                slider.style.backgroundColor = 'white';
-                slider.style.transform = 'translateX(0)';
+                btnContainer.innerHTML = `<button class="btn-primary" onclick="closeModal()">Tutup</button>`;
             }
-            if(chartInstance) initBeranda(); // Redraw chart
+            modal.style.display = 'flex';
         }
 
-        // --- STREAMING_CHUNK:Logika Dashboard (Beranda) ---
+        function closeModal() { document.getElementById('custom-modal').style.display = 'none'; }
+        function executeModalAction() { if(window.modalConfirmAction) window.modalConfirmAction(); closeModal(); }
+
+        // --- STREAMING_CHUNK:Logika Dashboard ---
         function initBeranda() {
-            document.getElementById('dash-guru-nama').innerText = DB.guru.nama || 'Nama Guru';
-            document.getElementById('dash-guru-mapel').innerText = DB.guru.mapel || '-';
+            document.getElementById('dash-nama-guru').innerText = DB.guru.nama;
+            document.getElementById('dash-mapel').innerText = DB.guru.mapel;
             document.getElementById('dash-total-siswa').innerText = DB.siswa.length;
+            document.getElementById('dash-total-kelas').innerText = DB.kelas.length;
 
             const today = new Date().toISOString().split('T')[0];
-            const absensiToday = DB.absensi[today] || {};
+            const dataHariIni = DB.absensi[today] || {};
             
-            let hadir = 0, absen = 0;
-            Object.values(absensiToday).forEach(data => {
-                if (data.status === 'H') hadir++;
-                else if (['I', 'S', 'A'].includes(data.status) || data.isBolos) absen++;
+            let counts = { H: 0, I: 0, S: 0, A: 0, B: 0 };
+            Object.values(dataHariIni).forEach(v => {
+                if(v.status) counts[v.status]++;
+                if(v.isBolos) counts.B++;
             });
-
-            document.getElementById('stat-hadir').innerText = hadir;
-            document.getElementById('stat-absen').innerText = absen;
+            
+            document.getElementById('stat-h').innerText = counts.H;
+            document.getElementById('stat-i').innerText = counts.I;
+            document.getElementById('stat-s').innerText = counts.S;
+            document.getElementById('stat-a').innerText = counts.A + counts.B;
 
             renderChart();
         }
 
         function renderChart() {
-            const ctx = document.getElementById('attendanceChart').getContext('2d');
-            if(chartInstance) chartInstance.destroy();
+            const ctx = document.getElementById('kehadiranChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
 
-            // Ambil 5 hari terakhir
-            const labels = [];
-            const dataHadir = [];
-            const dataAbsen = [];
+            // Mengambil data 5 hari terakhir secara dinamis
+            const dates = [];
+            const hadirData = [];
+            const absenData = [];
             
             for(let i=4; i>=0; i--) {
                 const d = new Date();
                 d.setDate(d.getDate() - i);
                 const dateStr = d.toISOString().split('T')[0];
-                labels.push(d.toLocaleDateString('id-ID', { weekday:'short' }));
-                
+                const displayStr = d.toLocaleDateString('id-ID', { weekday: 'short' });
+                dates.push(displayStr);
+
+                const dataHarian = DB.absensi[dateStr] || {};
                 let h = 0, a = 0;
-                if(DB.absensi[dateStr]) {
-                    Object.values(DB.absensi[dateStr]).forEach(val => {
-                        if(val.status === 'H') h++;
-                        else if(['I', 'S', 'A'].includes(val.status) || val.isBolos) a++;
-                    });
+                
+                if(Object.keys(dataHarian).length === 0) {
+                    hadirData.push(0);
+                    absenData.push(0);
+                    continue;
                 }
-                dataHadir.push(h);
-                dataAbsen.push(a);
+
+                Object.values(dataHarian).forEach(v => {
+                    if(v.status === 'H') h++;
+                    else if(['I','S','A'].includes(v.status) || v.isBolos) a++;
+                });
+                hadirData.push(h);
+                absenData.push(a);
             }
 
-            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-            const textColor = isLight ? '#333' : '#fff';
+            // Hitung max y axis untuk memastikan grafik proporsional
+            const maxVal = Math.max(...hadirData, ...absenData, 5); // Minimal scale 5
 
             chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: labels,
+                    labels: dates,
                     datasets: [
-                        { label: 'Hadir', data: dataHadir, backgroundColor: '#39FF14' },
-                        { label: 'Absen/Bolos', data: dataAbsen, backgroundColor: '#ff3366' }
+                        { label: 'Hadir', data: hadirData, backgroundColor: '#39FF14', borderRadius: 5 },
+                        { label: 'Absen/Izin/Sakit/Bolos', data: absenData, backgroundColor: '#ff4757', borderRadius: 5 }
                     ]
                 },
                 options: {
                     responsive: true,
                     scales: {
-                        y: { beginAtZero: true, ticks: { color: textColor, stepSize: 1 } },
-                        x: { ticks: { color: textColor } }
+                        y: { 
+                            beginAtZero: true, 
+                            max: maxVal,
+                            ticks: { color: '#aaaaaa', stepSize: Math.ceil(maxVal/5) },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        x: { 
+                            ticks: { color: '#aaaaaa' },
+                            grid: { display: false }
+                        }
                     },
-                    plugins: { legend: { labels: { color: textColor } } }
+                    plugins: {
+                        legend: { labels: { color: '#ffffff' } }
+                    }
                 }
             });
         }
@@ -588,10 +870,10 @@
                 
                 let infoText = '';
                 if(stat.hadirTime) {
-                    infoText += `<div style="color:var(--primary); font-size:11px;">Hadir: ${stat.hadirTime} ${stat.lateMinutes > 0 ? `<span class="text-danger">(Telat ${stat.lateMinutes}m)</span>` : ''}</div>`;
+                    infoText += `<div style="color:var(--primary); font-size:11px; margin-top:4px;">Hadir: ${stat.hadirTime} ${stat.lateMinutes > 0 ? `<span class="text-danger">(Telat ${stat.lateMinutes}m)</span>` : ''}</div>`;
                 }
                 if(stat.isBolos && stat.bolosTime) {
-                    infoText += `<div style="color:var(--purple); font-size:11px;">Bolos: ${stat.bolosTime}</div>`;
+                    infoText += `<div style="color:var(--purple); font-size:11px; margin-top:2px;">Bolos: ${stat.bolosTime}</div>`;
                 }
 
                 const html = `
@@ -601,8 +883,8 @@
                             ${s.nama.charAt(0)}
                         </div>
                         <div style="flex: 1;">
-                            <h4 style="color: var(--text-main); font-size: 15px;">${s.nama}</h4>
-                            <p class="text-muted" style="font-size: 11px;">NIS: ${s.nis} | ${s.kelas}</p>
+                            <h4 style="color: var(--text-main); font-size: 15px; margin-bottom: 2px;">${s.nama}</h4>
+                            <p class="text-muted" style="font-size: 11px; margin-bottom: 0;">NIS: ${s.nis || '-'} | ${s.kelas}</p>
                             ${infoText}
                         </div>
                     </div>
@@ -621,14 +903,17 @@
         function setAbsen(date, siswaId, status) {
             let current = DB.absensi[date][siswaId] || { status: '', isBolos: false, hadirTime: '', bolosTime: '', lateMinutes: 0 };
             const now = new Date();
-            const timeStr = now.toLocaleTimeString('id-ID', { hour12: false }).substring(0, 5);
+            const timeStr = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' }).replace(':', '.');
             
-            // Jika status ditekan ulang, batalkan status utamanya
             if(current.status === status) {
                 current.status = '';
                 if(status === 'H') current.hadirTime = '';
             } else {
+                if(current.status === 'H' && status !== 'H') {
+                    current.hadirTime = '';
+                }
                 current.status = status;
+                
                 if(status === 'H' && !current.hadirTime) {
                     current.hadirTime = timeStr;
                     const mins = (now.getHours() * 60) + now.getMinutes();
@@ -636,7 +921,8 @@
                 }
             }
             DB.absensi[date][siswaId] = current;
-            autoSaveLokal(); renderAbsensiList();
+            autoSaveLokal(); 
+            renderAbsensiList();
         }
 
         function toggleBolos(date, siswaId) {
@@ -645,77 +931,117 @@
             
             if(current.isBolos) {
                 const now = new Date();
-                current.bolosTime = now.toLocaleTimeString('id-ID', { hour12: false }).substring(0, 5);
+                current.bolosTime = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' }).replace(':', '.');
             } else {
                 current.bolosTime = '';
             }
             
             DB.absensi[date][siswaId] = current;
-            autoSaveLokal(); renderAbsensiList();
+            autoSaveLokal(); 
+            renderAbsensiList();
         }
 
         function markAll(status) {
             const date = document.getElementById('absensi-date').value;
             const filterKelas = document.getElementById('absensi-kelas').value;
             const now = new Date();
-            const timeStr = now.toLocaleTimeString('id-ID', { hour12: false }).substring(0, 5);
+            const timeStr = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' }).replace(':', '.');
             const mins = (now.getHours() * 60) + now.getMinutes();
             const late = mins > 480 ? mins - 480 : 0;
 
             DB.siswa.forEach(s => {
                 if(filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
+                
+                const prevBolos = DB.absensi[date][s.id] ? DB.absensi[date][s.id].isBolos : false;
+                const prevBolosTime = DB.absensi[date][s.id] ? DB.absensi[date][s.id].bolosTime : '';
+
                 DB.absensi[date][s.id] = {
-                    status: status, isBolos: false,
+                    status: status, 
+                    isBolos: prevBolos,
                     hadirTime: status === 'H' ? timeStr : '',
-                    bolosTime: '', lateMinutes: late
+                    bolosTime: prevBolosTime, 
+                    lateMinutes: status === 'H' ? late : 0
                 };
             });
-            autoSaveLokal(); showToast('Semua ditandai Hadir!'); renderAbsensiList();
+            autoSaveLokal(); 
+            showToast('Semua ditandai ' + status + '!'); 
+            renderAbsensiList();
         }
 
         function resetAbsensi() {
             const date = document.getElementById('absensi-date').value;
-            showConfirm(`Reset semua data absensi tanggal ${date}?`, () => {
-                DB.absensi[date] = {};
-                autoSaveLokal(); showToast('Absensi direset!'); renderAbsensiList();
-            });
+            DB.absensi[date] = {};
+            autoSaveLokal(); // Simpan otomatis
+            renderAbsensiList();
+            showToast('Absensi berhasil direset!');
+        }
+
+        function simpanPresensiManual() {
+            autoSaveLokal(); // Eksekusi force save
+            const dateInput = document.getElementById('absensi-date').value;
+            // Format ulang tanggal agar enak dibaca (YYYY-MM-DD ke DD-MM-YYYY)
+            const parts = dateInput.split('-');
+            const displayDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : dateInput;
+            
+            showToast(`✅ Data presensi tanggal ${displayDate} berhasil disimpan!`);
         }
 
         // --- STREAMING_CHUNK:Logika Nilai ---
         function renderNilaiList() {
             const container = document.getElementById('nilai-list-container');
             const filterKelas = document.getElementById('nilai-kelas').value;
+            const search = document.getElementById('nilai-search').value.toLowerCase();
+            
             container.innerHTML = '';
 
-            let filtered = DB.siswa.filter(s => filterKelas === 'SEMUA' || s.kelas === filterKelas);
-            if(filtered.length === 0) {
-                container.innerHTML = '<p class="text-muted" style="text-align:center;">Tidak ada data siswa.</p>'; return;
+            let filteredSiswa = DB.siswa.filter(s => {
+                const matchKelas = filterKelas === 'SEMUA' || s.kelas === filterKelas;
+                const matchSearch = s.nama.toLowerCase().includes(search);
+                return matchKelas && matchSearch;
+            });
+
+            if(filteredSiswa.length === 0) {
+                container.innerHTML = '<p class="text-muted" style="text-align:center; padding:20px;">Tidak ada data siswa.</p>';
+                return;
             }
 
-            filtered.forEach(s => {
+            filteredSiswa.forEach(s => {
                 const n = DB.nilai[s.id] || { tugas:0, uts:0, uas:0, praktik:0 };
-                const akhir = Math.round((n.tugas + n.uts + n.uas + n.praktik) / 4);
-                let pred = 'E';
-                if(akhir >= 90) pred = 'A'; else if(akhir >= 80) pred = 'B';
-                else if(akhir >= 70) pred = 'C'; else if(akhir >= 60) pred = 'D';
+                const final = (n.tugas*0.2) + (n.uts*0.3) + (n.uas*0.3) + (n.praktik*0.2);
+                let predikat = 'E';
+                if(final >= 90) predikat = 'A';
+                else if(final >= 80) predikat = 'B';
+                else if(final >= 70) predikat = 'C';
+                else if(final >= 60) predikat = 'D';
 
                 const html = `
                 <div class="glass-card" style="padding: 15px; margin-bottom: 10px;">
-                    <div class="d-flex justify-between align-center mb-2">
+                    <div class="d-flex justify-between align-center mb-15">
                         <div>
-                            <h4 style="font-size: 14px;">${s.nama}</h4>
+                            <h4 style="color: var(--text-main); font-size: 15px; margin-bottom: 2px;">${s.nama}</h4>
                             <p class="text-muted" style="font-size: 11px;">${s.kelas}</p>
                         </div>
-                        <div style="text-align:right;">
-                            <h3 class="text-primary">${akhir}</h3>
-                            <span style="font-size: 10px; padding: 2px 8px; background: rgba(255,255,255,0.1); border-radius: 10px;">Predikat ${pred}</span>
+                        <div style="text-align: right;">
+                            <h2 style="color: var(--primary); font-size: 20px;">${final.toFixed(1)} <span style="font-size:12px; color:var(--text-muted);">(${predikat})</span></h2>
                         </div>
                     </div>
-                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 5px;">
-                        <input type="number" placeholder="Tugas" value="${n.tugas}" onchange="updateNilai(${s.id}, 'tugas', this.value)" style="margin:0; padding:5px; text-align:center; font-size:12px;">
-                        <input type="number" placeholder="UTS" value="${n.uts}" onchange="updateNilai(${s.id}, 'uts', this.value)" style="margin:0; padding:5px; text-align:center; font-size:12px;">
-                        <input type="number" placeholder="UAS" value="${n.uas}" onchange="updateNilai(${s.id}, 'uas', this.value)" style="margin:0; padding:5px; text-align:center; font-size:12px;">
-                        <input type="number" placeholder="Prak" value="${n.praktik}" onchange="updateNilai(${s.id}, 'praktik', this.value)" style="margin:0; padding:5px; text-align:center; font-size:12px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px;">
+                        <div>
+                            <label style="font-size:10px; color:var(--text-muted);">Tugas</label>
+                            <input type="number" value="${n.tugas}" onchange="updateNilai(${s.id}, 'tugas', this.value)" style="padding: 8px; text-align: center; margin-bottom:0;">
+                        </div>
+                        <div>
+                            <label style="font-size:10px; color:var(--text-muted);">UTS</label>
+                            <input type="number" value="${n.uts}" onchange="updateNilai(${s.id}, 'uts', this.value)" style="padding: 8px; text-align: center; margin-bottom:0;">
+                        </div>
+                        <div>
+                            <label style="font-size:10px; color:var(--text-muted);">UAS</label>
+                            <input type="number" value="${n.uas}" onchange="updateNilai(${s.id}, 'uas', this.value)" style="padding: 8px; text-align: center; margin-bottom:0;">
+                        </div>
+                        <div>
+                            <label style="font-size:10px; color:var(--text-muted);">Prak</label>
+                            <input type="number" value="${n.praktik}" onchange="updateNilai(${s.id}, 'praktik', this.value)" style="padding: 8px; text-align: center; margin-bottom:0;">
+                        </div>
                     </div>
                 </div>`;
                 container.insertAdjacentHTML('beforeend', html);
@@ -725,240 +1051,274 @@
         function updateNilai(siswaId, field, value) {
             if(!DB.nilai[siswaId]) DB.nilai[siswaId] = { tugas:0, uts:0, uas:0, praktik:0 };
             let valNum = Number(value);
-            if(valNum > 100) valNum = 100; if(valNum < 0) valNum = 0;
+            if(valNum > 100) valNum = 100;
+            if(valNum < 0) valNum = 0;
+            
             DB.nilai[siswaId][field] = valNum;
-            autoSaveLokal(); renderNilaiList();
+            autoSaveLokal(); 
+            renderNilaiList();
         }
 
         // --- STREAMING_CHUNK:Logika Pengaturan & Master Data ---
         function renderPengaturanLists() {
-            // Profil
-            document.getElementById('set-guru-nama').innerText = DB.guru.nama || '-';
-            document.getElementById('set-guru-nip').innerText = DB.guru.nip || '-';
-            document.getElementById('set-guru-mapel').innerText = DB.guru.mapel || '-';
+            document.getElementById('set-nama-guru').innerText = DB.guru.nama;
+            document.getElementById('set-nip-guru').innerText = DB.guru.nip;
+            document.getElementById('set-mapel-guru').innerText = DB.guru.mapel;
 
-            // List Kelas
-            const cKelas = document.getElementById('list-pengaturan-kelas');
-            cKelas.innerHTML = '';
-            if(DB.kelas.length === 0) cKelas.innerHTML = '<p>Belum ada kelas.</p>';
-            DB.kelas.forEach(k => {
-                cKelas.innerHTML += `<div class="d-flex justify-between mb-2 pb-2" style="border-bottom:1px solid var(--border);">
-                    <span>${k}</span>
-                    <i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="hapusKelas('${k}')"></i>
-                </div>`;
-            });
-
-            // List Siswa
-            const cSiswa = document.getElementById('list-pengaturan-siswa');
-            cSiswa.innerHTML = '';
-            if(DB.siswa.length === 0) cSiswa.innerHTML = '<p>Belum ada siswa.</p>';
-            DB.siswa.forEach(s => {
-                cSiswa.innerHTML += `<div class="d-flex justify-between mb-2 pb-2" style="border-bottom:1px solid var(--border);">
-                    <div><strong class="text-white">${s.nama}</strong> <br> ${s.kelas} | ${s.nis}</div>
-                    <i class="fas fa-trash text-danger" style="cursor:pointer; margin-top:5px;" onclick="hapusSiswa(${s.id}, '${s.nama}')"></i>
-                </div>`;
-            });
-        }
-
-        function updateKelasDropdowns() {
-            let opts = '<option value="SEMUA">Semua Kelas</option>';
-            let optsNew = '<option value="">Pilih Kelas...</option>';
-            DB.kelas.forEach(k => {
-                opts += `<option value="${k}">${k}</option>`;
-                optsNew += `<option value="${k}">${k}</option>`;
-            });
-            document.getElementById('absensi-kelas').innerHTML = opts;
-            document.getElementById('nilai-kelas').innerHTML = opts;
-            document.getElementById('select-kelas-baru').innerHTML = optsNew;
-        }
-
-        function tambahKelas() {
-            const kBaru = document.getElementById('input-kelas-baru').value.trim();
-            if(!kBaru) { showToast("Nama kelas tidak boleh kosong"); return; }
-            if(!DB.kelas.includes(kBaru)) {
-                DB.kelas.push(kBaru);
-                updateKelasDropdowns(); renderPengaturanLists(); autoSaveLokal();
-                showToast(`Kelas ${kBaru} ditambahkan!`);
-                document.getElementById('input-kelas-baru').value = '';
-            } else {
-                showToast("Kelas sudah ada!");
+            const container = document.getElementById('list-master-container');
+            container.innerHTML = '';
+            
+            if(DB.kelas.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center" style="font-size:12px;">Belum ada kelas.</p>';
+                return;
             }
-        }
 
-        function tambahSiswa() {
-            const nis = document.getElementById('input-nis-baru').value.trim() || '-';
-            const nama = document.getElementById('input-nama-baru').value.trim();
-            const kelas = document.getElementById('select-kelas-baru').value;
-            const gender = document.getElementById('select-gender-baru').value;
-
-            if(!nama || !kelas) { showToast("Nama dan Kelas wajib diisi!"); return; }
-
-            const id = new Date().getTime();
-            DB.siswa.push({ id, nis, nama, kelas, gender });
-            
-            document.getElementById('input-nis-baru').value = '';
-            document.getElementById('input-nama-baru').value = '';
-            document.getElementById('select-kelas-baru').value = '';
-            
-            autoSaveLokal(); renderPengaturanLists(); initBeranda();
-            showToast(`Siswa ${nama} berhasil ditambahkan!`);
-        }
-
-        function hapusKelas(k) {
-            showConfirm(`Hapus kelas ${k}? (Data siswa tidak ikut terhapus)`, () => {
-                DB.kelas = DB.kelas.filter(x => x !== k);
-                updateKelasDropdowns(); renderPengaturanLists(); autoSaveLokal(); showToast("Kelas dihapus!");
-            });
-        }
-
-        function hapusSiswa(id, nama) {
-            showConfirm(`Hapus siswa ${nama}?`, () => {
-                DB.siswa = DB.siswa.filter(s => s.id !== id);
-                delete DB.nilai[id];
-                renderPengaturanLists(); initBeranda(); autoSaveLokal(); showToast("Siswa dihapus!");
+            DB.kelas.forEach(k => {
+                const muridDiKelas = DB.siswa.filter(s => s.kelas === k);
+                let html = `
+                <div style="margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                    <div class="d-flex justify-between align-center mb-15">
+                        <h4 style="color: var(--accent);">${k} <span style="font-size:11px; color:var(--text-muted);">(${muridDiKelas.length} Siswa)</span></h4>
+                        <span class="list-item-delete" onclick="hapusKelas('${k}')"><i class="fas fa-trash"></i> Kelas</span>
+                    </div>
+                `;
+                
+                muridDiKelas.forEach(s => {
+                    html += `
+                    <div class="d-flex justify-between align-center" style="padding: 5px 0; font-size: 13px;">
+                        <span>- ${s.nama} <span style="color:var(--text-muted); font-size:10px;">(${s.nis || 'No NIS'})</span></span>
+                        <span class="list-item-delete" style="padding: 2px 6px; font-size: 10px;" onclick="hapusSiswa(${s.id})"><i class="fas fa-times"></i></span>
+                    </div>`;
+                });
+                
+                html += `</div>`;
+                container.insertAdjacentHTML('beforeend', html);
             });
         }
 
         function bukaModalEditProfil() {
-            document.getElementById('edit-nama-guru').value = DB.guru.nama || '';
-            document.getElementById('edit-nip-guru').value = DB.guru.nip || '';
-            document.getElementById('edit-mapel-guru').value = DB.guru.mapel || '';
+            document.getElementById('edit-nama-guru').value = DB.guru.nama;
+            document.getElementById('edit-nip-guru').value = DB.guru.nip;
+            document.getElementById('edit-mapel-guru').value = DB.guru.mapel;
             document.getElementById('modal-edit-profil').style.display = 'flex';
         }
-        function tutupModalProfil() { document.getElementById('modal-edit-profil').style.display = 'none'; }
+
+        function tutupModalProfil() {
+            document.getElementById('modal-edit-profil').style.display = 'none';
+        }
+
         function simpanProfilGuru() {
             DB.guru.nama = document.getElementById('edit-nama-guru').value;
             DB.guru.nip = document.getElementById('edit-nip-guru').value;
             DB.guru.mapel = document.getElementById('edit-mapel-guru').value;
-            tutupModalProfil(); autoSaveLokal(); initBeranda(); renderPengaturanLists();
-            showToast("Profil disimpan!");
+            tutupModalProfil();
+            autoSaveLokal();
+            renderPengaturanLists();
+            showToast('Profil diperbarui!');
         }
 
-        // --- STREAMING_CHUNK:Logika Export Data ---
-        function exportExcel() {
-            let dataArr = [["NIS", "Nama", "Kelas", "Hadir", "Izin", "Sakit", "Alfa", "Bolos", "Nilai Akhir"]];
-            
-            DB.siswa.forEach(s => {
-                let h=0, i=0, sakit=0, a=0, b=0;
-                // Hitung Rekap Absensi
-                for(let date in DB.absensi) {
-                    const rec = DB.absensi[date][s.id];
-                    if(rec) {
-                        if(rec.status === 'H') h++;
-                        if(rec.status === 'I') i++;
-                        if(rec.status === 'S') sakit++;
-                        if(rec.status === 'A') a++;
-                        if(rec.isBolos) b++;
-                    }
-                }
-                // Hitung Rekap Nilai
-                const n = DB.nilai[s.id] || {tugas:0, uts:0, uas:0, praktik:0};
-                const akhir = Math.round((n.tugas + n.uts + n.uas + n.praktik)/4);
-                
-                dataArr.push([s.nis, s.nama, s.kelas, h, i, sakit, a, b, akhir]);
+        function updateKelasDropdowns() {
+            const dropdowns = ['absensi-kelas', 'nilai-kelas', 'input-siswa-kelas'];
+            dropdowns.forEach(id => {
+                const el = document.getElementById(id);
+                if(!el) return;
+                const isFilter = id !== 'input-siswa-kelas';
+                el.innerHTML = isFilter ? '<option value="SEMUA">Semua Kelas</option>' : '<option value="">Pilih Kelas</option>';
+                DB.kelas.forEach(k => {
+                    el.insertAdjacentHTML('beforeend', `<option value="${k}">${k}</option>`);
+                });
             });
-
-            const ws = XLSX.utils.aoa_to_sheet(dataArr);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Rekap Presensi");
-            XLSX.writeFile(wb, `Laporan_${DB.guru.nama.replace(/\s/g, '_')}.xlsx`);
-            showToast("Excel berhasil diunduh!");
         }
 
-        function exportPDF() {
-            // Buat elemen tersembunyi untuk di PDF-kan
-            const div = document.createElement('div');
-            div.style.padding = '20px'; div.style.color = 'black'; div.style.background = 'white';
-            div.innerHTML = `<h2 style="text-align:center;">Laporan Presensi - ${DB.guru.nama}</h2><hr><br>`;
+        function tambahKelas() {
+            const nama = document.getElementById('input-kelas-nama').value.trim();
+            if(!nama) return showToast('Nama Kelas wajib diisi!');
+            if(DB.kelas.includes(nama)) return showToast('Kelas sudah ada!');
+
+            DB.kelas.push(nama);
+            document.getElementById('input-kelas-nama').value = '';
             
-            let table = '<table border="1" style="width:100%; border-collapse:collapse; font-size:12px;" cellpadding="5"><tr><th>Nama</th><th>Kelas</th><th>Rekap Nilai</th></tr>';
+            autoSaveLokal();
+            updateKelasDropdowns();
+            renderPengaturanLists();
+            showToast('Kelas ' + nama + ' ditambahkan!');
+        }
+
+        function hapusKelas(nama) {
+            showModal(`Hapus kelas ${nama} beserta seluruh siswanya?`, 'confirm', () => {
+                DB.kelas = DB.kelas.filter(k => k !== nama);
+                DB.siswa = DB.siswa.filter(s => s.kelas !== nama);
+                autoSaveLokal();
+                updateKelasDropdowns();
+                renderPengaturanLists();
+                showToast('Kelas dihapus!');
+            });
+        }
+
+        function tambahSiswa() {
+            const nis = document.getElementById('input-siswa-nis').value.trim();
+            const nama = document.getElementById('input-siswa-nama').value.trim();
+            const kelas = document.getElementById('input-siswa-kelas').value;
+            const gender = document.getElementById('input-siswa-gender').value;
+
+            if(!nama || !kelas) return showToast('Nama dan Kelas wajib diisi!');
+
+            const newId = Date.now();
+            DB.siswa.push({ id: newId, nis: nis || "-", nama: nama, kelas: kelas, gender: gender });
+            
+            document.getElementById('input-siswa-nis').value = '';
+            document.getElementById('input-siswa-nama').value = '';
+            
+            autoSaveLokal();
+            renderPengaturanLists();
+            initBeranda();
+            showToast('Siswa berhasil ditambahkan!');
+        }
+
+        function hapusSiswa(id) {
+            showModal('Hapus siswa ini dari database?', 'confirm', () => {
+                DB.siswa = DB.siswa.filter(s => s.id !== id);
+                autoSaveLokal();
+                renderPengaturanLists();
+                initBeranda();
+                showToast('Siswa dihapus!');
+            });
+        }
+
+        function toggleTheme() {
+            const root = document.documentElement;
+            const currentTheme = root.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            root.setAttribute('data-theme', newTheme);
+            document.getElementById('btn-theme').innerText = newTheme === 'dark' ? 'Terang' : 'Gelap';
+            localStorage.setItem('presensi_theme', newTheme);
+        }
+
+        // --- STREAMING_CHUNK:Export Logic ---
+        function exportToExcel() {
+            try {
+                if(DB.siswa.length === 0) return showToast('Tidak ada data untuk diexport');
+                
+                // Ambil tanggal dari input tab absensi, atau hari ini jika kosong
+                const dateEl = document.getElementById('absensi-date');
+                const date = dateEl && dateEl.value ? dateEl.value : new Date().toISOString().split('T')[0];
+                const absData = DB.absensi[date] || {};
+
+                // Format Header / Kop Laporan Rapi (Array of Arrays)
+                let ws_data = [
+                    ["LAPORAN PRESENSI SISWA"],
+                    ["SMK NEGERI 1 MARISA"],
+                    [],
+                    ["Nama Guru", ":", DB.guru.nama],
+                    ["Mata Pelajaran", ":", DB.guru.mapel],
+                    ["NIP", ":", DB.guru.nip || "-"],
+                    ["Tanggal", ":", date],
+                    [],
+                    // Header Tabel
+                    ["No", "NIS", "Nama Lengkap Siswa", "L/P", "Kelas", "Status Kehadiran", "Waktu Hadir", "Waktu Bolos", "Keterangan Terlambat"]
+                ];
+
+                // Memasukkan data siswa ke baris tabel
+                let no = 1;
+                DB.siswa.forEach(s => {
+                    const abs = absData[s.id] || { status: '-', hadirTime: '-', bolosTime: '-', lateMinutes: 0 };
+                    
+                    let ketTelat = "-";
+                    if (abs.lateMinutes > 0) ketTelat = `Terlambat ${abs.lateMinutes} Menit`;
+
+                    ws_data.push([
+                        no++,
+                        s.nis || "-",
+                        s.nama,
+                        s.gender || "-",
+                        s.kelas,
+                        abs.status || "-",
+                        abs.hadirTime || "-",
+                        abs.bolosTime || "-",
+                        ketTelat
+                    ]);
+                });
+
+                // Convert JSON Array to Worksheet
+                const ws = XLSX.utils.aoa_to_sheet(ws_data);
+                
+                // Mengatur lebar kolom otomatis agar rapih dibuka di Excel
+                ws['!cols'] = [
+                    { wch: 5 },   // A: No
+                    { wch: 15 },  // B: NIS
+                    { wch: 35 },  // C: Nama
+                    { wch: 5 },   // D: L/P
+                    { wch: 15 },  // E: Kelas
+                    { wch: 15 },  // F: Status
+                    { wch: 15 },  // G: Waktu Hadir
+                    { wch: 15 },  // H: Waktu Bolos
+                    { wch: 25 }   // I: Keterangan
+                ];
+
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Rekap_Harian");
+                XLSX.writeFile(wb, `Laporan_Absensi_${DB.guru.nama.replace(/\s+/g, '_')}_${date}.xlsx`);
+                showToast('Download Excel berhasil!');
+            } catch (e) {
+                showToast('Error saat export Excel');
+                console.error(e);
+            }
+        }
+
+        function exportToCSV() {
+            try {
+                if(DB.siswa.length === 0) return showToast('Tidak ada data untuk diexport');
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "NIS,Nama,Kelas,Status,Waktu Hadir,Nilai Akhir\n";
+                const date = new Date().toISOString().split('T')[0];
+                
+                DB.siswa.forEach(s => {
+                    const abs = DB.absensi[date]?.[s.id] || {};
+                    const n = DB.nilai[s.id] || { tugas:0, uts:0, uas:0, praktik:0 };
+                    const final = (n.tugas*0.2) + (n.uts*0.3) + (n.uas*0.3) + (n.praktik*0.2);
+                    csvContent += `${s.nis},${s.nama},${s.kelas},${abs.status||'-'},${abs.hadirTime||'-'},${final.toFixed(1)}\n`;
+                });
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `Data_${date}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast('Download CSV berhasil!');
+            } catch(e) {
+                showToast('Error export CSV');
+            }
+        }
+
+        function exportToPDF() {
+            showToast('Menyiapkan dokumen PDF...');
+            const element = document.createElement('div');
+            element.style.padding = '20px';
+            element.style.color = '#000';
+            element.style.background = '#fff';
+            element.innerHTML = `
+                <h2 style="text-align:center;">Laporan Presensi - ${DB.guru.nama}</h2>
+                <p style="text-align:center;">Tanggal: ${new Date().toLocaleDateString('id-ID')}</p>
+                <hr style="margin:20px 0;">
+            `;
+            
+            let table = '<table border="1" width="100%" cellpadding="5" style="border-collapse:collapse; font-size:12px;">';
+            table += '<tr style="background:#eee;"><th>NIS</th><th>Nama</th><th>Kelas</th><th>Status Hadir</th></tr>';
+            
+            const date = new Date().toISOString().split('T')[0];
             DB.siswa.forEach(s => {
-                const n = DB.nilai[s.id] || {tugas:0, uts:0, uas:0, praktik:0};
-                const akhir = Math.round((n.tugas + n.uts + n.uas + n.praktik)/4);
-                table += `<tr><td>${s.nama}</td><td>${s.kelas}</td><td align="center">${akhir}</td></tr>`;
+                const abs = DB.absensi[date]?.[s.id] || {};
+                table += `<tr><td>${s.nis}</td><td>${s.nama}</td><td>${s.kelas}</td><td align="center">${abs.status||'-'}</td></tr>`;
             });
             table += '</table>';
-            div.innerHTML += table;
+            element.innerHTML += table;
 
-            html2pdf().from(div).save(`Laporan_${DB.guru.nama.replace(/\s/g, '_')}.pdf`);
-            showToast("Memproses PDF...");
-        }
-
-        // --- Init App ---
-        window.onload = () => {
-            checkLoginSession();
-            initOfflineSupport();
-        };
-
-        function initOfflineSupport() {
-            const updateNetworkStatus = () => {
-                const statusEl = document.getElementById('network-status');
-                if(!statusEl) return;
-                
-                if (navigator.onLine) {
-                    statusEl.innerHTML = '<i class="fas fa-wifi"></i> Online';
-                    statusEl.style.color = 'var(--primary)';
-                    statusEl.style.background = 'rgba(57, 255, 20, 0.1)';
-                } else {
-                    statusEl.innerHTML = '<i class="fas fa-plane-slash"></i> Mode Offline';
-                    statusEl.style.color = 'var(--warning)';
-                    statusEl.style.background = 'rgba(255, 204, 0, 0.1)';
-                    showToast("Koneksi terputus. Jangan khawatir, absen tersimpan aman di HP Anda!");
-                }
-            };
-            
-            // Pantau perubahan jaringan secara realtime
-            window.addEventListener('online', updateNetworkStatus);
-            window.addEventListener('offline', updateNetworkStatus);
-            updateNetworkStatus();
-
-            // Mendaftarkan Service Worker via Blob (Bypass file terpisah untuk caching PWA)
-            if ('serviceWorker' in navigator) {
-                const swCode = `
-                    const CACHE_NAME = 'presensi-marisa-v1';
-                    self.addEventListener('install', event => {
-                        event.waitUntil(
-                            caches.open(CACHE_NAME).then(cache => {
-                                return cache.addAll([
-                                    location.href,
-                                    'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap',
-                                    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-                                    'https://cdn.jsdelivr.net/npm/chart.js',
-                                    'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
-                                    'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'
-                                ]).catch(err => console.log('Cache aset eksternal ditangguhkan'));
-                            })
-                        );
-                    });
-                    self.addEventListener('fetch', event => {
-                        event.respondWith(
-                            caches.match(event.request).then(response => {
-                                return response || fetch(event.request).then(fetchRes => {
-                                    return caches.open(CACHE_NAME).then(cache => {
-                                        if (event.request.method === 'GET' && !event.request.url.startsWith('chrome-extension')) {
-                                            cache.put(event.request, fetchRes.clone());
-                                        }
-                                        return fetchRes;
-                                    });
-                                });
-                            }).catch(() => {
-                                // Mode Offline 100% Menggunakan Cache & LocalStorage
-                            })
-                        );
-                    });
-                `;
-                try {
-                    const blob = new Blob([swCode], { type: 'application/javascript' });
-                    const swUrl = URL.createObjectURL(blob);
-                    navigator.serviceWorker.register(swUrl).then(() => {
-                        console.log('Mesin Caching Offline Aktif.');
-                    }).catch(e => {
-                        console.log('Peringatan: Service Worker dimatikan otomatis pada mode Preview. Akan aktif sepenuhnya setelah di-deploy ke Vercel.');
-                    });
-                } catch(e) {
-                    console.log('SW terbatas pada mode pratinjau, berjalan otomatis saat di-deploy.');
-                }
-            }
+            html2pdf().from(element).save(`Laporan_PDF_${date}.pdf`).then(() => {
+                showToast('Download PDF berhasil!');
+            });
         }
     </script>
 </body>
