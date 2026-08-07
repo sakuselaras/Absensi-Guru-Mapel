@@ -353,6 +353,63 @@
             cursor: pointer;
         }
 
+        /* --- STREAMING_CHUNK:Fitur Riwayat Absensi CSS --- */
+        .fab-btn {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            background: var(--primary);
+            color: #000;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            border: none;
+            cursor: pointer;
+            z-index: 100;
+            transition: transform 0.2s;
+        }
+        .fab-btn:active { transform: scale(0.9); }
+
+        .history-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .history-card:active { transform: scale(0.98); }
+        
+        .h-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-right: 10px;
+            display: inline-block;
+        }
+        .h-badge.today { 
+            background: rgba(57, 255, 20, 0.2); 
+            color: var(--primary); 
+        }
+
+        .dot-status {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .dot-hadir { background-color: var(--primary); }
+        .dot-alpa { background-color: var(--danger); }
+
         .profile-upload-btn {
             cursor: pointer;
             position: relative;
@@ -463,27 +520,68 @@
 
     <!-- --- STREAMING_CHUNK:View Absensi --- -->
     <div id="view-absensi" class="page-view">
-        <div class="glass-card" style="padding: 15px;">
-            <input type="date" id="absensi-date" onchange="renderAbsensiList()" style="margin-bottom: 10px;">
-            <select id="absensi-kelas" onchange="renderAbsensiList()" style="margin-bottom: 10px;">
-                <option value="SEMUA">Semua Kelas</option>
-            </select>
-            <input type="text" id="absensi-search" placeholder="Cari nama siswa..." onkeyup="renderAbsensiList()" style="margin-bottom: 0;">
+        
+        <!-- BAGIAN 1: RIWAYAT ABSENSI -->
+        <div id="absensi-history-view">
+            <div class="glass-card" style="padding: 15px; margin-bottom: 20px;">
+                <div class="d-flex align-center justify-between">
+                    <div style="flex: 1;">
+                        <label style="font-size:11px; color:var(--text-muted); display:block; margin-bottom: 5px;">Pilih Kelas:</label>
+                        <select id="history-kelas-filter" onchange="renderAbsensiHistory()" style="margin-bottom: 0; background: transparent; border: none; padding: 0; font-size: 15px; font-weight: 600; color: var(--text-main); outline: none;">
+                            <option value="SEMUA">Semua Kelas / Jurusan</option>
+                        </select>
+                    </div>
+                    <i class="fas fa-graduation-cap text-muted" style="font-size: 24px; opacity: 0.5;"></i>
+                </div>
+            </div>
+
+            <div class="d-flex justify-between align-center mb-15">
+                <h3 style="font-size: 16px; font-weight: 600;">Riwayat Absensi</h3>
+                <i class="fas fa-calendar-check text-muted" style="font-size: 18px;"></i>
+            </div>
+
+            <div id="absensi-history-list">
+                <!-- Kartu riwayat dirender via JS -->
+            </div>
+
+            <!-- Tombol Tambah Absen Baru -->
+            <button class="fab-btn" onclick="openNewAbsensi()">
+                <i class="fas fa-plus"></i>
+            </button>
         </div>
 
-        <div class="d-flex justify-between mb-15" style="gap: 10px;">
-            <button class="btn-primary" style="flex: 1; padding: 10px;" onclick="markAll('H')">Semua Hadir</button>
-            <button class="btn-outline" style="flex: 1; padding: 10px; color: var(--danger); border-color: rgba(255,71,87,0.3);" onclick="showModal('Reset absensi hari ini?', 'confirm', resetAbsensi)">Reset</button>
+        <!-- BAGIAN 2: DETAIL FORM ABSENSI (Awalnya Disembunyikan) -->
+        <div id="absensi-detail-view" style="display: none;">
+            <div class="d-flex align-center mb-15" style="gap: 15px;">
+                <button class="btn-outline" style="width: auto; padding: 8px 15px; border-radius: 10px;" onclick="closeAbsensiDetail()">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </button>
+                <h3 style="font-size: 16px; margin: 0; flex: 1;">Form Absensi</h3>
+            </div>
+
+            <div class="glass-card" style="padding: 15px;">
+                <input type="date" id="absensi-date" onchange="renderAbsensiList()" style="margin-bottom: 10px;">
+                <select id="absensi-kelas" onchange="renderAbsensiList()" style="margin-bottom: 10px;">
+                    <option value="SEMUA">Semua Kelas</option>
+                </select>
+                <input type="text" id="absensi-search" placeholder="Cari nama siswa..." onkeyup="renderAbsensiList()" style="margin-bottom: 0;">
+            </div>
+
+            <div class="d-flex justify-between mb-15" style="gap: 10px;">
+                <button class="btn-primary" style="flex: 1; padding: 10px;" onclick="markAll('H')">Semua Hadir</button>
+                <button class="btn-outline" style="flex: 1; padding: 10px; color: var(--danger); border-color: rgba(255,71,87,0.3);" onclick="showModal('Reset absensi tanggal ini?', 'confirm', resetAbsensi)">Reset</button>
+            </div>
+
+            <div id="absensi-list-container">
+                <!-- List siswa dirender via JS -->
+            </div>
+
+            <!-- Tombol Simpan Presensi Harian -->
+            <button class="btn-primary mt-15" style="background: var(--primary); color: #000; font-size: 15px; padding: 15px; border-radius: 15px; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 5px 20px rgba(57, 255, 20, 0.3);" onclick="simpanPresensiManual()">
+                <i class="fas fa-check-circle" style="font-size: 20px;"></i> <b>Simpan Data Absensi</b>
+            </button>
         </div>
 
-        <div id="absensi-list-container">
-            <!-- List siswa dirender via JS -->
-        </div>
-
-        <!-- Tombol Simpan Presensi Harian -->
-        <button class="btn-primary mt-15" style="background: var(--primary); color: #000; font-size: 15px; padding: 15px; border-radius: 15px; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 5px 20px rgba(57, 255, 20, 0.3);" onclick="simpanPresensiManual()">
-            <i class="fas fa-save" style="font-size: 20px;"></i> <b>Simpan Data Absensi</b>
-        </button>
     </div>
 
     <!-- --- STREAMING_CHUNK:View Nilai --- -->
@@ -777,7 +875,12 @@
             localStorage.setItem('presensi_last_tab', tabId);
 
             if(tabId === 'beranda') initBeranda();
-            if(tabId === 'absensi') renderAbsensiList();
+            if(tabId === 'absensi') {
+                // Tampilkan mode riwayat secara default setiap kali masuk tab absensi
+                document.getElementById('absensi-history-view').style.display = 'block';
+                document.getElementById('absensi-detail-view').style.display = 'none';
+                renderAbsensiHistory();
+            }
             if(tabId === 'nilai') renderNilaiList();
             if(tabId === 'pengaturan') renderPengaturanLists();
         }
@@ -1035,13 +1138,115 @@
         }
 
         function simpanPresensiManual() {
-            autoSaveLokal(); // Eksekusi force save
+            autoSaveLokal(); 
             const dateInput = document.getElementById('absensi-date').value;
-            // Format ulang tanggal agar enak dibaca (YYYY-MM-DD ke DD-MM-YYYY)
             const parts = dateInput.split('-');
             const displayDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : dateInput;
             
-            showToast(`✅ Data presensi tanggal ${displayDate} berhasil disimpan!`);
+            showToast(`✅ Data presensi tanggal ${displayDate} tersimpan!`);
+            
+            // Otomatis kembali ke riwayat setelah menyimpan
+            setTimeout(() => {
+                closeAbsensiDetail();
+            }, 500);
+        }
+
+        // --- STREAMING_CHUNK:Logika Riwayat Absensi ---
+        function renderAbsensiHistory() {
+            const container = document.getElementById('absensi-history-list');
+            const filterKelas = document.getElementById('history-kelas-filter').value;
+            container.innerHTML = '';
+
+            const todayStr = new Date().toISOString().split('T')[0];
+            const dates = Object.keys(DB.absensi).sort((a, b) => new Date(b) - new Date(a)); // Urut dari terbaru
+
+            if (dates.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center" style="padding: 30px 0; font-size: 13px;">Belum ada riwayat absensi.</p>';
+                return;
+            }
+
+            dates.forEach(dateStr => {
+                const dataHarian = DB.absensi[dateStr];
+                
+                let totalSiswa = 0;
+                let hadir = 0;
+                let alpa = 0; // Termasuk Izin, Sakit, Alfa, Bolos
+
+                DB.siswa.forEach(s => {
+                    if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
+                    totalSiswa++;
+                    
+                    const stat = dataHarian[s.id];
+                    if (stat && stat.status) {
+                        if (stat.status === 'H') hadir++;
+                        else alpa++;
+                    }
+                });
+
+                if (totalSiswa === 0) return; // Lewati jika tidak ada siswa di kelas tsb pada hari ini
+
+                const persentase = totalSiswa > 0 ? Math.round((hadir / totalSiswa) * 100) : 0;
+                
+                // Format Badge
+                let badgeHtml = '';
+                if (dateStr === todayStr) {
+                    badgeHtml = '<span class="h-badge today">HARI INI</span>';
+                } else {
+                    const d = new Date(dateStr);
+                    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGU', 'SEP', 'OKT', 'NOV', 'DES'];
+                    badgeHtml = `<span class="h-badge">${d.getDate()} ${months[d.getMonth()]}</span>`;
+                }
+
+                // Format Teks Tanggal
+                const dt = new Date(dateStr);
+                const fullMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+                const dateDisplay = `${dt.getDate()} ${fullMonths[dt.getMonth()]} ${dt.getFullYear()}`;
+
+                const html = `
+                <div class="history-card" onclick="openAbsensiDetail('${dateStr}', '${filterKelas}')">
+                    <div class="d-flex align-center mb-15">
+                        ${badgeHtml}
+                        <span style="font-size: 13px; color: var(--text-muted); flex: 1;">${dateDisplay}</span>
+                        <span style="font-size: 11px; color: var(--text-muted);">Harian</span>
+                    </div>
+                    
+                    <div class="d-flex justify-between align-center">
+                        <div>
+                            <h1 style="font-size: 42px; font-weight: 700; margin: 0; line-height: 1; color: var(--text-main);">${persentase}%</h1>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">${hadir}/${totalSiswa} siswa</p>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-muted);">
+                            <div style="margin-bottom: 5px;"><span class="dot-status dot-hadir"></span> ${hadir} hadir</div>
+                            <div><span class="dot-status dot-alpa"></span> ${alpa} alpa/absen</div>
+                        </div>
+                    </div>
+                </div>`;
+                
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function openNewAbsensi() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const filterKelas = document.getElementById('history-kelas-filter').value;
+            openAbsensiDetail(todayStr, filterKelas);
+        }
+
+        function openAbsensiDetail(dateStr, kelasValue) {
+            document.getElementById('absensi-history-view').style.display = 'none';
+            document.getElementById('absensi-detail-view').style.display = 'block';
+            
+            document.getElementById('absensi-date').value = dateStr;
+            document.getElementById('absensi-kelas').value = kelasValue;
+            
+            renderAbsensiList();
+            window.scrollTo(0, 0); // Scroll ke atas
+        }
+
+        function closeAbsensiDetail() {
+            document.getElementById('absensi-detail-view').style.display = 'none';
+            document.getElementById('absensi-history-view').style.display = 'block';
+            renderAbsensiHistory();
         }
 
         // --- STREAMING_CHUNK:Logika Nilai ---
@@ -1318,16 +1523,24 @@
             tutupModalProfil();
             autoSaveLokal();
             renderPengaturanLists();
+            initBeranda(); // Refresh nama di beranda
             showToast('Profil diperbarui!');
         }
 
         function updateKelasDropdowns() {
-            const dropdowns = ['absensi-kelas', 'nilai-kelas', 'input-siswa-kelas'];
+            const dropdowns = ['history-kelas-filter', 'absensi-kelas', 'nilai-kelas', 'input-siswa-kelas'];
             dropdowns.forEach(id => {
                 const el = document.getElementById(id);
                 if(!el) return;
                 const isFilter = id !== 'input-siswa-kelas';
-                el.innerHTML = isFilter ? '<option value="SEMUA">Semua Kelas</option>' : '<option value="">Pilih Kelas</option>';
+                
+                // Khusus untuk history, teksnya sedikit beda
+                if(id === 'history-kelas-filter') {
+                    el.innerHTML = '<option value="SEMUA">Semua Kelas / Jurusan</option>';
+                } else {
+                    el.innerHTML = isFilter ? '<option value="SEMUA">Semua Kelas</option>' : '<option value="">Pilih Kelas</option>';
+                }
+                
                 DB.kelas.forEach(k => {
                     el.insertAdjacentHTML('beforeend', `<option value="${k}">${k}</option>`);
                 });
