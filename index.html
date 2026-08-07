@@ -1100,6 +1100,108 @@
             renderNilaiList();
         }
 
+        function simpanDataNilaiButton() {
+            autoSaveLokal();
+            showToast('✅ Data nilai berhasil disimpan!');
+        }
+
+        function exportNilaiExcel() {
+            if(DB.siswa.length === 0) return showToast('Tidak ada data siswa');
+            
+            const filterKelas = document.getElementById('nilai-kelas').value;
+            let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas;
+
+            let ws_data = [
+                ["PEMERINTAH PROVINSI GORONTALO"],
+                ["DINAS PENDIDIKAN DAN KEBUDAYAAN"],
+                ["SMK NEGERI 1 MARISA"],
+                ["Jln. Lintas Sulawesi, Marisa"],
+                [],
+                ["REKAPITULASI NILAI SISWA"],
+                [],
+                ["Nama Guru", ":", DB.guru.nama],
+                ["Mata Pelajaran", ":", DB.guru.mapel],
+                ["Kelas", ":", kelasText],
+                [],
+                ["No", "NIS", "Nama Lengkap Siswa", "Kelas", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "Tugas (Rata)", "UTS", "UAS", "Absen", "Nilai Akhir", "Predikat"]
+            ];
+
+            let no = 1;
+            DB.siswa.forEach(s => {
+                if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
+                
+                let n = DB.nilai[s.id] || { tugasList: Array(10).fill(0), uts: 0, uas: 0, absen: 0 };
+                let totalTugas = 0;
+                let countTugas = 0;
+                for(let i=0; i<10; i++) {
+                    let val = Number(n.tugasList[i] || 0);
+                    if (val > 0) {
+                        totalTugas += val;
+                        countTugas++;
+                    }
+                }
+                const rataTugas = countTugas > 0 ? (totalTugas / countTugas) : 0;
+                const final = (rataTugas * 0.5) + ((n.uts||0) * 0.1) + ((n.uas||0) * 0.2) + ((n.absen||0) * 0.2);
+                
+                let predikat = 'E';
+                if(final >= 90) predikat = 'A';
+                else if(final >= 80) predikat = 'B';
+                else if(final >= 70) predikat = 'C';
+                else if(final >= 60) predikat = 'D';
+
+                let rowData = [no++, s.nis, s.nama, s.kelas];
+                for(let i=0; i<10; i++) {
+                    rowData.push(n.tugasList[i] || 0);
+                }
+                rowData.push(rataTugas.toFixed(1), n.uts || 0, n.uas || 0, n.absen || 0, final.toFixed(1), predikat);
+                ws_data.push(rowData);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Rekap_Nilai");
+            XLSX.writeFile(wb, `Rekap_Nilai_${kelasText.replace(/ /g, '_')}.xlsx`);
+            showToast('Mengunduh Excel Nilai...');
+        }
+        
+        function exportNilaiCSV() {
+            if(DB.siswa.length === 0) return showToast('Tidak ada data siswa');
+            
+            const filterKelas = document.getElementById('nilai-kelas').value;
+            let csv = "NIS,Nama Lengkap,Kelas,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,Rata-rata Tugas,UTS,UAS,Absen,Nilai Akhir,Predikat\n";
+            
+            DB.siswa.forEach(s => {
+                if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
+                
+                let n = DB.nilai[s.id] || { tugasList: Array(10).fill(0), uts: 0, uas: 0, absen: 0 };
+                let totalTugas = 0; let countTugas = 0;
+                for(let i=0; i<10; i++) {
+                    let val = Number(n.tugasList[i] || 0);
+                    if (val > 0) { totalTugas += val; countTugas++; }
+                }
+                const rataTugas = countTugas > 0 ? (totalTugas / countTugas) : 0;
+                const final = (rataTugas * 0.5) + ((n.uts||0) * 0.1) + ((n.uas||0) * 0.2) + ((n.absen||0) * 0.2);
+                
+                let predikat = 'E';
+                if(final >= 90) predikat = 'A';
+                else if(final >= 80) predikat = 'B';
+                else if(final >= 70) predikat = 'C';
+                else if(final >= 60) predikat = 'D';
+
+                let row = `${s.nis},${s.nama},${s.kelas}`;
+                for(let i=0; i<10; i++) { row += `,${n.tugasList[i] || 0}`; }
+                row += `,${rataTugas.toFixed(1)},${n.uts || 0},${n.uas || 0},${n.absen || 0},${final.toFixed(1)},${predikat}\n`;
+                
+                csv += row;
+            });
+
+            const link = document.createElement("a");
+            link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
+            link.download = `Data_Nilai_${filterKelas.replace(/ /g, '_')}.csv`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            showToast('Mengunduh CSV Nilai...');
+        }
+
         // --- STREAMING_CHUNK:Logika Pengaturan ---
         function renderPengaturanLists() {
             document.getElementById('set-nama-guru').innerText = DB.guru.nama;
