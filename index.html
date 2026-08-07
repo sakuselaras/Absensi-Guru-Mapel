@@ -322,6 +322,24 @@
             <div id="nilai-list-container">
                 <!-- Daftar Nilai Grid 2 Tingkat -->
             </div>
+
+            <!-- Tombol Aksi Nilai (Simpan & Export) -->
+            <div class="glass-card" style="margin-top: 20px; padding: 15px;">
+                <h3 style="font-size: 14px; margin-bottom: 15px; color: #fff; font-weight: 600;"><i class="fas fa-tools text-primary"></i> Aksi Data Nilai</h3>
+                
+                <button class="btn-primary mb-15" style="background-color: var(--accent); color: #fff; box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);" onclick="simpanDataNilaiButton()">
+                    <i class="fas fa-save"></i> Simpan Data Nilai
+                </button>
+                
+                <div class="action-grid">
+                    <button class="btn-outline" style="border-color: #217346; color: #217346; background: rgba(33, 115, 70, 0.1);" onclick="exportNilaiExcel()">
+                        <i class="fas fa-file-excel"></i> Excel (.xlsx)
+                    </button>
+                    <button class="btn-outline" style="border-color: #00e5ff; color: #00e5ff; background: rgba(0, 229, 255, 0.1);" onclick="exportNilaiCSV()">
+                        <i class="fas fa-file-csv"></i> CSV (G-Sheet)
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- --- STREAMING_CHUNK:View Pengaturan --- -->
