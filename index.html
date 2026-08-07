@@ -139,16 +139,18 @@
             outline: none;
             transition: all 0.3s;
         }
-        
-        /* Tambahan: Memaksa warna latar dropdown mengikuti tema aplikasi */
+
+        /* FIX CSS: Agar opsi list dropdown tidak silau/putih saat di mode gelap */
         select option {
             background-color: var(--bg-main);
             color: var(--text-main);
         }
 
         input::placeholder {
-            color: var(--text-muted);
-            opacity: 0.8;
+            color: rgba(255, 255, 255, 0.5); /* Placeholder lebih terang di mode gelap */
+        }
+        [data-theme="light"] input::placeholder {
+            color: rgba(0, 0, 0, 0.5); /* Placeholder gelap di mode terang */
         }
 
         input:focus, select:focus {
@@ -216,9 +218,9 @@
         }
 
         .status-btn.active.s-H { background: var(--primary); color: #000; border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
-        .status-btn.active.s-I { background: var(--accent); color: #000; border-color: var(--accent); }
-        .status-btn.active.s-S { background: var(--warning); color: #000; border-color: var(--warning); }
-        .status-btn.active.s-A { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .status-btn.active.s-I { background: transparent; color: var(--text-main); border-color: var(--border); } /* Izin, Sakit, Alfa dibuat netral jika aktif */
+        .status-btn.active.s-S { background: transparent; color: var(--text-main); border-color: var(--border); }
+        .status-btn.active.s-A { background: transparent; color: var(--text-main); border-color: var(--border); }
         .status-btn.active.s-B { background: var(--purple); color: #fff; border-color: var(--purple); box-shadow: 0 0 10px rgba(165, 94, 234, 0.5);}
 
         /* --- STREAMING_CHUNK:Navigation --- */
@@ -326,7 +328,6 @@
 
         .text-danger { color: var(--danger) !important; }
         .text-success { color: var(--primary) !important; }
-        .font-weight-bold { font-weight: bold; }
         
         .login-screen {
             position: fixed;
@@ -337,27 +338,22 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
-        }
-        
-        .list-item-delete {
-            background: rgba(255, 71, 87, 0.1);
-            color: var(--danger);
-            border: 1px solid rgba(255, 71, 87, 0.3);
-            padding: 5px 10px;
-            border-radius: 8px;
-            font-size: 12px;
-            cursor: pointer;
+            overflow-y: auto;
         }
 
-        .list-item-edit {
-            background: rgba(0, 229, 255, 0.1);
-            color: var(--accent);
-            border: 1px solid rgba(0, 229, 255, 0.3);
+        .list-item-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--border);
             padding: 5px 10px;
             border-radius: 8px;
             font-size: 12px;
             cursor: pointer;
+            transition: 0.2s;
         }
+        .list-item-btn:active { transform: scale(0.9); }
+        .btn-delete { color: var(--danger); border-color: rgba(255, 71, 87, 0.3); }
+        .btn-edit { color: var(--accent); border-color: rgba(0, 229, 255, 0.3); }
 
         /* --- STREAMING_CHUNK:Fitur Riwayat Absensi CSS --- */
         .fab-btn {
@@ -435,6 +431,15 @@
             color: white;
             font-size: 24px;
         }
+
+        .history-btn {
+            display: flex; align-items: center; justify-content: center;
+            background: transparent; color: var(--text-main);
+            border: 1px solid var(--primary); padding: 10px;
+            border-radius: 12px; margin-bottom: 10px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .history-btn:hover { background: rgba(57, 255, 20, 0.1); }
     </style>
 </head>
 <body>
@@ -453,7 +458,15 @@
             <p class="text-muted" style="font-size: 12px; margin-bottom: 25px;">Setiap guru memiliki ruang data tersendiri</p>
             
             <input type="text" id="login-room" placeholder="Nama Guru (Misal: Pak_Budi)" style="text-align: center; font-weight: bold;">
-            <button class="btn-primary" onclick="loginRoom()">Masuk Ruangan</button>
+            <button class="btn-primary" onclick="loginRoom()">Masuk Ruangan Baru</button>
+
+            <!-- Riwayat Ruangan Sebelumnya -->
+            <div id="login-history-container" style="margin-top: 25px; display: none;">
+                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Atau masuk ke ruang sebelumnya:</p>
+                <div id="login-history-list" style="display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Dirender via JS -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -464,7 +477,7 @@
             <p>SMK Negeri 1 Marisa</p>
         </div>
         <div class="time-display">
-            <h2 id="clock">00:00:00</h2>
+            <h2 id="clock">00.00.00</h2>
             <p id="date">Memuat...</p>
             <div class="network-status" id="network-status">
                 <i class="fas fa-wifi"></i> Online
@@ -519,7 +532,7 @@
         </div>
 
         <div class="glass-card">
-            <h3 style="font-size: 14px; margin-bottom: 15px;">Grafik Kehadiran 5 Hari Terakhir</h3>
+            <h3 style="font-size: 14px; margin-bottom: 15px;">Grafik Kehadiran Mingguan</h3>
             <canvas id="kehadiranChart" height="200"></canvas>
         </div>
     </div>
@@ -550,13 +563,13 @@
                 <!-- Kartu riwayat dirender via JS -->
             </div>
 
-            <!-- Tombol Tambah Absen Baru -->
+            <!-- Tombol Tambah Absen Baru (+) -->
             <button class="fab-btn" onclick="openNewAbsensi()">
                 <i class="fas fa-plus"></i>
             </button>
         </div>
 
-        <!-- BAGIAN 2: DETAIL FORM ABSENSI (Awalnya Disembunyikan) -->
+        <!-- BAGIAN 2: DETAIL FORM ABSENSI (Disembunyikan di awal) -->
         <div id="absensi-detail-view" style="display: none;">
             <div class="d-flex align-center mb-15" style="gap: 15px;">
                 <button class="btn-outline" style="width: auto; padding: 8px 15px; border-radius: 10px;" onclick="closeAbsensiDetail()">
@@ -582,8 +595,7 @@
                 <!-- List siswa dirender via JS -->
             </div>
 
-            <!-- Tombol Simpan Presensi Harian -->
-            <button class="btn-primary mt-15" style="background: var(--primary); color: #000; font-size: 15px; padding: 15px; border-radius: 15px; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 5px 20px rgba(57, 255, 20, 0.3);" onclick="simpanPresensiManual()">
+            <button class="btn-primary mt-15" style="padding: 15px; display: flex; justify-content: center; gap: 10px; border-radius: 15px; font-size: 16px;" onclick="simpanDataAbsensiButton()">
                 <i class="fas fa-check-circle" style="font-size: 20px;"></i> <b>Simpan Data Absensi</b>
             </button>
         </div>
@@ -599,7 +611,7 @@
             <input type="text" id="nilai-search" placeholder="Cari nama siswa..." onkeyup="renderNilaiList()" style="margin-bottom: 0;">
         </div>
         <div id="nilai-list-container">
-            <!-- List nilai dirender via JS -->
+            <!-- List nilai (Grid 2 Tingkat) dirender via JS -->
         </div>
     </div>
 
@@ -616,12 +628,21 @@
             <h3 style="font-size: 18px; color: var(--primary);" id="set-nama-guru">Nama Guru</h3>
             <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">NIP: <span id="set-nip-guru"></span></p>
             <div style="display: inline-block; padding: 5px 15px; border: 1px solid var(--primary); border-radius: 20px; font-size: 11px; font-weight: 600;">
-                Guru <span id="set-mapel-guru"></span>
+                <span id="set-mapel-guru"></span>
             </div>
             <button class="btn-outline mt-15" onclick="bukaModalEditProfil()" style="padding: 8px; font-size: 12px;">Edit Profil</button>
         </div>
 
-        <h3 style="font-size: 14px; margin: 20px 0 10px 5px; color: #fff; font-weight: 600;">Input Master Data</h3>
+        <h3 style="font-size: 14px; margin: 20px 0 10px 5px; color: var(--text-main); font-weight: 600;">Export Data (Laporan)</h3>
+        <div class="glass-card">
+            <div class="d-flex" style="gap: 10px; margin-bottom: 10px;">
+                <button class="btn-outline" style="flex: 1; border-color: var(--primary); color: var(--primary);" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Excel (.xlsx)</button>
+                <button class="btn-outline" style="flex: 1; border-color: var(--danger); color: var(--danger);" onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+            </div>
+            <button class="btn-outline" style="border-color: var(--accent); color: var(--accent);" onclick="exportToCSV()"><i class="fas fa-file-csv"></i> CSV (Untuk Google Sheet)</button>
+        </div>
+
+        <h3 style="font-size: 14px; margin: 20px 0 10px 5px; color: var(--text-main); font-weight: 600;">Input Master Data</h3>
         
         <div class="glass-card">
             <h4 style="font-size: 14px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-layer-group"></i> Tambah Kelas</h4>
@@ -637,31 +658,18 @@
                 <select id="input-siswa-kelas" style="flex: 1;">
                     <option value="">Pilih Kelas</option>
                 </select>
-                <select id="input-siswa-gender" style="flex: 1;">
-                    <option value="L">Laki-laki</option>
-                    <option value="P">Perempuan</option>
-                </select>
             </div>
             <button class="btn-primary" onclick="tambahSiswa()">Simpan Siswa</button>
         </div>
 
-        <h3 style="font-size: 14px; margin: 20px 0 10px 5px; color: #fff; font-weight: 600;">Export Data (Laporan)</h3>
-        <div class="glass-card">
-            <div class="d-flex" style="gap: 10px; margin-bottom: 10px;">
-                <button class="btn-outline" style="flex: 1; border-color: var(--primary); color: var(--primary);" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Excel (.xlsx)</button>
-                <button class="btn-outline" style="flex: 1; border-color: var(--danger); color: var(--danger);" onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
-            </div>
-            <button class="btn-outline" style="border-color: var(--accent); color: var(--accent);" onclick="exportToCSV()"><i class="fas fa-file-csv"></i> CSV (Untuk Google Sheet)</button>
-        </div>
-
-        <h3 style="font-size: 14px; margin: 20px 0 10px 5px; color: #fff; font-weight: 600;">Daftar Kelas & Siswa</h3>
+        <h3 style="font-size: 14px; margin: 20px 0 10px 5px; color: var(--text-main); font-weight: 600;">Daftar Kelas & Siswa</h3>
         <div class="glass-card" id="list-master-container" style="max-height: 300px; overflow-y: auto;">
             <!-- Dirender via JS -->
         </div>
 
         <div class="glass-card mt-15">
             <div class="d-flex justify-between align-center">
-                <span>Mode Tampilan</span>
+                <span style="color: var(--text-main);">Mode Tampilan</span>
                 <button class="btn-outline" style="width: auto; padding: 5px 15px;" onclick="toggleTheme()" id="btn-theme">Terang</button>
             </div>
         </div>
@@ -702,7 +710,7 @@
             <h3 style="margin-bottom: 20px;">Edit Profil Guru</h3>
             <input type="text" id="edit-nama-guru" placeholder="Nama Lengkap & Gelar">
             <input type="text" id="edit-nip-guru" placeholder="NIP">
-            <input type="text" id="edit-mapel-guru" placeholder="Mata Pelajaran">
+            <input type="text" id="edit-mapel-guru" placeholder="Guru ... (Mata Pelajaran)">
             <div class="d-flex" style="gap: 10px;">
                 <button class="btn-outline" onclick="tutupModalProfil()">Batal</button>
                 <button class="btn-primary" onclick="simpanProfilGuru()">Simpan</button>
@@ -710,7 +718,6 @@
         </div>
     </div>
 
-    <!-- Modal Input Edit Master Data -->
     <div class="modal-overlay" id="modal-edit-data">
         <div class="modal-box">
             <h3 style="margin-bottom: 20px;" id="modal-edit-title">Edit Data</h3>
@@ -729,7 +736,6 @@
 
     <!-- --- STREAMING_CHUNK:Javascript Logic --- -->
     <script>
-        // State Management
         let activeRoomKey = null;
         let DB = {
             guru: { nama: "Guru Pengajar", nip: "-", mapel: "-", foto: "" },
@@ -740,12 +746,11 @@
         };
         let chartInstance = null;
 
-        // Inisialisasi Aplikasi
         window.onload = () => {
             initClock();
             initOfflineSupport();
+            loadRoomHistory();
             
-            // Cek apakah sudah login di localStorage
             const savedRoom = localStorage.getItem('presensi_active_room');
             if(savedRoom) {
                 activeRoomKey = savedRoom;
@@ -755,7 +760,20 @@
             }
         };
 
-        // --- PWA & Offline Support ---
+        function showToast(message) {
+            const toast = document.getElementById('toast-message');
+            toast.innerText = message;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2000);
+        }
+
+        function autoSaveLokal() {
+            if(activeRoomKey) {
+                localStorage.setItem(activeRoomKey, JSON.stringify(DB));
+            }
+        }
+
+        // --- Fitur PWA (Offline) ---
         function initOfflineSupport() {
             const updateOnlineStatus = () => {
                 const statusEl = document.getElementById('network-status');
@@ -765,25 +783,116 @@
                 } else {
                     statusEl.innerHTML = '<i class="fas fa-plane-slash"></i> Offline Mode';
                     statusEl.className = 'network-status status-offline';
-                    showToast('Mode Offline: Data tetap tersimpan aman di perangkat Anda.');
+                    showToast('Offline Mode: Aplikasi tetap bisa digunakan!');
                 }
             };
             window.addEventListener('online', updateOnlineStatus);
             window.addEventListener('offline', updateOnlineStatus);
             updateOnlineStatus();
 
-            // Register dummy service worker for PWA standard (with error catch for preview environments)
             if ('serviceWorker' in navigator) {
                 const swCode = `
-                    self.addEventListener('install', (e) => { e.waitUntil(self.skipWaiting()); });
+                    self.addEventListener('install', (e) => { self.skipWaiting(); });
                     self.addEventListener('activate', (e) => { e.waitUntil(self.clients.claim()); });
                     self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => new Response('Offline'))); });
                 `;
                 const blob = new Blob([swCode], {type: 'application/javascript'});
                 navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => {
-                    console.log("Service worker registration handled for preview mode.");
+                    console.log("Service Worker: Mode Preview lokal mendeteksi PWA fallback.");
                 });
             }
+        }
+
+        // --- Fitur Login Riwayat ---
+        function loadRoomHistory() {
+            let history = JSON.parse(localStorage.getItem('presensi_room_history') || '[]');
+            const container = document.getElementById('login-history-container');
+            const list = document.getElementById('login-history-list');
+            
+            if(history.length > 0) {
+                container.style.display = 'block';
+                list.innerHTML = '';
+                history.forEach(h => {
+                    list.innerHTML += `
+                        <button class="history-btn" onclick="masukRuangDariHistory('${h.key}')">
+                            <i class="fas fa-user-circle" style="margin-right: 10px; color: var(--primary); font-size: 18px;"></i>
+                            <b>${h.nama}</b>
+                        </button>
+                    `;
+                });
+            }
+        }
+
+        function masukRuangDariHistory(roomKey) {
+            localStorage.setItem('presensi_active_room', roomKey);
+            activeRoomKey = roomKey;
+            loadDataRoom();
+        }
+
+        function loginRoom() {
+            const roomInput = document.getElementById('login-room').value.trim();
+            if(!roomInput) return showToast('Nama Guru tidak boleh kosong!');
+            
+            const sanitizedRoom = 'presensi_db_' + roomInput.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+            localStorage.setItem('presensi_active_room', sanitizedRoom);
+            activeRoomKey = sanitizedRoom;
+
+            let history = JSON.parse(localStorage.getItem('presensi_room_history') || '[]');
+            if (!history.find(h => h.key === sanitizedRoom)) {
+                history.push({ key: sanitizedRoom, nama: roomInput });
+                localStorage.setItem('presensi_room_history', JSON.stringify(history));
+            }
+            
+            loadDataRoom();
+        }
+
+        function logoutRoom() {
+            showModal('Yakin ingin keluar?', 'confirm', () => {
+                localStorage.removeItem('presensi_active_room');
+                localStorage.removeItem('presensi_last_tab');
+                window.location.reload();
+            });
+        }
+
+        function loadDataRoom() {
+            const savedData = localStorage.getItem(activeRoomKey);
+            if(savedData) {
+                DB = JSON.parse(savedData);
+                // MIGRATION CHECK FOR NILAI: upgrade format lama ke array (jika ada yg nyangkut)
+                DB.siswa.forEach(s => {
+                    if (DB.nilai[s.id] && DB.nilai[s.id].tugas !== undefined && !DB.nilai[s.id].tugasList) {
+                        let nLama = DB.nilai[s.id];
+                        DB.nilai[s.id] = {
+                            tugasList: [nLama.tugas,0,0,0,0,0,0,0,0,0],
+                            uts: nLama.uts||0,
+                            uas: nLama.uas||0,
+                            absen: 0
+                        };
+                    }
+                });
+            } else {
+                DB.guru.nama = document.getElementById('login-room').value || "Guru Pengajar";
+                autoSaveLokal();
+            }
+            
+            document.getElementById('login-screen').style.display = 'none';
+            onDataLoaded();
+        }
+
+        function onDataLoaded() {
+            updateKelasDropdowns();
+            renderFotoProfil();
+            
+            const savedTheme = localStorage.getItem('presensi_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('btn-theme').innerText = savedTheme === 'dark' ? 'Terang' : 'Gelap';
+
+            const lastTab = localStorage.getItem('presensi_last_tab') || 'beranda';
+            switchTab(lastTab);
+
+            renderAbsensiList();
+            renderNilaiList();
+            renderPengaturanLists();
         }
 
         function initClock() {
@@ -796,78 +905,8 @@
                 document.getElementById('date').innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
             }, 1000);
 
-            // Set default date input to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('absensi-date').value = today;
-        }
-
-        // --- Fitur Multi-User Room ---
-        function loginRoom() {
-            const roomInput = document.getElementById('login-room').value.trim();
-            if(!roomInput) {
-                showToast('Nama Guru tidak boleh kosong!');
-                return;
-            }
-            
-            const sanitizedRoom = 'presensi_db_' + roomInput.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
-            localStorage.setItem('presensi_active_room', sanitizedRoom);
-            activeRoomKey = sanitizedRoom;
-
-            // Simpan ke riwayat ruangan agar muncul sebagai tombol
-            let history = JSON.parse(localStorage.getItem('presensi_room_history') || '[]');
-            if (!history.find(h => h.key === sanitizedRoom)) {
-                history.push({ key: sanitizedRoom, nama: roomInput });
-                localStorage.setItem('presensi_room_history', JSON.stringify(history));
-            }
-            
-            loadDataRoom();
-        }
-
-        function logoutRoom() {
-            showModal('Yakin ingin keluar dari ruangan ini?', 'confirm', () => {
-                localStorage.removeItem('presensi_active_room');
-                localStorage.removeItem('presensi_last_tab');
-                window.location.reload();
-            });
-        }
-
-        function loadDataRoom() {
-            const savedData = localStorage.getItem(activeRoomKey);
-            if(savedData) {
-                DB = JSON.parse(savedData);
-            } else {
-                // Inisialisasi DB baru jika ruang kosong
-                DB.guru.nama = document.getElementById('login-room').value || "Guru Pengajar";
-                autoSaveLokal();
-            }
-            
-            document.getElementById('login-screen').style.display = 'none';
-            onDataLoaded();
-        }
-
-        // --- SISTEM AUTO-SAVE LOKAL ---
-        function autoSaveLokal() {
-            if(activeRoomKey) {
-                localStorage.setItem(activeRoomKey, JSON.stringify(DB));
-            }
-        }
-
-        function onDataLoaded() {
-            updateKelasDropdowns();
-            renderFotoProfil(); // Render foto dari DB
-            
-            // Ingat posisi tab terakhir sebelum refresh
-            const lastTab = localStorage.getItem('presensi_last_tab') || 'beranda';
-            switchTab(lastTab);
-
-            // Terapkan tema yang tersimpan
-            const savedTheme = localStorage.getItem('presensi_theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            document.getElementById('btn-theme').innerText = savedTheme === 'dark' ? 'Terang' : 'Gelap';
-
-            renderAbsensiList();
-            renderNilaiList();
-            renderPengaturanLists();
         }
 
         function switchTab(tabId) {
@@ -877,25 +916,16 @@
             document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active'));
             document.getElementById(`view-${tabId}`).classList.add('active');
             
-            // Simpan posisi tab saat ini
             localStorage.setItem('presensi_last_tab', tabId);
 
             if(tabId === 'beranda') initBeranda();
             if(tabId === 'absensi') {
-                // Tampilkan mode riwayat secara default setiap kali masuk tab absensi
                 document.getElementById('absensi-history-view').style.display = 'block';
                 document.getElementById('absensi-detail-view').style.display = 'none';
                 renderAbsensiHistory();
             }
             if(tabId === 'nilai') renderNilaiList();
             if(tabId === 'pengaturan') renderPengaturanLists();
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById('toast-message');
-            toast.innerText = message;
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 2000);
         }
 
         function showModal(message, type = 'alert', onConfirm = null) {
@@ -905,20 +935,19 @@
             
             if(type === 'confirm') {
                 btnContainer.innerHTML = `
-                    <button class="btn-outline" style="flex:1;" onclick="closeModal()">Batal</button>
+                    <button class="btn-outline" style="flex:1;" onclick="document.getElementById('custom-modal').style.display='none'">Batal</button>
                     <button class="btn-primary" style="flex:1;" onclick="executeModalAction()">Ya</button>
                 `;
                 window.modalConfirmAction = onConfirm;
             } else {
-                btnContainer.innerHTML = `<button class="btn-primary" onclick="closeModal()">Tutup</button>`;
+                btnContainer.innerHTML = `<button class="btn-primary" onclick="document.getElementById('custom-modal').style.display='none'">Tutup</button>`;
             }
             modal.style.display = 'flex';
         }
 
-        function closeModal() { document.getElementById('custom-modal').style.display = 'none'; }
-        function executeModalAction() { if(window.modalConfirmAction) window.modalConfirmAction(); closeModal(); }
+        function executeModalAction() { if(window.modalConfirmAction) window.modalConfirmAction(); document.getElementById('custom-modal').style.display='none'; }
 
-        // --- STREAMING_CHUNK:Logika Dashboard ---
+        // --- DASHBOARD ---
         function initBeranda() {
             document.getElementById('dash-nama-guru').innerText = DB.guru.nama;
             document.getElementById('dash-mapel').innerText = DB.guru.mapel;
@@ -946,27 +975,19 @@
             const ctx = document.getElementById('kehadiranChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
 
-            // Mengambil data 5 hari terakhir secara dinamis
             const dates = [];
             const hadirData = [];
             const absenData = [];
             
+            const today = new Date();
             for(let i=4; i>=0; i--) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
                 const dateStr = d.toISOString().split('T')[0];
-                const displayStr = d.toLocaleDateString('id-ID', { weekday: 'short' });
-                dates.push(displayStr);
+                dates.push(d.toLocaleDateString('id-ID', { weekday: 'short' }));
 
                 const dataHarian = DB.absensi[dateStr] || {};
                 let h = 0, a = 0;
-                
-                if(Object.keys(dataHarian).length === 0) {
-                    hadirData.push(0);
-                    absenData.push(0);
-                    continue;
-                }
-
                 Object.values(dataHarian).forEach(v => {
                     if(v.status === 'H') h++;
                     else if(['I','S','A'].includes(v.status) || v.isBolos) a++;
@@ -975,8 +996,7 @@
                 absenData.push(a);
             }
 
-            // Hitung max y axis untuk memastikan grafik proporsional
-            const maxVal = Math.max(...hadirData, ...absenData, 5); // Minimal scale 5
+            const maxVal = Math.max(...hadirData, ...absenData, 5); 
 
             chartInstance = new Chart(ctx, {
                 type: 'bar',
@@ -990,25 +1010,93 @@
                 options: {
                     responsive: true,
                     scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            max: maxVal,
-                            ticks: { color: '#aaaaaa', stepSize: Math.ceil(maxVal/5) },
-                            grid: { color: 'rgba(255,255,255,0.05)' }
-                        },
-                        x: { 
-                            ticks: { color: '#aaaaaa' },
-                            grid: { display: false }
-                        }
+                        y: { beginAtZero: true, max: maxVal, ticks: { color: '#aaaaaa', stepSize: Math.ceil(maxVal/5) }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { ticks: { color: '#aaaaaa' }, grid: { display: false } }
                     },
-                    plugins: {
-                        legend: { labels: { color: '#ffffff' } }
-                    }
+                    plugins: { legend: { labels: { color: '#ffffff' } } }
                 }
             });
         }
 
-        // --- STREAMING_CHUNK:Logika Absensi ---
+        // --- ABSENSI & RIWAYAT ---
+        function renderAbsensiHistory() {
+            const container = document.getElementById('absensi-history-list');
+            const filterKelas = document.getElementById('history-kelas-filter').value;
+            container.innerHTML = '';
+
+            const todayStr = new Date().toISOString().split('T')[0];
+            const dates = Object.keys(DB.absensi).sort((a, b) => new Date(b) - new Date(a));
+
+            if (dates.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center" style="padding: 30px 0; font-size: 13px;">Belum ada riwayat absensi.</p>';
+                return;
+            }
+
+            dates.forEach(dateStr => {
+                const dataHarian = DB.absensi[dateStr];
+                let totalSiswa = 0, hadir = 0, alpa = 0;
+
+                DB.siswa.forEach(s => {
+                    if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
+                    totalSiswa++;
+                    const stat = dataHarian[s.id];
+                    if (stat && stat.status) {
+                        if (stat.status === 'H') hadir++;
+                        else alpa++;
+                    }
+                });
+
+                if (totalSiswa === 0) return;
+
+                const persentase = totalSiswa > 0 ? Math.round((hadir / totalSiswa) * 100) : 0;
+                let badgeHtml = dateStr === todayStr ? '<span class="h-badge today">HARI INI</span>' : `<span class="h-badge">${dateStr}</span>`;
+                const dt = new Date(dateStr);
+                const fullMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+                const dateDisplay = `${dt.getDate()} ${fullMonths[dt.getMonth()]} ${dt.getFullYear()}`;
+
+                const html = `
+                <div class="history-card" onclick="openAbsensiDetail('${dateStr}', '${filterKelas}')">
+                    <div class="d-flex align-center mb-15">
+                        ${badgeHtml}
+                        <span style="font-size: 13px; color: var(--text-muted); flex: 1;">${dateDisplay}</span>
+                        <span style="font-size: 11px; color: var(--text-muted);">Harian</span>
+                    </div>
+                    <div class="d-flex justify-between align-center">
+                        <div>
+                            <h1 style="font-size: 42px; font-weight: 700; margin: 0; line-height: 1; color: var(--text-main);">${persentase}%</h1>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">${hadir}/${totalSiswa} siswa</p>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-muted);">
+                            <div style="margin-bottom: 5px;"><span class="dot-status dot-hadir"></span> ${hadir} hadir</div>
+                            <div><span class="dot-status dot-alpa"></span> ${alpa} alpa/absen</div>
+                        </div>
+                    </div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function openNewAbsensi() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const filterKelas = document.getElementById('history-kelas-filter').value;
+            openAbsensiDetail(todayStr, filterKelas);
+        }
+
+        function openAbsensiDetail(dateStr, kelasValue) {
+            document.getElementById('absensi-history-view').style.display = 'none';
+            document.getElementById('absensi-detail-view').style.display = 'block';
+            document.getElementById('absensi-date').value = dateStr;
+            document.getElementById('absensi-kelas').value = kelasValue;
+            renderAbsensiList();
+            window.scrollTo(0, 0);
+        }
+
+        function closeAbsensiDetail() {
+            document.getElementById('absensi-detail-view').style.display = 'none';
+            document.getElementById('absensi-history-view').style.display = 'block';
+            renderAbsensiHistory();
+        }
+
         function renderAbsensiList() {
             const container = document.getElementById('absensi-list-container');
             const date = document.getElementById('absensi-date').value;
@@ -1076,15 +1164,13 @@
                 current.status = '';
                 if(status === 'H') current.hadirTime = '';
             } else {
-                if(current.status === 'H' && status !== 'H') {
-                    current.hadirTime = '';
-                }
+                if(current.status === 'H' && status !== 'H') current.hadirTime = '';
                 current.status = status;
                 
                 if(status === 'H' && !current.hadirTime) {
                     current.hadirTime = timeStr;
                     const mins = (now.getHours() * 60) + now.getMinutes();
-                    current.lateMinutes = mins > 480 ? mins - 480 : 0; // 480 = 08:00
+                    current.lateMinutes = mins > (8 * 60) ? mins - (8 * 60) : 0;
                 }
             }
             DB.absensi[date][siswaId] = current;
@@ -1095,14 +1181,12 @@
         function toggleBolos(date, siswaId) {
             let current = DB.absensi[date][siswaId] || { status: '', isBolos: false, hadirTime: '', bolosTime: '', lateMinutes: 0 };
             current.isBolos = !current.isBolos;
-            
             if(current.isBolos) {
                 const now = new Date();
                 current.bolosTime = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' }).replace(':', '.');
             } else {
                 current.bolosTime = '';
             }
-            
             DB.absensi[date][siswaId] = current;
             autoSaveLokal(); 
             renderAbsensiList();
@@ -1118,7 +1202,6 @@
 
             DB.siswa.forEach(s => {
                 if(filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
-                
                 const prevBolos = DB.absensi[date][s.id] ? DB.absensi[date][s.id].isBolos : false;
                 const prevBolosTime = DB.absensi[date][s.id] ? DB.absensi[date][s.id].bolosTime : '';
 
@@ -1138,124 +1221,19 @@
         function resetAbsensi() {
             const date = document.getElementById('absensi-date').value;
             DB.absensi[date] = {};
-            autoSaveLokal(); // Simpan otomatis
+            autoSaveLokal(); 
             renderAbsensiList();
             showToast('Absensi berhasil direset!');
         }
 
-        function simpanPresensiManual() {
+        function simpanDataAbsensiButton() {
+            const date = document.getElementById('absensi-date').value;
             autoSaveLokal(); 
-            const dateInput = document.getElementById('absensi-date').value;
-            const parts = dateInput.split('-');
-            const displayDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : dateInput;
-            
-            showToast(`✅ Data presensi tanggal ${displayDate} tersimpan!`);
-            
-            // Otomatis kembali ke riwayat setelah menyimpan
-            setTimeout(() => {
-                closeAbsensiDetail();
-            }, 500);
+            showToast(`✅ Data absen tgl ${date} direkam!`);
+            setTimeout(() => { closeAbsensiDetail(); }, 800);
         }
 
-        // --- STREAMING_CHUNK:Logika Riwayat Absensi ---
-        function renderAbsensiHistory() {
-            const container = document.getElementById('absensi-history-list');
-            const filterKelas = document.getElementById('history-kelas-filter').value;
-            container.innerHTML = '';
-
-            const todayStr = new Date().toISOString().split('T')[0];
-            const dates = Object.keys(DB.absensi).sort((a, b) => new Date(b) - new Date(a)); // Urut dari terbaru
-
-            if (dates.length === 0) {
-                container.innerHTML = '<p class="text-muted text-center" style="padding: 30px 0; font-size: 13px;">Belum ada riwayat absensi.</p>';
-                return;
-            }
-
-            dates.forEach(dateStr => {
-                const dataHarian = DB.absensi[dateStr];
-                
-                let totalSiswa = 0;
-                let hadir = 0;
-                let alpa = 0; // Termasuk Izin, Sakit, Alfa, Bolos
-
-                DB.siswa.forEach(s => {
-                    if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
-                    totalSiswa++;
-                    
-                    const stat = dataHarian[s.id];
-                    if (stat && stat.status) {
-                        if (stat.status === 'H') hadir++;
-                        else alpa++;
-                    }
-                });
-
-                if (totalSiswa === 0) return; // Lewati jika tidak ada siswa di kelas tsb pada hari ini
-
-                const persentase = totalSiswa > 0 ? Math.round((hadir / totalSiswa) * 100) : 0;
-                
-                // Format Badge
-                let badgeHtml = '';
-                if (dateStr === todayStr) {
-                    badgeHtml = '<span class="h-badge today">HARI INI</span>';
-                } else {
-                    const d = new Date(dateStr);
-                    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGU', 'SEP', 'OKT', 'NOV', 'DES'];
-                    badgeHtml = `<span class="h-badge">${d.getDate()} ${months[d.getMonth()]}</span>`;
-                }
-
-                // Format Teks Tanggal
-                const dt = new Date(dateStr);
-                const fullMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-                const dateDisplay = `${dt.getDate()} ${fullMonths[dt.getMonth()]} ${dt.getFullYear()}`;
-
-                const html = `
-                <div class="history-card" onclick="openAbsensiDetail('${dateStr}', '${filterKelas}')">
-                    <div class="d-flex align-center mb-15">
-                        ${badgeHtml}
-                        <span style="font-size: 13px; color: var(--text-muted); flex: 1;">${dateDisplay}</span>
-                        <span style="font-size: 11px; color: var(--text-muted);">Harian</span>
-                    </div>
-                    
-                    <div class="d-flex justify-between align-center">
-                        <div>
-                            <h1 style="font-size: 42px; font-weight: 700; margin: 0; line-height: 1; color: var(--text-main);">${persentase}%</h1>
-                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">${hadir}/${totalSiswa} siswa</p>
-                        </div>
-                        <div style="font-size: 13px; color: var(--text-muted);">
-                            <div style="margin-bottom: 5px;"><span class="dot-status dot-hadir"></span> ${hadir} hadir</div>
-                            <div><span class="dot-status dot-alpa"></span> ${alpa} alpa/absen</div>
-                        </div>
-                    </div>
-                </div>`;
-                
-                container.insertAdjacentHTML('beforeend', html);
-            });
-        }
-
-        function openNewAbsensi() {
-            const todayStr = new Date().toISOString().split('T')[0];
-            const filterKelas = document.getElementById('history-kelas-filter').value;
-            openAbsensiDetail(todayStr, filterKelas);
-        }
-
-        function openAbsensiDetail(dateStr, kelasValue) {
-            document.getElementById('absensi-history-view').style.display = 'none';
-            document.getElementById('absensi-detail-view').style.display = 'block';
-            
-            document.getElementById('absensi-date').value = dateStr;
-            document.getElementById('absensi-kelas').value = kelasValue;
-            
-            renderAbsensiList();
-            window.scrollTo(0, 0); // Scroll ke atas
-        }
-
-        function closeAbsensiDetail() {
-            document.getElementById('absensi-detail-view').style.display = 'none';
-            document.getElementById('absensi-history-view').style.display = 'block';
-            renderAbsensiHistory();
-        }
-
-        // --- STREAMING_CHUNK:Logika Nilai ---
+        // --- NILAI (FITUR GRID 2 TINGKAT) ---
         function renderNilaiList() {
             const container = document.getElementById('nilai-list-container');
             const filterKelas = document.getElementById('nilai-kelas').value;
@@ -1275,8 +1253,25 @@
             }
 
             filteredSiswa.forEach(s => {
-                const n = DB.nilai[s.id] || { tugas:0, uts:0, uas:0, praktik:0 };
-                const final = (n.tugas*0.2) + (n.uts*0.3) + (n.uas*0.3) + (n.praktik*0.2);
+                let n = DB.nilai[s.id];
+                if (!n || !n.tugasList) {
+                     n = { tugasList: Array(10).fill(0), uts: 0, uas: 0, absen: 0 };
+                }
+
+                // Kalkulasi Tugas (Hanya merata-ratakan kolom yang terisi / > 0)
+                let totalTugas = 0;
+                let countTugas = 0;
+                for(let i=0; i<10; i++) {
+                    let val = Number(n.tugasList[i] || 0);
+                    if (val > 0) {
+                        totalTugas += val;
+                        countTugas++;
+                    }
+                }
+                const rataTugas = countTugas > 0 ? (totalTugas / countTugas) : 0;
+                
+                // Kalkulasi Nilai Akhir (Tugas Rata2 50% + UTS 10% + UAS 20% + Absen 20%)
+                const final = (rataTugas * 0.5) + ((n.uts||0) * 0.1) + ((n.uas||0) * 0.2) + ((n.absen||0) * 0.2);
                 let predikat = 'E';
                 if(final >= 90) predikat = 'A';
                 else if(final >= 80) predikat = 'B';
@@ -1294,22 +1289,37 @@
                             <h2 style="color: var(--primary); font-size: 20px;">${final.toFixed(1)} <span style="font-size:12px; color:var(--text-muted);">(${predikat})</span></h2>
                         </div>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px;">
+                    
+                    <p style="font-size: 11px; color: var(--primary); margin-bottom: 5px; font-weight: 600;">Nilai Tugas (1-10)</p>
+                    <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--border);">
+                        ${Array.from({length: 10}).map((_, i) => `
+                            <div style="min-width: 60px;">
+                                <label style="font-size:9px; color:var(--text-muted); display:block; text-align:center;">T${i+1}</label>
+                                <input type="number" value="${n.tugasList[i] || 0}" onchange="updateNilaiTugas(${s.id}, ${i}, this.value)" style="padding: 5px; text-align: center; margin-bottom:0; font-size:12px;">
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1.2fr; gap: 6px;">
                         <div>
-                            <label style="font-size:10px; color:var(--text-muted);">Tugas</label>
-                            <input type="number" value="${n.tugas}" onchange="updateNilai(${s.id}, 'tugas', this.value)" style="padding: 8px; text-align: center; margin-bottom:0;">
+                            <label style="font-size:10px; color:var(--text-muted); display:block; text-align:center;">Tugas(Rata)</label>
+                            <div style="background: rgba(255,255,255,0.05); padding: 8px 4px; text-align: center; border-radius: 12px; font-size: 13px; font-weight: bold; border: 1px solid var(--border);">${rataTugas.toFixed(1)}</div>
                         </div>
                         <div>
-                            <label style="font-size:10px; color:var(--text-muted);">UTS</label>
-                            <input type="number" value="${n.uts}" onchange="updateNilai(${s.id}, 'uts', this.value)" style="padding: 8px; text-align: center; margin-bottom:0;">
+                            <label style="font-size:10px; color:var(--text-muted); display:block; text-align:center;">UTS</label>
+                            <input type="number" value="${n.uts || 0}" onchange="updateNilaiLain(${s.id}, 'uts', this.value)" style="padding: 8px 4px; text-align: center; margin-bottom:0;">
                         </div>
                         <div>
-                            <label style="font-size:10px; color:var(--text-muted);">UAS</label>
-                            <input type="number" value="${n.uas}" onchange="updateNilai(${s.id}, 'uas', this.value)" style="padding: 8px; text-align: center; margin-bottom:0;">
+                            <label style="font-size:10px; color:var(--text-muted); display:block; text-align:center;">UAS</label>
+                            <input type="number" value="${n.uas || 0}" onchange="updateNilaiLain(${s.id}, 'uas', this.value)" style="padding: 8px 4px; text-align: center; margin-bottom:0;">
                         </div>
                         <div>
-                            <label style="font-size:10px; color:var(--text-muted);">Prak</label>
-                            <input type="number" value="${n.praktik}" onchange="updateNilai(${s.id}, 'praktik', this.value)" style="padding: 8px; text-align: center; margin-bottom:0;">
+                            <label style="font-size:10px; color:var(--text-muted); display:block; text-align:center;">Absen</label>
+                            <input type="number" value="${n.absen || 0}" onchange="updateNilaiLain(${s.id}, 'absen', this.value)" style="padding: 8px 4px; text-align: center; margin-bottom:0;">
+                        </div>
+                        <div>
+                            <label style="font-size:10px; color:var(--text-muted); display:block; text-align:center; white-space:nowrap;">Nilai Akhir</label>
+                            <div style="background: rgba(57, 255, 20, 0.1); color: var(--primary); padding: 8px 4px; text-align: center; border-radius: 12px; font-size: 13px; font-weight: bold; border: 1px solid var(--primary);">${final.toFixed(1)}</div>
                         </div>
                     </div>
                 </div>`;
@@ -1317,18 +1327,27 @@
             });
         }
 
-        function updateNilai(siswaId, field, value) {
-            if(!DB.nilai[siswaId]) DB.nilai[siswaId] = { tugas:0, uts:0, uas:0, praktik:0 };
+        function updateNilaiTugas(siswaId, index, value) {
+            if(!DB.nilai[siswaId] || !DB.nilai[siswaId].tugasList) DB.nilai[siswaId] = { tugasList: Array(10).fill(0), uts:0, uas:0, absen:0 };
             let valNum = Number(value);
             if(valNum > 100) valNum = 100;
             if(valNum < 0) valNum = 0;
-            
+            DB.nilai[siswaId].tugasList[index] = valNum;
+            autoSaveLokal(); 
+            renderNilaiList();
+        }
+
+        function updateNilaiLain(siswaId, field, value) {
+            if(!DB.nilai[siswaId] || !DB.nilai[siswaId].tugasList) DB.nilai[siswaId] = { tugasList: Array(10).fill(0), uts:0, uas:0, absen:0 };
+            let valNum = Number(value);
+            if(valNum > 100) valNum = 100;
+            if(valNum < 0) valNum = 0;
             DB.nilai[siswaId][field] = valNum;
             autoSaveLokal(); 
             renderNilaiList();
         }
 
-        // --- STREAMING_CHUNK:Logika Pengaturan & Master Data ---
+        // --- PENGATURAN & MASTER DATA ---
         function renderPengaturanLists() {
             document.getElementById('set-nama-guru').innerText = DB.guru.nama;
             document.getElementById('set-nip-guru').innerText = DB.guru.nip;
@@ -1349,8 +1368,8 @@
                     <div class="d-flex justify-between align-center mb-15">
                         <h4 style="color: var(--accent);">${k} <span style="font-size:11px; color:var(--text-muted);">(${muridDiKelas.length} Siswa)</span></h4>
                         <div class="d-flex" style="gap: 5px;">
-                            <span class="list-item-edit" onclick="bukaModalEditKelas('${k}')"><i class="fas fa-edit"></i> Edit</span>
-                            <span class="list-item-delete" onclick="hapusKelas('${k}')"><i class="fas fa-trash"></i> Hapus</span>
+                            <span class="list-item-btn btn-edit" onclick="bukaModalEditKelas('${k}')"><i class="fas fa-edit"></i> Edit</span>
+                            <span class="list-item-btn btn-delete" onclick="hapusKelas('${k}')"><i class="fas fa-trash"></i> Hapus</span>
                         </div>
                     </div>
                 `;
@@ -1360,8 +1379,8 @@
                     <div class="d-flex justify-between align-center" style="padding: 5px 0; font-size: 13px;">
                         <span>- ${s.nama} <span style="color:var(--text-muted); font-size:10px;">(${s.nis || 'No NIS'})</span></span>
                         <div class="d-flex" style="gap: 5px;">
-                            <span class="list-item-edit" style="padding: 2px 6px; font-size: 10px;" onclick="bukaModalEditSiswa(${s.id})"><i class="fas fa-pencil-alt"></i></span>
-                            <span class="list-item-delete" style="padding: 2px 6px; font-size: 10px;" onclick="hapusSiswa(${s.id})"><i class="fas fa-times"></i></span>
+                            <span class="list-item-btn btn-edit" style="padding: 3px 8px; font-size: 10px;" onclick="bukaModalEditSiswa(${s.id})"><i class="fas fa-pencil-alt"></i></span>
+                            <span class="list-item-btn btn-delete" style="padding: 3px 8px; font-size: 10px;" onclick="hapusSiswa(${s.id})"><i class="fas fa-times"></i></span>
                         </div>
                     </div>`;
                 });
@@ -1371,11 +1390,9 @@
             });
         }
 
-        // --- STREAMING_CHUNK:Logika Foto Profil & Edit Master Data ---
         function renderFotoProfil() {
             const berandaFoto = document.getElementById('beranda-foto-profil');
             const setFoto = document.getElementById('set-foto-profil');
-            
             if (DB.guru.foto && DB.guru.foto !== "") {
                 const imgTag = `<img src="${DB.guru.foto}" style="width: 100%; height: 100%; object-fit: cover;">`;
                 berandaFoto.innerHTML = imgTag;
@@ -1391,31 +1408,23 @@
             const file = event.target.files[0];
             if (!file) return;
 
-            // Kompresi Gambar Menggunakan Canvas agar muat di LocalStorage
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_SIZE = 250; // Max lebar/tinggi pixel
+                    const MAX_SIZE = 250; 
                     let width = img.width;
                     let height = img.height;
 
-                    if (width > height) {
-                        if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
-                    } else {
-                        if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
-                    }
+                    if (width > height) { if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; } } 
+                    else { if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; } }
 
-                    canvas.width = width;
-                    canvas.height = height;
+                    canvas.width = width; canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // Simpan sebagai Base64 JPG kompresi 80%
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                    
-                    DB.guru.foto = dataUrl;
+                    DB.guru.foto = canvas.toDataURL('image/jpeg', 0.8);
                     autoSaveLokal();
                     renderFotoProfil();
                     showToast('Foto profil berhasil diperbarui!');
@@ -1425,14 +1434,30 @@
             reader.readAsDataURL(file);
         }
 
-        function bukaModalEditKelas(namaKelasLama) {
+        function updateKelasDropdowns() {
+            const dropdowns = ['history-kelas-filter', 'absensi-kelas', 'nilai-kelas', 'input-siswa-kelas'];
+            dropdowns.forEach(id => {
+                const el = document.getElementById(id);
+                if(!el) return;
+                
+                if(id === 'history-kelas-filter') el.innerHTML = '<option value="SEMUA">Semua Kelas / Jurusan</option>';
+                else if (id === 'input-siswa-kelas') el.innerHTML = '<option value="">Pilih Kelas</option>';
+                else el.innerHTML = '<option value="SEMUA">Semua Kelas</option>';
+                
+                DB.kelas.forEach(k => {
+                    el.insertAdjacentHTML('beforeend', `<option value="${k}">${k}</option>`);
+                });
+            });
+        }
+
+        function bukaModalEditKelas(namaLama) {
             document.getElementById('modal-edit-title').innerText = "Edit Nama Kelas";
             document.getElementById('modal-edit-type').value = "kelas";
-            document.getElementById('modal-edit-id').value = namaKelasLama; // ID diisi nama lama
+            document.getElementById('modal-edit-id').value = namaLama;
             
             const inputVal1 = document.getElementById('modal-edit-val1');
             inputVal1.placeholder = "Nama Kelas Baru";
-            inputVal1.value = namaKelasLama;
+            inputVal1.value = namaLama;
             
             document.getElementById('modal-edit-val2').style.display = 'none';
             document.getElementById('modal-edit-data').style.display = 'flex';
@@ -1464,93 +1489,22 @@
             const val2 = document.getElementById('modal-edit-val2').value.trim();
             const identifier = document.getElementById('modal-edit-id').value;
 
-            if(!val1) {
-                showToast("Nama tidak boleh kosong!");
-                return;
-            }
+            if(!val1) return showToast("Nama tidak boleh kosong!");
 
             if (type === 'kelas') {
-                const namaKelasLama = identifier;
-                const namaKelasBaru = val1;
-                
-                // Cegah duplikasi jika bukan namanya sendiri
-                if (namaKelasLama !== namaKelasBaru && DB.kelas.includes(namaKelasBaru)) {
-                    showToast("Nama kelas sudah digunakan!"); return;
-                }
-
-                // Update Array Kelas
-                const index = DB.kelas.indexOf(namaKelasLama);
-                if (index !== -1) DB.kelas[index] = namaKelasBaru;
-
-                // Update data siswa yang menggunakan kelas ini
-                DB.siswa.forEach(s => {
-                    if (s.kelas === namaKelasLama) s.kelas = namaKelasBaru;
-                });
-
-                showToast("Nama kelas berhasil diubah!");
-            } 
-            else if (type === 'siswa') {
-                const idSiswa = parseInt(identifier);
-                const siswaIndex = DB.siswa.findIndex(s => s.id === idSiswa);
-                
-                if(siswaIndex !== -1) {
-                    DB.siswa[siswaIndex].nama = val1;
-                    DB.siswa[siswaIndex].nis = val2 || "-";
-                }
-                showToast("Data siswa berhasil diubah!");
+                if (identifier !== val1 && DB.kelas.includes(val1)) return showToast("Nama kelas sudah digunakan!");
+                const index = DB.kelas.indexOf(identifier);
+                if (index !== -1) DB.kelas[index] = val1;
+                DB.siswa.forEach(s => { if (s.kelas === identifier) s.kelas = val1; });
+                showToast("Nama kelas diubah!");
+            } else if (type === 'siswa') {
+                const siswaIndex = DB.siswa.findIndex(s => s.id === parseInt(identifier));
+                if(siswaIndex !== -1) { DB.siswa[siswaIndex].nama = val1; DB.siswa[siswaIndex].nis = val2 || "-"; }
+                showToast("Data siswa diubah!");
             }
 
-            autoSaveLokal();
-            updateKelasDropdowns();
-            renderPengaturanLists();
-            initBeranda();
-            
-            // Render ulang tab lain yang terkait (seperti daftar absen) jika perlu
-            renderAbsensiList(); 
-            
+            autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); initBeranda(); renderAbsensiList(); renderNilaiList();
             document.getElementById('modal-edit-data').style.display = 'none';
-        }
-
-        function bukaModalEditProfil() {
-            document.getElementById('edit-nama-guru').value = DB.guru.nama;
-            document.getElementById('edit-nip-guru').value = DB.guru.nip;
-            document.getElementById('edit-mapel-guru').value = DB.guru.mapel;
-            document.getElementById('modal-edit-profil').style.display = 'flex';
-        }
-
-        function tutupModalProfil() {
-            document.getElementById('modal-edit-profil').style.display = 'none';
-        }
-
-        function simpanProfilGuru() {
-            DB.guru.nama = document.getElementById('edit-nama-guru').value;
-            DB.guru.nip = document.getElementById('edit-nip-guru').value;
-            DB.guru.mapel = document.getElementById('edit-mapel-guru').value;
-            tutupModalProfil();
-            autoSaveLokal();
-            renderPengaturanLists();
-            initBeranda(); // Refresh nama di beranda
-            showToast('Profil diperbarui!');
-        }
-
-        function updateKelasDropdowns() {
-            const dropdowns = ['history-kelas-filter', 'absensi-kelas', 'nilai-kelas', 'input-siswa-kelas'];
-            dropdowns.forEach(id => {
-                const el = document.getElementById(id);
-                if(!el) return;
-                const isFilter = id !== 'input-siswa-kelas';
-                
-                // Khusus untuk history, teksnya sedikit beda
-                if(id === 'history-kelas-filter') {
-                    el.innerHTML = '<option value="SEMUA">Semua Kelas / Jurusan</option>';
-                } else {
-                    el.innerHTML = isFilter ? '<option value="SEMUA">Semua Kelas</option>' : '<option value="">Pilih Kelas</option>';
-                }
-                
-                DB.kelas.forEach(k => {
-                    el.insertAdjacentHTML('beforeend', `<option value="${k}">${k}</option>`);
-                });
-            });
         }
 
         function tambahKelas() {
@@ -1560,21 +1514,14 @@
 
             DB.kelas.push(nama);
             document.getElementById('input-kelas-nama').value = '';
-            
-            autoSaveLokal();
-            updateKelasDropdowns();
-            renderPengaturanLists();
-            showToast('Kelas ' + nama + ' ditambahkan!');
+            autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); showToast('Kelas ditambahkan!');
         }
 
         function hapusKelas(nama) {
-            showModal(`Hapus kelas ${nama} beserta seluruh siswanya?`, 'confirm', () => {
+            showModal(`Hapus kelas ${nama} beserta siswanya?`, 'confirm', () => {
                 DB.kelas = DB.kelas.filter(k => k !== nama);
                 DB.siswa = DB.siswa.filter(s => s.kelas !== nama);
-                autoSaveLokal();
-                updateKelasDropdowns();
-                renderPengaturanLists();
-                showToast('Kelas dihapus!');
+                autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); showToast('Kelas dihapus!');
             });
         }
 
@@ -1582,176 +1529,120 @@
             const nis = document.getElementById('input-siswa-nis').value.trim();
             const nama = document.getElementById('input-siswa-nama').value.trim();
             const kelas = document.getElementById('input-siswa-kelas').value;
-            const gender = document.getElementById('input-siswa-gender').value;
 
             if(!nama || !kelas) return showToast('Nama dan Kelas wajib diisi!');
 
-            const newId = Date.now();
-            DB.siswa.push({ id: newId, nis: nis || "-", nama: nama, kelas: kelas, gender: gender });
+            DB.siswa.push({ id: Date.now(), nis: nis || "-", nama: nama, kelas: kelas });
+            document.getElementById('input-siswa-nis').value = ''; document.getElementById('input-siswa-nama').value = '';
             
-            document.getElementById('input-siswa-nis').value = '';
-            document.getElementById('input-siswa-nama').value = '';
-            
-            autoSaveLokal();
-            renderPengaturanLists();
-            initBeranda();
-            showToast('Siswa berhasil ditambahkan!');
+            autoSaveLokal(); renderPengaturanLists(); initBeranda(); showToast('Siswa ditambahkan!');
         }
 
         function hapusSiswa(id) {
-            showModal('Hapus siswa ini dari database?', 'confirm', () => {
+            showModal('Hapus siswa ini?', 'confirm', () => {
                 DB.siswa = DB.siswa.filter(s => s.id !== id);
-                autoSaveLokal();
-                renderPengaturanLists();
-                initBeranda();
-                showToast('Siswa dihapus!');
+                autoSaveLokal(); renderPengaturanLists(); initBeranda(); showToast('Siswa dihapus!');
             });
+        }
+
+        function bukaModalEditProfil() {
+            document.getElementById('edit-nama-guru').value = DB.guru.nama;
+            document.getElementById('edit-nip-guru').value = DB.guru.nip;
+            document.getElementById('edit-mapel-guru').value = DB.guru.mapel;
+            document.getElementById('modal-edit-profil').style.display = 'flex';
+        }
+
+        function tutupModalProfil() { document.getElementById('modal-edit-profil').style.display = 'none'; }
+
+        function simpanProfilGuru() {
+            DB.guru.nama = document.getElementById('edit-nama-guru').value;
+            DB.guru.nip = document.getElementById('edit-nip-guru').value;
+            DB.guru.mapel = document.getElementById('edit-mapel-guru').value;
+            tutupModalProfil(); autoSaveLokal(); renderPengaturanLists(); initBeranda(); showToast('Profil diperbarui!');
         }
 
         function toggleTheme() {
             const root = document.documentElement;
-            const currentTheme = root.getAttribute('data-theme') || 'dark';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
+            const newTheme = (root.getAttribute('data-theme') || 'dark') === 'dark' ? 'light' : 'dark';
             root.setAttribute('data-theme', newTheme);
             document.getElementById('btn-theme').innerText = newTheme === 'dark' ? 'Terang' : 'Gelap';
             localStorage.setItem('presensi_theme', newTheme);
         }
 
-        // --- STREAMING_CHUNK:Export Logic ---
+        // --- EXPORT ---
         function exportToExcel() {
-            try {
-                if(DB.siswa.length === 0) return showToast('Tidak ada data untuk diexport');
-                
-                // Ambil tanggal dari input tab absensi, atau hari ini jika kosong
-                const dateEl = document.getElementById('absensi-date');
-                const date = dateEl && dateEl.value ? dateEl.value : new Date().toISOString().split('T')[0];
-                const absData = DB.absensi[date] || {};
+            if(DB.siswa.length === 0) return showToast('Tidak ada data');
+            const date = document.getElementById('absensi-date').value || new Date().toISOString().split('T')[0];
+            const absData = DB.absensi[date] || {};
 
-                // Format Header / Kop Laporan Rapi (Array of Arrays)
-                let ws_data = [
-                    ["LAPORAN PRESENSI SISWA"],
-                    ["SMK NEGERI 1 MARISA"],
-                    [],
-                    ["Nama Guru", ":", DB.guru.nama],
-                    ["Mata Pelajaran", ":", DB.guru.mapel],
-                    ["NIP", ":", DB.guru.nip || "-"],
-                    ["Tanggal", ":", date],
-                    [],
-                    // Header Tabel (Ditambahkan Waktu Hadir & Waktu Bolos)
-                    ["No", "NIS", "Nama Lengkap Siswa", "L/P", "Kelas", "Status Kehadiran", "Waktu Hadir", "Waktu Bolos", "Keterangan Terlambat"]
-                ];
+            let ws_data = [
+                ["LAPORAN PRESENSI SISWA"], ["SMK NEGERI 1 MARISA"], [],
+                ["Nama Guru", ":", DB.guru.nama],
+                ["Mata Pelajaran", ":", DB.guru.mapel],
+                ["Tanggal", ":", date], [],
+                ["No", "NIS", "Nama Lengkap", "Kelas", "Kehadiran", "Waktu Hadir", "Waktu Bolos"]
+            ];
 
-                // Memasukkan data siswa ke baris tabel
-                let no = 1;
-                DB.siswa.forEach(s => {
-                    const abs = absData[s.id] || { status: '-', hadirTime: '-', bolosTime: '-', lateMinutes: 0 };
-                    
-                    let ketTelat = "-";
-                    if (abs.lateMinutes > 0) ketTelat = `Terlambat ${abs.lateMinutes} Menit`;
+            let no = 1;
+            DB.siswa.forEach(s => {
+                const abs = absData[s.id] || { status: '-', hadirTime: '-', bolosTime: '-' };
+                let st = abs.status; if(abs.isBolos) st += " (Bolos)";
+                ws_data.push([ no++, s.nis, s.nama, s.kelas, st, abs.hadirTime||'-', abs.bolosTime||'-' ]);
+            });
 
-                    ws_data.push([
-                        no++,
-                        s.nis || "-",
-                        s.nama,
-                        s.gender || "-",
-                        s.kelas,
-                        abs.status || "-",
-                        abs.hadirTime || "-",
-                        abs.bolosTime || "-",
-                        ketTelat
-                    ]);
-                });
-
-                // Convert JSON Array to Worksheet
-                const ws = XLSX.utils.aoa_to_sheet(ws_data);
-                
-                // Mengatur lebar kolom otomatis agar rapih dibuka di Excel
-                ws['!cols'] = [
-                    { wch: 5 },   // A: No
-                    { wch: 15 },  // B: NIS
-                    { wch: 35 },  // C: Nama
-                    { wch: 5 },   // D: L/P
-                    { wch: 15 },  // E: Kelas
-                    { wch: 15 },  // F: Status
-                    { wch: 15 },  // G: Waktu Hadir
-                    { wch: 15 },  // H: Waktu Bolos
-                    { wch: 25 }   // I: Keterangan
-                ];
-
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Rekap_Harian");
-                XLSX.writeFile(wb, `Laporan_Absensi_${DB.guru.nama.replace(/\s+/g, '_')}_${date}.xlsx`);
-                showToast('Download Excel berhasil!');
-            } catch (e) {
-                showToast('Error saat export Excel');
-                console.error(e);
-            }
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            ws['!cols'] = [ {wch: 5}, {wch: 15}, {wch: 35}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15} ];
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Rekap");
+            XLSX.writeFile(wb, `Absen_${date}.xlsx`);
         }
 
         function exportToCSV() {
-            try {
-                if(DB.siswa.length === 0) return showToast('Tidak ada data untuk diexport');
-                let csvContent = "data:text/csv;charset=utf-8,";
-                csvContent += "NIS,Nama,Kelas,Status,Waktu Hadir,Waktu Bolos,Nilai Akhir\n";
-                const date = new Date().toISOString().split('T')[0];
+            if(DB.siswa.length === 0) return showToast('Tidak ada data');
+            let csv = "NIS,Nama,Kelas,Status,Waktu_Hadir,Waktu_Bolos,Nilai_Akhir\n";
+            const date = document.getElementById('absensi-date').value || new Date().toISOString().split('T')[0];
+            
+            DB.siswa.forEach(s => {
+                const abs = DB.absensi[date]?.[s.id] || {};
                 
-                DB.siswa.forEach(s => {
-                    const abs = DB.absensi[date]?.[s.id] || {};
-                    const n = DB.nilai[s.id] || { tugas:0, uts:0, uas:0, praktik:0 };
-                    const final = (n.tugas*0.2) + (n.uts*0.3) + (n.uas*0.3) + (n.praktik*0.2);
-                    csvContent += `${s.nis},${s.nama},${s.kelas},${abs.status||'-'},${abs.hadirTime||'-'},${abs.bolosTime||'-'},${final.toFixed(1)}\n`;
-                });
-
-                const encodedUri = encodeURI(csvContent);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", `Data_${date}.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                showToast('Download CSV berhasil!');
-            } catch(e) {
-                showToast('Error export CSV');
-            }
+                let n = DB.nilai[s.id] || { tugasList: Array(10).fill(0), uts: 0, uas: 0, absen: 0 };
+                let totalTugas = 0;
+                let countTugas = 0;
+                for(let i=0; i<10; i++) {
+                    let val = Number(n.tugasList[i] || 0);
+                    if (val > 0) { totalTugas += val; countTugas++; }
+                }
+                const rataTugas = countTugas > 0 ? (totalTugas / countTugas) : 0;
+                const final = (rataTugas * 0.5) + ((n.uts||0) * 0.1) + ((n.uas||0) * 0.2) + ((n.absen||0) * 0.2);
+                
+                csv += `${s.nis},${s.nama},${s.kelas},${abs.status||'-'},${abs.hadirTime||'-'},${abs.bolosTime||'-'},${final.toFixed(1)}\n`;
+            });
+            const link = document.createElement("a");
+            link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
+            link.download = `Data_${date}.csv`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
 
         function exportToPDF() {
-            showToast('Menyiapkan dokumen PDF...');
-            const element = document.createElement('div');
-            element.style.padding = '20px';
-            element.style.color = '#000';
-            element.style.background = '#fff';
-            element.innerHTML = `
-                <h2 style="text-align:center; margin-bottom:5px;">Laporan Presensi - ${DB.guru.nama}</h2>
-                <h4 style="text-align:center; margin-top:0;">Mata Pelajaran: ${DB.guru.mapel}</h4>
-                <p style="text-align:center;">Tanggal: ${new Date().toLocaleDateString('id-ID')}</p>
-                <hr style="margin:20px 0;">
+            showToast('Menyiapkan PDF...');
+            const date = document.getElementById('absensi-date').value || new Date().toISOString().split('T')[0];
+            const el = document.createElement('div');
+            el.style.padding = '20px'; el.style.background = '#fff'; el.style.color = '#000';
+            
+            let html = `
+                <h3 style="text-align:center;">Laporan Presensi - ${DB.guru.nama}</h3>
+                <p style="text-align:center; font-size:12px;">Mapel: ${DB.guru.mapel} | Tgl: ${date}</p><hr>
+                <table border="1" width="100%" cellpadding="5" style="border-collapse:collapse; font-size:12px; text-align:center;">
+                <tr style="background:#eee;"><th>NIS</th><th>Nama</th><th>Kelas</th><th>Status</th><th>Jam Hadir</th><th>Jam Bolos</th></tr>
             `;
             
-            let table = '<table border="1" width="100%" cellpadding="5" style="border-collapse:collapse; font-size:12px; text-align:center;">';
-            table += '<tr style="background:#eee;"><th>NIS</th><th>Nama Lengkap</th><th>Kelas</th><th>Status Hadir</th><th>Waktu Hadir</th><th>Waktu Bolos</th></tr>';
-            
-            const dateEl = document.getElementById('absensi-date');
-            const date = dateEl && dateEl.value ? dateEl.value : new Date().toISOString().split('T')[0];
-            
             DB.siswa.forEach(s => {
-                const abs = DB.absensi[date]?.[s.id] || { status: '-', hadirTime: '-', bolosTime: '-' };
-                table += `<tr>
-                    <td>${s.nis || '-'}</td>
-                    <td style="text-align:left;">${s.nama}</td>
-                    <td>${s.kelas}</td>
-                    <td><b>${abs.status||'-'}</b></td>
-                    <td>${abs.hadirTime||'-'}</td>
-                    <td>${abs.bolosTime||'-'}</td>
-                </tr>`;
+                const abs = DB.absensi[date]?.[s.id] || {};
+                let st = abs.status||'-'; if(abs.isBolos) st += " (B)";
+                html += `<tr><td>${s.nis}</td><td style="text-align:left;">${s.nama}</td><td>${s.kelas}</td><td><b>${st}</b></td><td>${abs.hadirTime||'-'}</td><td>${abs.bolosTime||'-'}</td></tr>`;
             });
-            table += '</table>';
-            element.innerHTML += table;
-
-            html2pdf().from(element).save(`Laporan_PDF_${date}.pdf`).then(() => {
-                showToast('Download PDF berhasil!');
-            });
+            html += '</table>'; el.innerHTML = html;
+            html2pdf().from(el).save(`PDF_${date}.pdf`);
         }
     </script>
 </body>
