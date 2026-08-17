@@ -161,7 +161,7 @@
         
         <div style="text-align: center; margin-bottom: 20px;">
             <p style="font-size: 14px; color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">Absensi Kelas</p>
-            <h2 style="font-size: 22px; color: var(--text-main); margin: 5px 0 10px; font-weight: 700;">SMK NEGERI 1 MARISA</h2>
+            <h2 style="font-size: 22px; color: var(--text-main); margin: 5px 0 10px; font-weight: 700;">PEGANGAN GURU MAPEL</h2>
             <h3 style="font-size: 18px; color: var(--text-main); font-weight: 600;">Login Ruang Guru</h3>
             <p style="font-size: 12px; color: var(--text-muted);">Setiap guru memiliki ruang data tersendiri</p>
         </div>
@@ -182,7 +182,7 @@
     <header class="header">
         <div class="logo-title">
             <h1>PRESENSI SISWA</h1>
-            <p>SMK Negeri 1 Marisa</p>
+            <p>Pegangan Guru Mapel</p>
         </div>
         <div class="header-right">
             <div class="time" id="clock">00.00.00</div>
@@ -364,11 +364,30 @@
             <!-- Export Section -->
             <h3 style="font-size: 14px; margin: 20px 0 10px 5px; color: #ffffff; font-weight: 600;">Export Data (Laporan)</h3>
             <div class="glass-card">
-                <div class="action-grid mb-15">
-                    <button class="btn-outline" style="border-color: #217346; color: #217346; background: rgba(33, 115, 70, 0.1);" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Excel (.xlsx)</button>
-                    <button class="btn-outline" style="border-color: #e74c3c; color: #e74c3c; background: rgba(231, 76, 60, 0.1);" onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                <!-- Filter Export -->
+                <div style="margin-bottom: 15px;">
+                    <select id="export-tipe" onchange="toggleExportDate()" style="margin-bottom: 10px;">
+                        <option value="harian">Laporan Harian</option>
+                        <option value="bulanan">Laporan Bulanan</option>
+                    </select>
+                    
+                    <input type="date" id="export-date" style="margin-bottom: 10px;">
+                    <input type="month" id="export-month" style="margin-bottom: 10px; display: none;">
+                    
+                    <select id="export-kelas" style="margin-bottom: 10px;">
+                        <option value="SEMUA">Semua Kelas</option>
+                    </select>
+                    
+                    <select id="export-mapel" style="margin-bottom: 15px;">
+                        <option value="Umum">Umum</option>
+                    </select>
                 </div>
-                <button class="btn-outline" style="border-color: #00e5ff; color: #00e5ff; background: rgba(0, 229, 255, 0.1);" onclick="exportToCSV()"><i class="fas fa-file-csv"></i> CSV (Untuk Google Sheet)</button>
+
+                <div class="action-grid mb-15">
+                    <button class="btn-outline" style="border-color: #217346; color: #217346; background: rgba(33, 115, 70, 0.1);" onclick="exportAbsensi('excel')"><i class="fas fa-file-excel"></i> Excel (.xlsx)</button>
+                    <button class="btn-outline" style="border-color: #e74c3c; color: #e74c3c; background: rgba(231, 76, 60, 0.1);" onclick="exportAbsensi('pdf')"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                </div>
+                <button class="btn-outline" style="border-color: #00e5ff; color: #00e5ff; background: rgba(0, 229, 255, 0.1);" onclick="exportAbsensi('html')"><i class="fas fa-globe"></i> Export HTML (Web View)</button>
             </div>
 
             <!-- Input Master Data -->
@@ -400,6 +419,23 @@
                     </select>
                 </div>
                 <button class="btn-primary" onclick="tambahSiswa()">Simpan Siswa</button>
+
+                <hr style="border-color: var(--border); margin: 25px 0;">
+
+                <h4 style="font-size: 14px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-file-excel"></i> Upload Siswa Massal (Excel)</h4>
+                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Gunakan fitur ini untuk menambah banyak siswa sekaligus. Download template, isi datanya, lalu upload kembali ke sini.</p>
+                
+                <div class="action-grid">
+                    <button class="btn-outline" style="border-color: #217346; color: #217346; background: rgba(33, 115, 70, 0.1);" onclick="downloadTemplateSiswa()">
+                        <i class="fas fa-download"></i> Template Excel
+                    </button>
+                    <div style="position: relative; width: 100%;">
+                        <button class="btn-primary" style="width: 100%; background-color: #217346; color: #fff; box-shadow: 0 4px 15px rgba(33, 115, 70, 0.3);">
+                            <i class="fas fa-upload"></i> Upload Excel
+                        </button>
+                        <input type="file" id="input-excel-siswa" accept=".xlsx, .xls" style="position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; width: 100%; margin: 0; padding: 0;" onchange="uploadSiswaExcel()">
+                    </div>
+                </div>
             </div>
 
             <!-- Daftar Master Data -->
@@ -562,6 +598,12 @@
             const today = new Date().toISOString().split('T')[0];
             const absDate = document.getElementById('absensi-date');
             if (absDate) absDate.value = today;
+            
+            const expDate = document.getElementById('export-date');
+            if (expDate) expDate.value = today;
+            
+            const expMonth = document.getElementById('export-month');
+            if (expMonth) expMonth.value = today.substring(0, 7);
         }
 
         // Room Login System
@@ -1324,7 +1366,7 @@
         }
 
         function updateKelasDropdowns() {
-            const dropdowns = ['history-kelas-filter', 'absensi-kelas', 'nilai-kelas', 'input-siswa-kelas'];
+            const dropdowns = ['history-kelas-filter', 'absensi-kelas', 'nilai-kelas', 'input-siswa-kelas', 'export-kelas'];
             dropdowns.forEach(id => {
                 const el = document.getElementById(id);
                 if(!el) return;
@@ -1338,17 +1380,18 @@
                 });
             });
 
-            const mapelEl = document.getElementById('absensi-mapel');
-            if(mapelEl) {
-                mapelEl.innerHTML = '';
+            const mapelEls = [document.getElementById('absensi-mapel'), document.getElementById('export-mapel')];
+            mapelEls.forEach(el => {
+                if(!el) return;
+                el.innerHTML = '';
                 if(DB.mapelList.length === 0) {
-                    mapelEl.innerHTML = '<option value="">-- Buat Mapel di Pengaturan --</option>';
+                    el.innerHTML = '<option value="">-- Buat Mapel di Pengaturan --</option>';
                 } else {
                     DB.mapelList.forEach(m => {
-                        mapelEl.insertAdjacentHTML('beforeend', `<option value="${m}">${m}</option>`);
+                        el.insertAdjacentHTML('beforeend', `<option value="${m}">${m}</option>`);
                     });
                 }
-            }
+            });
         }
 
         // Action Handlers
@@ -1462,6 +1505,82 @@
             });
         }
 
+        function downloadTemplateSiswa() {
+            const ws_data = [
+                ["NIS", "Nama Lengkap Siswa", "Kelas"],
+                ["1001", "Budi Santoso", "X TKP"],
+                ["1002", "Siti Aminah", "X TKP"],
+                ["", "Ahmad (Contoh Tanpa NIS)", "XI RPL 1"]
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            ws['!cols'] = [{wch: 15}, {wch: 35}, {wch: 15}];
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Template_Siswa");
+            XLSX.writeFile(wb, "Template_Upload_Siswa.xlsx");
+            showToast('Mendownload Template Excel...');
+        }
+
+        function uploadSiswaExcel() {
+            const fileInput = document.getElementById('input-excel-siswa');
+            const file = fileInput.files[0];
+            
+            if (!file) return showToast('Pilih file Excel terlebih dahulu!');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                    
+                    if(jsonData.length <= 1) return showToast('File kosong atau format salah!');
+
+                    let newSiswaCount = 0;
+                    let addedKelasCount = 0;
+
+                    // Iterasi dimulai dari 1 (mengabaikan baris 0 yang merupakan Header)
+                    for (let i = 1; i < jsonData.length; i++) {
+                        const row = jsonData[i];
+                        if (row && row.length >= 2) {
+                            let nis = row[0] ? String(row[0]).trim() : "-";
+                            let nama = row[1] ? String(row[1]).trim() : "";
+                            let kelas = row[2] ? String(row[2]).trim() : "Tanpa Kelas";
+
+                            if (nama) {
+                                // Jika kelas di Excel belum ada di sistem, otomatis tambahkan
+                                if (!DB.kelas.includes(kelas) && kelas !== "Tanpa Kelas") {
+                                    DB.kelas.push(kelas);
+                                    addedKelasCount++;
+                                }
+                                
+                                DB.siswa.push({
+                                    id: Date.now() + i, // Generate ID unik
+                                    nis: nis,
+                                    nama: nama,
+                                    kelas: kelas
+                                });
+                                newSiswaCount++;
+                            }
+                        }
+                    }
+
+                    if (newSiswaCount > 0) {
+                        autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); initBeranda();
+                        fileInput.value = ""; // Bersihkan kolom upload
+                        showToast(`Berhasil upload ${newSiswaCount} siswa & ${addedKelasCount} kelas baru!`);
+                    } else {
+                        showToast('Tidak ada data siswa valid ditemukan.');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    showToast('Gagal membaca file Excel. Pastikan formatnya benar.');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
         function bukaModalEditProfil() {
             document.getElementById('edit-nama-guru').value = DB.guru.nama;
             document.getElementById('edit-nip-guru').value = DB.guru.nip;
@@ -1486,6 +1605,17 @@
             localStorage.setItem('presensi_theme', newTheme);
         }
 
+        function toggleExportDate() {
+            const tipe = document.getElementById('export-tipe').value;
+            if(tipe === 'harian') {
+                document.getElementById('export-date').style.display = 'block';
+                document.getElementById('export-month').style.display = 'none';
+            } else {
+                document.getElementById('export-date').style.display = 'none';
+                document.getElementById('export-month').style.display = 'block';
+            }
+        }
+
         function addRippleEffect() {
             const buttons = document.querySelectorAll('.btn-primary, .history-btn, .fab-btn');
             buttons.forEach(btn => {
@@ -1503,68 +1633,252 @@
         }
 
         // --- STREAMING_CHUNK:Logika Export ---
-        function exportToExcel() {
+        function exportAbsensi(format) {
             if(DB.siswa.length === 0) return showToast('Tidak ada data siswa');
             
-            const date = document.getElementById('absensi-date').value || new Date().toISOString().split('T')[0];
-            const mapel = document.getElementById('absensi-mapel').value || 'Umum';
-            const filterKelas = document.getElementById('absensi-kelas').value;
-            const key = date + '|' + mapel;
-            const absData = DB.absensi[key] || {};
+            const tipe = document.getElementById('export-tipe').value;
+            const filterKelas = document.getElementById('export-kelas').value;
+            const mapel = document.getElementById('export-mapel').value || 'Umum';
+            
+            let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas;
+            let dateTitle = "";
+            let ws_data = [];
+            let htmlTable = "";
 
+            if(tipe === 'harian') {
+                const date = document.getElementById('export-date').value || new Date().toISOString().split('T')[0];
+                dateTitle = date;
+                const key = date + '|' + mapel;
+                const absData = DB.absensi[key] || {};
+
+                ws_data = [
+                    ["PEMERINTAH PROVINSI GORONTALO"],
+                    ["DINAS PENDIDIKAN DAN KEBUDAYAAN"],
+                    ["PEGANGAN GURU MAPEL"],
+                    ["REKAPITULASI KEHADIRAN SISWA (HARIAN)"],
+                    [],
+                    ["Nama Guru", ":", DB.guru.nama],
+                    ["Mata Pelajaran", ":", mapel],
+                    ["Kelas", ":", kelasText],
+                    ["Tanggal", ":", date], 
+                    [],
+                    ["No", "NIS", "Nama Lengkap Siswa", "Status Kehadiran", "Waktu Hadir", "Waktu Bolos"]
+                ];
+
+                htmlTable = `<tr><th>No</th><th>NIS</th><th style="text-align:left;">Nama Lengkap Siswa</th><th>Status</th><th>Waktu Hadir</th><th>Waktu Bolos</th></tr>`;
+
+                let no = 1;
+                DB.siswa.forEach(s => {
+                    if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
+                    const abs = absData[s.id] || { status: '-', hadirTime: '-', bolosTime: '-' };
+                    
+                    let st = "-";
+                    if (abs.status === 'H') st = "Hadir";
+                    else if (abs.status === 'I') st = "Izin";
+                    else if (abs.status === 'S') st = "Sakit";
+                    else if (abs.status === 'A') st = "Alpa";
+
+                    if(abs.isBolos) st += " (Bolos)";
+
+                    ws_data.push([ no, s.nis, s.nama, st, abs.hadirTime||'-', abs.bolosTime||'-' ]);
+                    htmlTable += `<tr><td>${no}</td><td>${s.nis}</td><td style="text-align:left;">${s.nama}</td><td><b>${st}</b></td><td>${abs.hadirTime||'-'}</td><td>${abs.bolosTime||'-'}</td></tr>`;
+                    no++;
+                });
+
+            } else {
+                const month = document.getElementById('export-month').value; 
+                if(!month) return showToast('Pilih bulan terlebih dahulu');
+                dateTitle = month;
+
+                ws_data = [
+                    ["PEMERINTAH PROVINSI GORONTALO"],
+                    ["DINAS PENDIDIKAN DAN KEBUDAYAAN"],
+                    ["PEGANGAN GURU MAPEL"],
+                    ["REKAPITULASI KEHADIRAN SISWA (BULANAN)"],
+                    [],
+                    ["Nama Guru", ":", DB.guru.nama],
+                    ["Mata Pelajaran", ":", mapel],
+                    ["Kelas", ":", kelasText],
+                    ["Bulan", ":", month], 
+                    [],
+                    ["No", "NIS", "Nama Lengkap Siswa", "Hadir", "Izin", "Sakit", "Alpa", "Bolos"]
+                ];
+
+                htmlTable = `<tr><th>No</th><th>NIS</th><th style="text-align:left;">Nama Lengkap Siswa</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Alpa</th><th>Bolos</th></tr>`;
+
+                const monthKeys = Object.keys(DB.absensi).filter(k => k.startsWith(month) && k.endsWith('|' + mapel));
+
+                let no = 1;
+                DB.siswa.forEach(s => {
+                    if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
+                    
+                    let counts = { H: 0, I: 0, S: 0, A: 0, B: 0 };
+                    
+                    monthKeys.forEach(k => {
+                        const abs = DB.absensi[k][s.id];
+                        if(abs) {
+                            if(abs.status === 'H') counts.H++;
+                            if(abs.status === 'I') counts.I++;
+                            if(abs.status === 'S') counts.S++;
+                            if(abs.status === 'A') counts.A++;
+                            if(abs.isBolos) counts.B++;
+                        }
+                    });
+
+                    ws_data.push([ no, s.nis, s.nama, counts.H, counts.I, counts.S, counts.A, counts.B ]);
+                    htmlTable += `<tr><td>${no}</td><td>${s.nis}</td><td style="text-align:left;">${s.nama}</td><td style="color:#00c853; font-weight:bold;">${counts.H}</td><td>${counts.I}</td><td>${counts.S}</td><td style="color:#ff1744;">${counts.A}</td><td style="color:#aa00ff;">${counts.B}</td></tr>`;
+                    no++;
+                });
+            }
+
+            if(format === 'excel') {
+                const ws = XLSX.utils.aoa_to_sheet(ws_data);
+                ws['!cols'] = [ {wch: 5}, {wch: 15}, {wch: 35}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 10}, {wch: 10} ];
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Rekap_Absensi");
+                XLSX.writeFile(wb, `Absensi_${tipe}_${mapel}_${dateTitle}.xlsx`);
+                showToast('Mengunduh Excel...');
+            } 
+            else if(format === 'pdf') {
+                showToast('Menyiapkan PDF...');
+                const el = document.createElement('div');
+                el.style.padding = '30px'; el.style.background = '#fff'; el.style.color = '#000'; el.style.fontFamily = 'Arial, sans-serif';
+                
+                let pdfHtml = `
+                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px;">
+                        <h2 style="margin:5px 0; font-size:18px;">DINAS PENDIDIKAN DAN KEBUDAYAAN</h2>
+                        <h1 style="margin:0; font-size:22px;">PEGANGAN GURU MAPEL</h1>
+                    </div>
+                    <h3 style="text-align:center; text-decoration: underline; margin-bottom: 20px;">REKAPITULASI KEHADIRAN SISWA (${tipe.toUpperCase()})</h3>
+                    <table style="width: 100%; margin-bottom: 15px; font-size: 13px;">
+                        <tr><td width="120">Nama Guru</td><td width="10">:</td><td><b>${DB.guru.nama}</b></td></tr>
+                        <tr><td>Mata Pelajaran</td><td>:</td><td>${mapel}</td></tr>
+                        <tr><td>Kelas</td><td>:</td><td>${kelasText}</td></tr>
+                        <tr><td>Periode</td><td>:</td><td>${dateTitle}</td></tr>
+                    </table>
+                    <table border="1" width="100%" cellpadding="6" style="border-collapse:collapse; font-size:12px; text-align:center;">
+                    ${htmlTable}
+                    </table>
+                `;
+                el.innerHTML = pdfHtml;
+                html2pdf().from(el).set({ margin: 1, filename: `Absen_${tipe}_${mapel}_${dateTitle}.pdf` }).save();
+            }
+            else if(format === 'html') {
+                let webHtml = `
+                <!DOCTYPE html>
+                <html><head><title>Laporan Absensi</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
+                    .card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 1000px; margin: 0 auto; overflow-x: auto; }
+                    h1, h2, h3 { text-align: center; margin: 5px 0; line-height: 1.3; }
+                    h1 { color: #2c3e50; font-size: 24px; }
+                    h2 { font-size: 16px; font-weight: normal; }
+                    .info-grid { display: grid; grid-template-columns: auto 1fr; gap: 8px 15px; margin: 20px 0; font-size: 14px; background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #00c853; }
+                    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; min-width: 600px; }
+                    th, td { padding: 12px 10px; text-align: center; border: 1px solid #e0e0e0; }
+                    th { background: #00c853; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
+                    tr:nth-child(even) { background: #fcfcfc; }
+                    tr:hover { background: #f1f1f1; }
+                </style>
+                </head><body>
+                <div class="card">
+                    <h2>DINAS PENDIDIKAN DAN KEBUDAYAAN</h2>
+                    <h1>PEGANGAN GURU MAPEL</h1>
+                    <h3 style="color: #666; font-weight: normal; margin-top:15px; text-decoration: underline;">REKAPITULASI KEHADIRAN SISWA (${tipe.toUpperCase()})</h3>
+                    
+                    <div class="info-grid">
+                        <b>Nama Guru</b> <span>: ${DB.guru.nama}</span>
+                        <b>Mata Pelajaran</b> <span>: ${mapel}</span>
+                        <b>Kelas</b> <span>: ${kelasText}</span>
+                        <b>Periode</b> <span>: ${dateTitle}</span>
+                    </div>
+
+                    <table>${htmlTable}</table>
+                </div>
+                </body></html>`;
+
+                const blob = new Blob([webHtml], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Absen_${tipe}_${mapel}_${dateTitle}.html`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Tampilan HTML Berhasil Diunduh!');
+            }
+        }
+
+        function exportNilaiExcel() {
+            if(DB.siswa.length === 0) return showToast('Tidak ada data siswa');
+            
+            const filterKelas = document.getElementById('nilai-kelas').value;
             let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas;
 
             let ws_data = [
                 ["PEMERINTAH PROVINSI GORONTALO"],
                 ["DINAS PENDIDIKAN DAN KEBUDAYAAN"],
-                ["SMK NEGERI 1 MARISA"],
-                ["Jln. Lintas Sulawesi, Marisa"],
-                [],
-                ["REKAPITULASI KEHADIRAN SISWA"],
+                ["PEGANGAN GURU MAPEL"],
+                ["REKAPITULASI NILAI SISWA"],
                 [],
                 ["Nama Guru", ":", DB.guru.nama],
-                ["Mata Pelajaran", ":", mapel],
+                ["Mata Pelajaran", ":", DB.guru.mapel],
                 ["Kelas", ":", kelasText],
-                ["Tanggal", ":", date], 
                 [],
-                ["No", "NIS", "Nama Lengkap Siswa", "L/P", "Status Kehadiran", "Waktu Hadir", "Waktu Bolos"]
+                ["No", "NIS", "Nama Lengkap Siswa", "Kelas", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "Tugas (Rata)", "UTS", "UAS", "Absen", "Nilai Akhir", "Predikat"]
             ];
 
             let no = 1;
             DB.siswa.forEach(s => {
                 if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
-                const abs = absData[s.id] || { status: '-', hadirTime: '-', bolosTime: '-' };
                 
-                let st = "";
-                if (abs.status === 'H') st = "Hadir";
-                else if (abs.status === 'I') st = "Izin";
-                else if (abs.status === 'S') st = "Sakit";
-                else if (abs.status === 'A') st = "Alpa";
-                else st = "-";
+                let n = DB.nilai[s.id] || { tugasList: Array(10).fill(0), uts: 0, uas: 0, absen: 0 };
+                let totalTugas = 0;
+                let countTugas = 0;
+                for(let i=0; i<10; i++) {
+                    let val = Number(n.tugasList[i] || 0);
+                    if (val > 0) {
+                        totalTugas += val;
+                        countTugas++;
+                    }
+                }
+                const rataTugas = countTugas > 0 ? (totalTugas / countTugas) : 0;
+                const final = (rataTugas * 0.5) + ((n.uts||0) * 0.1) + ((n.uas||0) * 0.2) + ((n.absen||0) * 0.2);
+                
+                let predikat = 'E';
+                if(final >= 90) predikat = 'A';
+                else if(final >= 80) predikat = 'B';
+                else if(final >= 70) predikat = 'C';
+                else if(final >= 60) predikat = 'D';
 
-                if(abs.isBolos) st += " (Bolos)";
-
-                ws_data.push([ no++, s.nis, s.nama, "", st, abs.hadirTime||'-', abs.bolosTime||'-' ]);
+                let rowData = [no++, s.nis, s.nama, s.kelas];
+                for(let i=0; i<10; i++) {
+                    rowData.push(n.tugasList[i] || 0);
+                }
+                rowData.push(rataTugas.toFixed(1), n.uts || 0, n.uas || 0, n.absen || 0, final.toFixed(1), predikat);
+                ws_data.push(rowData);
             });
 
             const ws = XLSX.utils.aoa_to_sheet(ws_data);
-            ws['!cols'] = [ {wch: 5}, {wch: 15}, {wch: 35}, {wch: 5}, {wch: 18}, {wch: 15}, {wch: 15} ];
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Rekap");
-            XLSX.writeFile(wb, `Absensi_${mapel}_${date}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "Rekap_Nilai");
+            XLSX.writeFile(wb, `Rekap_Nilai_${kelasText.replace(/ /g, '_')}.xlsx`);
+            showToast('Mengunduh Excel Nilai...');
         }
-
-        function exportToCSV() {
+        
+        function exportNilaiHTML() {
             if(DB.siswa.length === 0) return showToast('Tidak ada data siswa');
-            let csv = "NIS,Nama,Kelas,Status,Waktu_Hadir,Waktu_Bolos,Tugas_Rata,UTS,UAS,Absen,Nilai_Akhir\n";
-            const date = document.getElementById('absensi-date').value || new Date().toISOString().split('T')[0];
-            const mapel = document.getElementById('absensi-mapel').value || 'Umum';
-            const key = date + '|' + mapel;
             
+            const filterKelas = document.getElementById('nilai-kelas').value;
+            let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas;
+
+            let htmlTable = `<tr><th>No</th><th>NIS</th><th style="text-align:left;">Nama Lengkap</th><th>Tugas (Rata)</th><th>UTS</th><th>UAS</th><th>Absen</th><th>Nilai Akhir</th><th>Predikat</th></tr>`;
+            
+            let no = 1;
             DB.siswa.forEach(s => {
-                const abs = DB.absensi[key]?.[s.id] || {};
-                let n = DB.nilai[s.id] || { tugasList: Array(10).fill(0), uts: 0, uas: 0, absen: 0 };
+                if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
                 
+                let n = DB.nilai[s.id] || { tugasList: Array(10).fill(0), uts: 0, uas: 0, absen: 0 };
                 let totalTugas = 0; let countTugas = 0;
                 for(let i=0; i<10; i++) {
                     let val = Number(n.tugasList[i] || 0);
@@ -1573,85 +1887,66 @@
                 const rataTugas = countTugas > 0 ? (totalTugas / countTugas) : 0;
                 const final = (rataTugas * 0.5) + ((n.uts||0) * 0.1) + ((n.uas||0) * 0.2) + ((n.absen||0) * 0.2);
                 
-                csv += `${s.nis},${s.nama},${s.kelas},${abs.status||'-'},${abs.hadirTime||'-'},${abs.bolosTime||'-'},${rataTugas.toFixed(1)},${n.uts},${n.uas},${n.absen},${final.toFixed(1)}\n`;
-            });
-            const link = document.createElement("a");
-            link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
-            link.download = `Data_${mapel}_${date}.csv`;
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        }
+                let predikat = 'E';
+                if(final >= 90) predikat = 'A';
+                else if(final >= 80) predikat = 'B';
+                else if(final >= 70) predikat = 'C';
+                else if(final >= 60) predikat = 'D';
 
-        function exportToPDF() {
-            showToast('Menyiapkan PDF...');
-            const date = document.getElementById('absensi-date').value || new Date().toISOString().split('T')[0];
-            const mapel = document.getElementById('absensi-mapel').value || 'Umum';
-            const filterKelas = document.getElementById('absensi-kelas').value;
-            const key = date + '|' + mapel;
-            let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas;
-
-            const el = document.createElement('div');
-            el.style.padding = '30px'; el.style.background = '#fff'; el.style.color = '#000'; el.style.fontFamily = 'Arial, sans-serif';
-            
-            let html = `
-                <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px;">
-                    <h3 style="margin:0; font-size:16px;">PEMERINTAH PROVINSI GORONTALO</h3>
-                    <h2 style="margin:5px 0; font-size:18px;">DINAS PENDIDIKAN DAN KEBUDAYAAN</h2>
-                    <h1 style="margin:0; font-size:22px;">SMK NEGERI 1 MARISA</h1>
-                    <p style="margin:5px 0 0; font-size:12px;">Jln. Lintas Sulawesi, Marisa</p>
-                </div>
-                <h3 style="text-align:center; text-decoration: underline; margin-bottom: 20px;">REKAPITULASI KEHADIRAN SISWA</h3>
-                <table style="width: 100%; margin-bottom: 15px; font-size: 13px;">
-                    <tr><td width="120">Nama Guru</td><td width="10">:</td><td><b>${DB.guru.nama}</b></td></tr>
-                    <tr><td>Mata Pelajaran</td><td>:</td><td>${mapel}</td></tr>
-                    <tr><td>Kelas</td><td>:</td><td>${kelasText}</td></tr>
-                    <tr><td>Tanggal</td><td>:</td><td>${date}</td></tr>
-                </table>
-                <table border="1" width="100%" cellpadding="6" style="border-collapse:collapse; font-size:12px; text-align:center;">
-                <tr style="background:#eee;">
-                    <th width="30">No</th><th>NIS</th><th>Nama Lengkap Siswa</th><th width="30">L/P</th><th>Status Kehadiran</th><th>Jam Hadir</th><th>Jam Bolos</th>
-                </tr>
-            `;
-            
-            let no = 1;
-            DB.siswa.forEach(s => {
-                if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
-                const abs = DB.absensi[key]?.[s.id] || {};
-                
-                let st = "";
-                if (abs.status === 'H') st = "Hadir";
-                else if (abs.status === 'I') st = "Izin";
-                else if (abs.status === 'S') st = "Sakit";
-                else if (abs.status === 'A') st = "Alpa";
-                else st = "-";
-
-                if(abs.isBolos) st += " (B)";
-
-                html += `<tr>
+                htmlTable += `<tr>
                     <td>${no++}</td>
                     <td>${s.nis}</td>
                     <td style="text-align:left;">${s.nama}</td>
-                    <td></td>
-                    <td><b>${st}</b></td>
-                    <td>${abs.hadirTime||'-'}</td>
-                    <td>${abs.bolosTime||'-'}</td>
+                    <td><b>${rataTugas.toFixed(1)}</b></td>
+                    <td>${n.uts || 0}</td>
+                    <td>${n.uas || 0}</td>
+                    <td>${n.absen || 0}</td>
+                    <td style="color:#00e5ff; font-weight:bold;">${final.toFixed(1)}</td>
+                    <td><b>${predikat}</b></td>
                 </tr>`;
             });
-            html += '</table>'; 
-            
-            html += `
-                <table style="width: 100%; margin-top: 40px; font-size: 13px; text-align: center;">
-                    <tr>
-                        <td width="60%"></td>
-                        <td width="40%">
-                            Marisa, ${date}<br>Guru Mata Pelajaran,<br><br><br><br><br>
-                            <b><u>${DB.guru.nama}</u></b><br>NIP. ${DB.guru.nip || '-'}
-                        </td>
-                    </tr>
-                </table>
-            `;
 
-            el.innerHTML = html;
-            html2pdf().from(el).set({ margin: 1, filename: `Absen_${mapel}_${date}.pdf` }).save();
+            let webHtml = `
+                <!DOCTYPE html>
+                <html><head><title>Laporan Nilai</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
+                    .card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 1000px; margin: 0 auto; overflow-x: auto; }
+                    h1, h2, h3 { text-align: center; margin: 5px 0; line-height: 1.3; }
+                    h1 { color: #2c3e50; font-size: 24px; }
+                    h2 { font-size: 16px; font-weight: normal; }
+                    .info-grid { display: grid; grid-template-columns: auto 1fr; gap: 8px 15px; margin: 20px 0; font-size: 14px; background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #00e5ff; }
+                    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; min-width: 600px; }
+                    th, td { padding: 12px 10px; text-align: center; border: 1px solid #e0e0e0; }
+                    th { background: #00e5ff; color: #000; text-transform: uppercase; letter-spacing: 0.5px; }
+                    tr:nth-child(even) { background: #fcfcfc; }
+                    tr:hover { background: #f1f1f1; }
+                </style>
+                </head><body>
+                <div class="card">
+                    <h2>DINAS PENDIDIKAN DAN KEBUDAYAAN</h2>
+                    <h1>PEGANGAN GURU MAPEL</h1>
+                    <h3 style="color: #666; font-weight: normal; margin-top:15px; text-decoration: underline;">REKAPITULASI NILAI SISWA</h3>
+                    
+                    <div class="info-grid">
+                        <b>Nama Guru</b> <span>: ${DB.guru.nama}</span>
+                        <b>Mata Pelajaran</b> <span>: ${DB.guru.mapel}</span>
+                        <b>Kelas</b> <span>: ${kelasText}</span>
+                    </div>
+
+                    <table>${htmlTable}</table>
+                </div>
+                </body></html>`;
+
+            const blob = new Blob([webHtml], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Data_Nilai_${kelasText.replace(/ /g, '_')}.html`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Tampilan HTML Nilai Berhasil Diunduh!');
         }
     </script>
 </body>
