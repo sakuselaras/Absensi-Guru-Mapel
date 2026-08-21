@@ -530,6 +530,16 @@
         </div>
     </div>
 
+    <!-- Kotak Modal Reset Kelas -->
+    <div class="modal-overlay" id="modal-reset-kelas">
+        <div class="modal-box text-center">
+            <h3 style="margin-bottom: 20px; color: var(--danger);">Reset Data Absensi</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Pilih kelas mana yang ingin dikosongkan datanya pada hari ini:</p>
+            <div id="reset-kelas-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;"></div>
+            <button class="btn-outline" onclick="document.getElementById('modal-reset-kelas').style.display='none'">Batal</button>
+        </div>
+    </div>
+
     <!-- --- STREAMING_CHUNK:Javascript Core Logic --- -->
     <script>
         let activeRoomKey = null;
@@ -770,6 +780,9 @@
                         ${badgeHtml}
                         <span style="font-size: 13px; color: var(--text-muted); flex: 1;">${dateStr}</span>
                         <span class="h-badge" style="margin-right:0; background:rgba(0, 229, 255, 0.1); color:var(--accent);">${mapelStr}</span>
+                        <button onclick="hapusRiwayatAbsensi('${key}', event)" style="background: rgba(255, 71, 87, 0.1); border: 1px solid var(--danger); color: var(--danger); cursor: pointer; border-radius: 6px; padding: 4px 8px; margin-left: 10px; transition: 0.2s;" title="Hapus Riwayat">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </div>
                     <div class="d-flex justify-between align-center">
                         <div>
