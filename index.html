@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presensi Siswa SMK Negeri 1 Marisa</title>
+    <title>ABSENSI SISWA</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -84,7 +84,6 @@
         input, select { width: 100%; padding: 12px 15px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 12px; color: var(--text-main); font-size: 14px; margin-bottom: 15px; outline: none; }
         input::placeholder { color: var(--text-main); opacity: 0.7; }
         input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
-        
         select option { background-color: var(--bg-main); color: var(--text-main); }
 
         .btn-primary { width: 100%; padding: 14px; background: var(--primary); color: #000; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 4px 15px var(--primary-glow); position: relative; overflow: hidden; }
@@ -170,7 +169,7 @@
         <i class="fas fa-fingerprint" style="font-size: 50px; color: var(--primary); margin-bottom: 20px;"></i>
         
         <div style="text-align: center; margin-bottom: 20px;">
-            <p style="font-size: 14px; color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">Absensi Kelas</p>
+            <p style="font-size: 14px; color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">ABSENSI KELAS</p>
             <h2 style="font-size: 22px; color: var(--text-main); margin: 5px 0 10px; font-weight: 700;">PEGANGAN GURU MAPEL</h2>
             <h3 style="font-size: 18px; color: var(--text-main); font-weight: 600;">Login Ruang Guru</h3>
             <p style="font-size: 12px; color: var(--text-muted);">Setiap guru memiliki ruang data tersendiri</p>
@@ -190,7 +189,7 @@
     <!-- Header App -->
     <header class="header">
         <div class="logo-title">
-            <h1>PRESENSI SISWA</h1>
+            <h1>ABSENSI SISWA</h1>
             <p>Pegangan Guru Mapel</p>
         </div>
         <div class="header-right">
@@ -403,13 +402,16 @@
                     
                     <hr style="border-color: var(--border); margin: 15px 0;">
                     <h4 style="font-size: 13px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-file-excel"></i> Upload Siswa Massal</h4>
-                    <div class="action-grid">
+                    <div class="action-grid mb-15">
                         <button class="btn-outline" style="border-color: #217346; color: #217346; background: rgba(33, 115, 70, 0.1);" onclick="downloadTemplateSiswa()"><i class="fas fa-download"></i> Template</button>
                         <div style="position: relative; width: 100%;">
                             <button class="btn-primary" style="width: 100%; background-color: #217346; color: #fff; box-shadow: 0 4px 15px rgba(33, 115, 70, 0.3);"><i class="fas fa-upload"></i> Upload</button>
                             <input type="file" id="input-excel-siswa" accept=".xlsx, .xls" style="position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; width: 100%;" onchange="uploadSiswaExcel()">
                         </div>
                     </div>
+                    <hr style="border-color: var(--border); margin: 15px 0;">
+                    <h4 style="font-size: 13px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-list"></i> Daftar Siswa Terdaftar</h4>
+                    <div id="list-master-siswa"></div>
                 </div>
 
                 <!-- 3. Pindah Kelas (Placeholder) -->
@@ -458,14 +460,24 @@
                     <button class="btn-outline" style="border-color: #00e5ff; color: #00e5ff; background: rgba(0, 229, 255, 0.1);" onclick="exportAbsensi('html')"><i class="fas fa-globe"></i> Export HTML (Web View)</button>
                 </div>
 
-                <!-- 6. Tentang Aplikasi -->
-                <div class="menu-list-item" onclick="showModal('Aplikasi Presensi dan Rekapan Nilai Terpadu untuk Guru. Versi 2.0 (Offline Mode Support).', 'alert')">
+                <!-- 6. Pelajari Cara Kerja -->
+                <div class="menu-list-item" onclick="toggleSettingMenu('menu-bantuan')">
                     <div class="menu-icon"><i class="fas fa-info-circle"></i></div>
                     <div class="menu-text">
-                        <div class="menu-title">Tentang Aplikasi</div>
-                        <div class="menu-desc">Rating, bagikan, dan info aplikasi lainnya</div>
+                        <div class="menu-title">Pelajari Cara Kerja</div>
+                        <div class="menu-desc">Panduan cara menggunakan fitur aplikasi</div>
                     </div>
                     <i class="fas fa-chevron-right text-muted"></i>
+                </div>
+                <div id="menu-bantuan" class="setting-content" style="font-size: 12px; line-height: 1.6; color: var(--text-muted);">
+                    <h4 style="color: var(--primary); margin-bottom: 5px;">Beranda</h4>
+                    <p style="margin-bottom: 10px;">Menampilkan ringkasan kehadiran siswa harian dan grafik statistik mingguan secara <i>real-time</i>.</p>
+                    <h4 style="color: var(--primary); margin-bottom: 5px;">Absensi</h4>
+                    <p style="margin-bottom: 10px;">Gunakan tombol (+) untuk memulai absensi. Pilih tanggal, kelas, dan Mata Pelajaran. Jangan lupa klik <b>Simpan Data Absensi</b> di bawah daftar agar riwayat tersimpan permanen.</p>
+                    <h4 style="color: var(--primary); margin-bottom: 5px;">Nilai</h4>
+                    <p style="margin-bottom: 10px;">Input nilai tugas (T1-T10). Rata-rata akan dihitung otomatis HANYA dari kotak yang terisi. Nilai akhir dirumuskan dari (Tugas 50% + UTS 10% + UAS 20% + Absen 20%). Klik <b>Simpan Data Nilai</b> untuk merekam.</p>
+                    <h4 style="color: var(--primary); margin-bottom: 5px;">Kelola Master Data</h4>
+                    <p style="margin-bottom: 10px;">Menu untuk menambah, mengedit, atau menghapus Kelas, Mapel, dan Siswa. Anda juga bisa mengunggah file excel massal untuk data siswa.</p>
                 </div>
             </div>
 
@@ -645,7 +657,7 @@
         }
 
         function onDataLoaded() {
-            updateKelasDropdowns(); renderFotoProfil();
+            updateDropdowns(); renderFotoProfil();
             const savedTheme = localStorage.getItem('presensi_theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
             const btnTheme = document.getElementById('btn-theme');
@@ -722,7 +734,8 @@
         // --- STREAMING_CHUNK:Logika Absensi ---
         function renderAbsensiHistory() {
             const container = document.getElementById('absensi-history-list');
-            const filterKelas = document.getElementById('history-kelas-filter').value;
+            const filterEl = document.getElementById('history-kelas-filter');
+            const filterKelas = filterEl ? filterEl.value : 'SEMUA';
             container.innerHTML = '';
 
             const keys = Object.keys(DB.absensi).sort((a, b) => new Date(b.split('|')[0]) - new Date(a.split('|')[0]));
@@ -744,6 +757,7 @@
                     }
                 });
 
+                // HANYA RENDER JIKA ADA SISWA DAN MINIMAL 1 STATUS YANG DIISI (Mencegah tampilan 0%)
                 if (totalSiswa === 0 || !hasInput) return;
                 renderedCount++;
 
@@ -773,12 +787,13 @@
                 </div>`;
                 container.insertAdjacentHTML('beforeend', html);
             });
-            if (renderedCount === 0) container.innerHTML = '<p class="text-muted text-center" style="padding: 30px 0; font-size: 13px;">Belum ada data absensi.</p>';
+            if (renderedCount === 0) container.innerHTML = '<p class="text-muted text-center" style="padding: 30px 0; font-size: 13px;">Belum ada riwayat absensi.</p>';
         }
 
         function openNewAbsensi() {
             const todayStr = new Date().toISOString().split('T')[0];
-            const filterKelas = document.getElementById('history-kelas-filter').value;
+            const filterEl = document.getElementById('history-kelas-filter');
+            const filterKelas = filterEl ? filterEl.value : 'SEMUA';
             const mapelValue = DB.mapelList.length > 0 ? DB.mapelList[0] : '';
             if(!mapelValue) return showToast('Harap buat Mata Pelajaran di menu Pengaturan terlebih dahulu!');
             openAbsensiDetail(todayStr, filterKelas, mapelValue);
@@ -887,8 +902,10 @@
         // --- STREAMING_CHUNK:Logika Nilai ---
         function renderNilaiList() {
             const container = document.getElementById('nilai-list-container');
-            const filterKelas = document.getElementById('nilai-kelas').value;
-            const search = document.getElementById('nilai-search').value.toLowerCase();
+            const filterEl = document.getElementById('nilai-kelas');
+            const filterKelas = filterEl ? filterEl.value : 'SEMUA';
+            const searchEl = document.getElementById('nilai-search');
+            const search = searchEl ? searchEl.value.toLowerCase() : '';
             
             container.innerHTML = '';
             let filteredSiswa = DB.siswa.filter(s => (filterKelas === 'SEMUA' || s.kelas === filterKelas) && s.nama.toLowerCase().includes(search));
@@ -897,7 +914,10 @@
             filteredSiswa.forEach(s => {
                 let n = DB.nilai[s.id] || { tugasList: Array(10).fill(0), uts: 0, uas: 0, absen: 0 };
                 let totalTugas = 0, countTugas = 0;
-                for(let i=0; i<10; i++) { let val = Number(n.tugasList[i] || 0); if (val > 0) { totalTugas += val; countTugas++; } }
+                for(let i=0; i<10; i++) { 
+                    let val = Number(n.tugasList[i] || 0); 
+                    if (val > 0) { totalTugas += val; countTugas++; } 
+                }
                 const rataTugas = countTugas > 0 ? (totalTugas / countTugas) : 0;
                 const final = (rataTugas * 0.5) + ((n.uts||0) * 0.1) + ((n.uas||0) * 0.2) + ((n.absen||0) * 0.2);
                 let predikat = final >= 90 ? 'A' : final >= 80 ? 'B' : final >= 70 ? 'C' : final >= 60 ? 'D' : 'E';
@@ -944,22 +964,45 @@
             document.getElementById('set-nip-guru').innerText = DB.guru.nip;
             document.getElementById('set-mapel-guru').innerText = DB.guru.mapel;
 
-            const container = document.getElementById('list-master-kelas-mapel'); container.innerHTML = '';
-            if(DB.mapelList && DB.mapelList.length > 0) {
-                let mapelHtml = `<h4 style="font-size: 13px; color: var(--accent); margin-bottom: 10px;"><i class="fas fa-book"></i> Daftar Mapel</h4>`;
-                DB.mapelList.forEach(m => {
-                    mapelHtml += `<div class="d-flex justify-between align-center" style="padding: 5px 0; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05);"><span>- ${m}</span><span class="list-item-btn btn-delete" onclick="hapusMapel('${m}')"><i class="fas fa-times"></i> Hapus</span></div>`;
-                });
-                container.insertAdjacentHTML('beforeend', mapelHtml + '<hr style="border-color: var(--border); margin: 15px 0;">');
+            // Render Master Kelas & Mapel
+            const containerKelasMapel = document.getElementById('list-master-kelas-mapel'); 
+            if(containerKelasMapel) {
+                containerKelasMapel.innerHTML = '';
+                if(DB.mapelList && DB.mapelList.length > 0) {
+                    let mapelHtml = `<h4 style="font-size: 13px; color: var(--accent); margin-bottom: 10px;"><i class="fas fa-book"></i> Daftar Mapel</h4>`;
+                    DB.mapelList.forEach(m => {
+                        mapelHtml += `<div class="d-flex justify-between align-center" style="padding: 5px 0; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05);"><span>- ${m}</span><span class="list-item-btn btn-delete" onclick="hapusMapel('${m}')"><i class="fas fa-times"></i> Hapus</span></div>`;
+                    });
+                    containerKelasMapel.insertAdjacentHTML('beforeend', mapelHtml + '<hr style="border-color: var(--border); margin: 15px 0;">');
+                }
+                
+                if(DB.kelas.length > 0) {
+                    let kelasHtml = `<h4 style="font-size: 13px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-chalkboard"></i> Daftar Kelas</h4>`;
+                    DB.kelas.forEach(k => {
+                        const countMurid = DB.siswa.filter(s => s.kelas === k).length;
+                        kelasHtml += `<div class="d-flex justify-between align-center mb-15"><h4 style="color: var(--primary); font-size:14px;">${k} <span style="font-size:11px; color:var(--text-muted);">(${countMurid} Siswa)</span></h4><div class="d-flex"><span class="list-item-btn btn-edit" onclick="bukaModalEditKelas('${k}')"><i class="fas fa-edit"></i></span><span class="list-item-btn btn-delete" onclick="hapusKelas('${k}')"><i class="fas fa-trash"></i></span></div></div>`;
+                    });
+                    containerKelasMapel.insertAdjacentHTML('beforeend', kelasHtml);
+                } else { containerKelasMapel.innerHTML += '<p class="text-muted" style="font-size:12px;">Belum ada data mapel dan kelas.</p>'; }
             }
-            if(DB.kelas.length > 0) {
-                DB.kelas.forEach(k => {
-                    const murid = DB.siswa.filter(s => s.kelas === k);
-                    let html = `<div style="margin-bottom: 15px;"><div class="d-flex justify-between align-center mb-15"><h4 style="color: var(--primary);">${k} <span style="font-size:11px; color:var(--text-muted);">(${murid.length} Siswa)</span></h4><div class="d-flex"><span class="list-item-btn btn-edit" onclick="bukaModalEditKelas('${k}')"><i class="fas fa-edit"></i></span><span class="list-item-btn btn-delete" onclick="hapusKelas('${k}')"><i class="fas fa-trash"></i></span></div></div>`;
-                    murid.forEach(s => { html += `<div class="d-flex justify-between align-center" style="padding: 5px 0; font-size: 13px;"><span>- ${s.nama}</span><div class="d-flex"><span class="list-item-btn btn-edit" onclick="bukaModalEditSiswa(${s.id})"><i class="fas fa-pencil-alt"></i></span><span class="list-item-btn btn-delete" onclick="hapusSiswa(${s.id})"><i class="fas fa-times"></i></span></div></div>`; });
-                    container.insertAdjacentHTML('beforeend', html + '</div>');
-                });
-            } else { container.innerHTML += '<p class="text-muted" style="font-size:12px;">Belum ada kelas.</p>'; }
+
+            // Render Master Siswa Terdaftar
+            const containerSiswa = document.getElementById('list-master-siswa');
+            if(containerSiswa) {
+                containerSiswa.innerHTML = '';
+                if(DB.kelas.length > 0) {
+                    DB.kelas.forEach(k => {
+                        const murid = DB.siswa.filter(s => s.kelas === k);
+                        if(murid.length > 0) {
+                            let html = `<div style="margin-bottom: 15px; padding:10px; border:1px solid rgba(255,255,255,0.05); border-radius:12px;"><h4 style="color: var(--accent); margin-bottom:10px; font-size:13px;"><i class="fas fa-folder-open"></i> Kelas ${k}</h4>`;
+                            murid.forEach(s => { 
+                                html += `<div class="d-flex justify-between align-center" style="padding: 5px 0; font-size: 13px; border-bottom:1px solid rgba(255,255,255,0.02);"><span>- ${s.nama} <small style="color:var(--text-muted);">(${s.nis})</small></span><div class="d-flex"><span class="list-item-btn btn-edit" onclick="bukaModalEditSiswa(${s.id})"><i class="fas fa-pencil-alt"></i></span><span class="list-item-btn btn-delete" onclick="hapusSiswa(${s.id})"><i class="fas fa-times"></i></span></div></div>`; 
+                            });
+                            containerSiswa.insertAdjacentHTML('beforeend', html + '</div>');
+                        }
+                    });
+                } else { containerSiswa.innerHTML = '<p class="text-muted" style="font-size:12px;">Belum ada siswa terdaftar.</p>'; }
+            }
         }
 
         function renderFotoProfil() {
@@ -967,10 +1010,10 @@
             const inputHtml = `<input type="file" accept="image/*" onchange="handleFotoUpload(event)">`;
             if (DB.guru.foto && DB.guru.foto !== "") {
                 const imgTag = `<img src="${DB.guru.foto}" style="width: 100%; height: 100%; object-fit: cover;">`;
-                berandaFoto.innerHTML = imgTag; setFoto.innerHTML = imgTag + inputHtml;
+                if(berandaFoto) berandaFoto.innerHTML = imgTag; if(setFoto) setFoto.innerHTML = imgTag + inputHtml;
             } else {
                 const iconTag = `<i class="fas fa-user-tie"></i>`;
-                berandaFoto.innerHTML = iconTag; setFoto.innerHTML = iconTag + inputHtml;
+                if(berandaFoto) berandaFoto.innerHTML = iconTag; if(setFoto) setFoto.innerHTML = iconTag + inputHtml;
             }
         }
 
@@ -992,7 +1035,7 @@
             reader.readAsDataURL(file);
         }
 
-        function updateKelasDropdowns() {
+        function updateDropdowns() {
             ['history-kelas-filter', 'absensi-kelas', 'nilai-kelas', 'export-kelas'].forEach(id => {
                 const el = document.getElementById(id); if(!el) return;
                 el.innerHTML = id === 'history-kelas-filter' ? '<option value="SEMUA">Semua Kelas / Jurusan</option>' : '<option value="SEMUA">Semua Kelas</option>';
@@ -1011,17 +1054,17 @@
             const nama = document.getElementById('input-mapel-nama').value.trim();
             if(!nama) return showToast('Isi nama mapel!'); if(DB.mapelList.includes(nama)) return showToast('Mapel sudah ada!');
             DB.mapelList.push(nama); document.getElementById('input-mapel-nama').value = '';
-            autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); showToast('Mapel ditambah!');
+            autoSaveLokal(); updateDropdowns(); renderPengaturanLists(); showToast('Mapel ditambah!');
         }
-        function hapusMapel(nama) { showModal(`Hapus mapel ${nama}?`, 'confirm', () => { DB.mapelList = DB.mapelList.filter(m => m !== nama); autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); showToast('Mapel dihapus!'); }); }
+        function hapusMapel(nama) { showModal(`Hapus mapel ${nama}?`, 'confirm', () => { DB.mapelList = DB.mapelList.filter(m => m !== nama); autoSaveLokal(); updateDropdowns(); renderPengaturanLists(); showToast('Mapel dihapus!'); }); }
         
         function tambahKelas() {
             const nama = document.getElementById('input-kelas-nama').value.trim();
             if(!nama) return showToast('Isi nama kelas!'); if(DB.kelas.includes(nama)) return showToast('Kelas sudah ada!');
             DB.kelas.push(nama); document.getElementById('input-kelas-nama').value = '';
-            autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); showToast('Kelas ditambah!');
+            autoSaveLokal(); updateDropdowns(); renderPengaturanLists(); showToast('Kelas ditambah!');
         }
-        function hapusKelas(nama) { showModal(`Hapus kelas ${nama} dan siswanya?`, 'confirm', () => { DB.kelas = DB.kelas.filter(k => k !== nama); DB.siswa = DB.siswa.filter(s => s.kelas !== nama); autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); showToast('Kelas dihapus!'); }); }
+        function hapusKelas(nama) { showModal(`Hapus kelas ${nama} dan siswanya?`, 'confirm', () => { DB.kelas = DB.kelas.filter(k => k !== nama); DB.siswa = DB.siswa.filter(s => s.kelas !== nama); autoSaveLokal(); updateDropdowns(); renderPengaturanLists(); showToast('Kelas dihapus!'); }); }
         
         function tambahSiswa() {
             const nis = document.getElementById('input-siswa-nis').value.trim(), nama = document.getElementById('input-siswa-nama').value.trim(), kelas = document.getElementById('input-siswa-kelas').value;
@@ -1056,7 +1099,7 @@
                 const siswaIndex = DB.siswa.findIndex(s => s.id === parseInt(identifier));
                 if(siswaIndex !== -1) { DB.siswa[siswaIndex].nama = val1; DB.siswa[siswaIndex].nis = val2 || "-"; }
             }
-            autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); initBeranda(); renderAbsensiList(); renderNilaiList();
+            autoSaveLokal(); updateDropdowns(); renderPengaturanLists(); initBeranda(); renderAbsensiList(); renderNilaiList();
             document.getElementById('modal-edit-data').style.display = 'none'; showToast("Perubahan disimpan!");
         }
 
@@ -1085,7 +1128,7 @@
                             }
                         }
                     }
-                    if (newSiswaCount > 0) { autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); initBeranda(); fileInput.value = ""; showToast(`Berhasil upload ${newSiswaCount} siswa!`); }
+                    if (newSiswaCount > 0) { autoSaveLokal(); updateDropdowns(); renderPengaturanLists(); initBeranda(); fileInput.value = ""; showToast(`Berhasil upload ${newSiswaCount} siswa!`); }
                 } catch (error) { showToast('Gagal membaca Excel.'); }
             }; reader.readAsArrayBuffer(file);
         }
@@ -1125,11 +1168,18 @@
         // --- STREAMING_CHUNK:Logika Export ---
         function exportAbsensi(format) {
             if(DB.siswa.length === 0) return showToast('Tidak ada data siswa');
-            const tipe = document.getElementById('export-tipe').value, filterKelas = document.getElementById('export-kelas').value, mapel = document.getElementById('export-mapel').value || 'Umum';
+            const tipe = document.getElementById('export-tipe').value;
+            const filterEl = document.getElementById('export-kelas');
+            const filterKelas = filterEl ? filterEl.value : 'SEMUA';
+            const mapelEl = document.getElementById('export-mapel');
+            const mapel = mapelEl && mapelEl.value ? mapelEl.value : 'Umum';
+            
             let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas, dateTitle = "", ws_data = [], htmlTable = "";
 
             if(tipe === 'harian') {
-                const date = document.getElementById('export-date').value || new Date().toISOString().split('T')[0]; dateTitle = date;
+                const dateEl = document.getElementById('export-date');
+                const date = (dateEl && dateEl.value) ? dateEl.value : new Date().toISOString().split('T')[0]; 
+                dateTitle = date;
                 const absData = DB.absensi[date + '|' + mapel] || {};
                 ws_data = [ ["PEMERINTAH PROVINSI GORONTALO"], ["DINAS PENDIDIKAN DAN KEBUDAYAAN"], ["PEGANGAN GURU MAPEL"], ["REKAPITULASI KEHADIRAN SISWA (HARIAN)"], [], ["Nama Guru", ":", DB.guru.nama], ["Mata Pelajaran", ":", mapel], ["Kelas", ":", kelasText], ["Tanggal", ":", date], [], ["No", "NIS", "Nama Lengkap Siswa", "Status Kehadiran", "Waktu Hadir", "Waktu Bolos"] ];
                 htmlTable = `<tr><th>No</th><th>NIS</th><th style="text-align:left;">Nama Lengkap Siswa</th><th>Status</th><th>Waktu Hadir</th><th>Waktu Bolos</th></tr>`;
@@ -1144,7 +1194,11 @@
                     htmlTable += `<tr><td>${no}</td><td>${s.nis}</td><td style="text-align:left;">${s.nama}</td><td><b>${st}</b></td><td>${abs.hadirTime||'-'}</td><td>${abs.bolosTime||'-'}</td></tr>`; no++;
                 });
             } else {
-                const month = document.getElementById('export-month').value; if(!month) return showToast('Pilih bulan terlebih dahulu'); dateTitle = month;
+                const monthEl = document.getElementById('export-month');
+                const month = monthEl ? monthEl.value : ''; 
+                if(!month) return showToast('Pilih bulan terlebih dahulu'); 
+                dateTitle = month;
+                
                 ws_data = [ ["PEMERINTAH PROVINSI GORONTALO"], ["DINAS PENDIDIKAN DAN KEBUDAYAAN"], ["PEGANGAN GURU MAPEL"], ["REKAPITULASI KEHADIRAN SISWA (BULANAN)"], [], ["Nama Guru", ":", DB.guru.nama], ["Mata Pelajaran", ":", mapel], ["Kelas", ":", kelasText], ["Bulan", ":", month], [], ["No", "NIS", "Nama Lengkap Siswa", "Hadir", "Izin", "Sakit", "Alpa", "Bolos"] ];
                 htmlTable = `<tr><th>No</th><th>NIS</th><th style="text-align:left;">Nama Lengkap Siswa</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Alpa</th><th>Bolos</th></tr>`;
                 
@@ -1180,7 +1234,9 @@
 
         function exportNilaiExcel() {
             if(DB.siswa.length === 0) return showToast('Tidak ada data siswa');
-            const filterKelas = document.getElementById('nilai-kelas').value; let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas;
+            const filterEl = document.getElementById('nilai-kelas');
+            const filterKelas = filterEl ? filterEl.value : 'SEMUA'; 
+            let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas;
             let ws_data = [ ["PEMERINTAH PROVINSI GORONTALO"], ["DINAS PENDIDIKAN DAN KEBUDAYAAN"], ["PEGANGAN GURU MAPEL"], ["REKAPITULASI NILAI SISWA"], [], ["Nama Guru", ":", DB.guru.nama], ["Mata Pelajaran", ":", DB.guru.mapel], ["Kelas", ":", kelasText], [], ["No", "NIS", "Nama Lengkap Siswa", "Kelas", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "Tugas (Rata)", "UTS", "UAS", "Absen", "Nilai Akhir", "Predikat"] ];
 
             let no = 1;
@@ -1203,7 +1259,9 @@
         
         function exportNilaiHTML() {
             if(DB.siswa.length === 0) return showToast('Tidak ada data siswa');
-            const filterKelas = document.getElementById('nilai-kelas').value; let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas;
+            const filterEl = document.getElementById('nilai-kelas');
+            const filterKelas = filterEl ? filterEl.value : 'SEMUA'; 
+            let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas;
             let htmlTable = `<tr><th>No</th><th>NIS</th><th style="text-align:left;">Nama Lengkap</th><th>Tugas (Rata)</th><th>UTS</th><th>UAS</th><th>Absen</th><th>Nilai Akhir</th><th>Predikat</th></tr>`;
             
             let no = 1;
