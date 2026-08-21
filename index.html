@@ -15,11 +15,11 @@
         :root[data-theme="dark"] {
             --bg-main: #111111;
             --bg-card: rgba(25, 25, 25, 0.7);
-            --primary: #39FF14; /* Hijau Stabilo */
+            --primary: #39FF14; 
             --primary-glow: rgba(57, 255, 20, 0.3);
             --secondary: #ffffff;
             --accent: #00e5ff;
-            --purple: #bf00ff; /* Warna Bolos */
+            --purple: #bf00ff; 
             --text-main: #ffffff;
             --text-muted: #aaaaaa;
             --border: rgba(57, 255, 20, 0.2);
@@ -82,17 +82,15 @@
 
         /* Form & Buttons */
         input, select { width: 100%; padding: 12px 15px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 12px; color: var(--text-main); font-size: 14px; margin-bottom: 15px; outline: none; }
-        input::placeholder { color: var(--text-muted); opacity: 1; }
+        input::placeholder { color: var(--text-main); opacity: 0.7; }
         input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
         
-        /* Perbaikan Dropdown Option agar terbaca */
         select option { background-color: var(--bg-main); color: var(--text-main); }
 
         .btn-primary { width: 100%; padding: 14px; background: var(--primary); color: #000; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 4px 15px var(--primary-glow); position: relative; overflow: hidden; }
         .btn-outline { width: 100%; padding: 14px; background: transparent; color: var(--text-main); border: 1px solid var(--border); border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; position: relative; overflow: hidden; }
         .btn-danger { background: rgba(255, 71, 87, 0.1); color: var(--danger); border-color: var(--danger); }
         
-        /* Action Buttons Area */
         .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         /* Navigasi Bawah */
@@ -108,11 +106,20 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- STREAMING_CHUNK:Komponen Spesifik --- */
+        /* Menu Settings Baru (Accordion List) */
+        .menu-list-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: 15px; overflow: hidden; margin-bottom: 20px; }
+        .menu-list-item { display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s; }
+        .menu-list-item:last-child { border-bottom: none; }
+        .menu-list-item:hover { background: rgba(255,255,255,0.05); }
+        .menu-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.05); display: flex; justify-content: center; align-items: center; font-size: 18px; color: var(--text-main); margin-right: 15px; }
+        .menu-text { flex: 1; }
+        .menu-title { font-size: 15px; color: var(--text-main); font-weight: 500; margin-bottom: 3px; }
+        .menu-desc { font-size: 12px; color: var(--text-muted); }
+        .setting-content { display: none; padding: 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); }
+
         /* Absensi Status Buttons */
         .status-btn-group { display: flex; gap: 5px; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 12px; }
         .status-btn { flex: 1; padding: 10px 5px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        
-        /* Active States */
         .status-btn.active.s-H { background: var(--primary); color: #000; box-shadow: 0 0 10px var(--primary-glow); }
         .status-btn.active.s-I { background: #f39c12; color: #fff; }
         .status-btn.active.s-S { background: #3498db; color: #fff; }
@@ -123,9 +130,14 @@
         .history-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 15px; padding: 20px; margin-bottom: 15px; position: relative; cursor: pointer; }
         .h-badge { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-right: 10px; }
         .h-badge.today { background: rgba(57, 255, 20, 0.2); color: var(--primary); border: 1px solid var(--primary); }
+        
+        /* Dot Colors for History Card */
         .dot-status { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
         .dot-hadir { background: var(--primary); }
+        .dot-izin { background: #f39c12; }
+        .dot-sakit { background: #3498db; }
         .dot-alpa { background: var(--danger); }
+        .dot-bolos { background: var(--purple); }
         
         .fab-btn { position: fixed; bottom: 90px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: #000; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 5px 20px var(--primary-glow); border: none; cursor: pointer; z-index: 99; transition: transform 0.2s; }
         .fab-btn:active { transform: scale(0.9); }
@@ -140,12 +152,10 @@
         .login-screen { position: fixed; top:0; left:0; width: 100%; height: 100%; background: var(--bg-main); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; flex-direction: column; }
         .history-btn { display: flex; align-items: center; width: 100%; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; color: var(--text-main); font-size: 15px; cursor: pointer; text-align: left; }
         
-        /* List Items */
         .list-item-btn { display: inline-block; padding: 5px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; margin-left: 5px; }
         .btn-edit { background: rgba(0, 229, 255, 0.1); color: var(--accent); border: 1px solid var(--accent); }
         .btn-delete { background: rgba(255, 71, 87, 0.1); color: var(--danger); border: 1px solid var(--danger); }
 
-        /* Ripple Effect */
         .ripple { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.4); transform: scale(0); animation: ripple-anim 0.6s linear; pointer-events: none; }
         @keyframes ripple-anim { to { transform: scale(4); opacity: 0; } }
     </style>
@@ -171,7 +181,6 @@
             <button class="btn-primary" onclick="loginRoom()">Masuk Ruangan</button>
         </div>
 
-        <!-- Bagian Riwayat Login -->
         <div id="login-history-container" style="display: none; width: 100%; max-width: 350px; margin-top: 10px;">
             <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px; text-align: center;">Atau masuk ke ruang sebelumnya:</p>
             <div id="login-history-list"></div>
@@ -245,7 +254,6 @@
         <!-- --- STREAMING_CHUNK:View Absensi --- -->
         <div id="view-absensi" class="page-view">
             
-            <!-- Layar Riwayat (Default) -->
             <div id="absensi-history-view">
                 <div class="glass-card" style="padding: 15px; margin-bottom: 20px;">
                     <div class="d-flex align-center justify-between">
@@ -268,14 +276,10 @@
                     <i class="fas fa-calendar-alt text-muted" style="font-size: 18px;"></i>
                 </div>
 
-                <div id="absensi-history-list">
-                    <!-- Kartu Riwayat -->
-                </div>
-
+                <div id="absensi-history-list"></div>
                 <button class="fab-btn" onclick="openNewAbsensi()"><i class="fas fa-plus"></i></button>
             </div>
 
-            <!-- Layar Detail Absensi (Form Input) -->
             <div id="absensi-detail-view" style="display: none;">
                 <div class="d-flex align-center mb-15" style="gap: 15px;">
                     <button class="btn-outline" style="width: auto; padding: 8px 15px; border-radius: 10px;" onclick="closeAbsensiDetail()">
@@ -300,9 +304,7 @@
                     <button class="btn-outline" style="flex: 1; padding: 10px; font-size: 13px; color: var(--danger); border-color: var(--danger);" onclick="resetAbsensi()"><i class="fas fa-undo"></i> Reset</button>
                 </div>
 
-                <div id="absensi-list-container">
-                    <!-- Daftar Siswa -->
-                </div>
+                <div id="absensi-list-container"></div>
 
                 <button class="btn-primary" style="margin-top: 20px; background-color: var(--accent); color: #fff; box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);" onclick="simpanDataAbsensiButton()">
                     <i class="fas fa-save"></i> Simpan Data Absensi
@@ -319,24 +321,19 @@
                 <input type="text" id="nilai-search" placeholder="Cari nama siswa..." onkeyup="renderNilaiList()" style="margin-bottom: 0;">
             </div>
 
-            <div id="nilai-list-container">
-                <!-- Daftar Nilai Grid 2 Tingkat -->
-            </div>
+            <div id="nilai-list-container"></div>
 
-            <!-- Tombol Aksi Nilai (Simpan & Export) -->
             <div class="glass-card" style="margin-top: 20px; padding: 15px;">
                 <h3 style="font-size: 14px; margin-bottom: 15px; color: #fff; font-weight: 600;"><i class="fas fa-tools text-primary"></i> Aksi Data Nilai</h3>
-                
                 <button class="btn-primary mb-15" style="background-color: var(--accent); color: #fff; box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);" onclick="simpanDataNilaiButton()">
                     <i class="fas fa-save"></i> Simpan Data Nilai
                 </button>
-                
                 <div class="action-grid">
                     <button class="btn-outline" style="border-color: #217346; color: #217346; background: rgba(33, 115, 70, 0.1);" onclick="exportNilaiExcel()">
                         <i class="fas fa-file-excel"></i> Excel (.xlsx)
                     </button>
-                    <button class="btn-outline" style="border-color: #00e5ff; color: #00e5ff; background: rgba(0, 229, 255, 0.1);" onclick="exportNilaiCSV()">
-                        <i class="fas fa-file-csv"></i> CSV (G-Sheet)
+                    <button class="btn-outline" style="border-color: #00e5ff; color: #00e5ff; background: rgba(0, 229, 255, 0.1);" onclick="exportNilaiHTML()">
+                        <i class="fas fa-globe"></i> Export HTML
                     </button>
                 </div>
             </div>
@@ -356,113 +353,133 @@
                 <p style="font-size: 13px; font-weight: 600;"><i class="fas fa-book"></i> Guru <span id="set-mapel-guru">-</span></p>
             </div>
 
-            <div class="glass-card d-flex justify-between align-center">
+            <div class="glass-card d-flex justify-between align-center" style="margin-bottom: 25px;">
                 <span style="font-weight: 600;"><i class="fas fa-moon" style="margin-right: 10px;"></i> Mode Tampilan</span>
                 <button class="btn-outline" id="btn-theme" style="width: auto; padding: 5px 15px;" onclick="toggleTheme()">Gelap</button>
             </div>
 
-            <!-- Export Section -->
-            <h3 style="font-size: 14px; margin: 20px 0 10px 5px; color: #ffffff; font-weight: 600;">Export Data (Laporan)</h3>
-            <div class="glass-card">
-                <!-- Filter Export -->
-                <div style="margin-bottom: 15px;">
+            <!-- List Menu Pengaturan Baru (Accordion) -->
+            <div class="menu-list-container">
+                
+                <!-- 1. Kelola Data Kelas -->
+                <div class="menu-list-item" onclick="toggleSettingMenu('menu-kelas')">
+                    <div class="menu-icon"><i class="fas fa-chalkboard"></i></div>
+                    <div class="menu-text">
+                        <div class="menu-title">Kelola Data Kelas & Mapel</div>
+                        <div class="menu-desc">Atur daftar ruangan kelas dan Mata Pelajaran</div>
+                    </div>
+                    <i class="fas fa-chevron-right text-muted"></i>
+                </div>
+                <div id="menu-kelas" class="setting-content">
+                    <h4 style="font-size: 13px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-book"></i> Tambah Mapel</h4>
+                    <div class="d-flex" style="gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="input-mapel-nama" placeholder="Nama Mapel (ex: Gambar Teknik)" style="margin-bottom: 0;">
+                        <button class="btn-outline" style="width: auto; border-color: var(--primary); color: var(--primary);" onclick="tambahMapel()">Simpan</button>
+                    </div>
+                    <hr style="border-color: var(--border); margin: 15px 0;">
+                    <h4 style="font-size: 13px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-layer-group"></i> Tambah Kelas Baru</h4>
+                    <div class="d-flex" style="gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="input-kelas-nama" placeholder="Nama Kelas (ex: XII RPL 1)" style="margin-bottom: 0;">
+                        <button class="btn-outline" style="width: auto; border-color: var(--primary); color: var(--primary);" onclick="tambahKelas()">Simpan</button>
+                    </div>
+                    <div id="list-master-kelas-mapel"></div>
+                </div>
+
+                <!-- 2. Kelola Data Siswa -->
+                <div class="menu-list-item" onclick="toggleSettingMenu('menu-siswa')">
+                    <div class="menu-icon"><i class="fas fa-users"></i></div>
+                    <div class="menu-text">
+                        <div class="menu-title">Kelola Data Siswa</div>
+                        <div class="menu-desc">Atur profil dan daftar nama seluruh siswa</div>
+                    </div>
+                    <i class="fas fa-chevron-right text-muted"></i>
+                </div>
+                <div id="menu-siswa" class="setting-content">
+                    <h4 style="font-size: 13px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-user-plus"></i> Input Manual Siswa</h4>
+                    <input type="text" id="input-siswa-nis" placeholder="NIS (Opsional)">
+                    <input type="text" id="input-siswa-nama" placeholder="Nama Lengkap Siswa">
+                    <select id="input-siswa-kelas" style="margin-bottom: 15px;"><option value="">Pilih Kelas</option></select>
+                    <button class="btn-primary mb-15" onclick="tambahSiswa()">Simpan Siswa</button>
+                    
+                    <hr style="border-color: var(--border); margin: 15px 0;">
+                    <h4 style="font-size: 13px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-file-excel"></i> Upload Siswa Massal</h4>
+                    <div class="action-grid">
+                        <button class="btn-outline" style="border-color: #217346; color: #217346; background: rgba(33, 115, 70, 0.1);" onclick="downloadTemplateSiswa()"><i class="fas fa-download"></i> Template</button>
+                        <div style="position: relative; width: 100%;">
+                            <button class="btn-primary" style="width: 100%; background-color: #217346; color: #fff; box-shadow: 0 4px 15px rgba(33, 115, 70, 0.3);"><i class="fas fa-upload"></i> Upload</button>
+                            <input type="file" id="input-excel-siswa" accept=".xlsx, .xls" style="position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; width: 100%;" onchange="uploadSiswaExcel()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Pindah Kelas (Placeholder) -->
+                <div class="menu-list-item" onclick="showToast('Fitur pindah kelas akan segera hadir di pembaruan selanjutnya!')">
+                    <div class="menu-icon"><i class="fas fa-exchange-alt"></i></div>
+                    <div class="menu-text">
+                        <div class="menu-title">Pindah Kelas</div>
+                        <div class="menu-desc">Naik kelas massal dan riwayat siswa</div>
+                    </div>
+                    <i class="fas fa-chevron-right text-muted"></i>
+                </div>
+
+                <!-- 4. Kelola Waktu Kehadiran (Placeholder) -->
+                <div class="menu-list-item" onclick="showToast('Fitur Kelola Waktu akan segera hadir di pembaruan selanjutnya!')">
+                    <div class="menu-icon"><i class="fas fa-clock"></i></div>
+                    <div class="menu-text">
+                        <div class="menu-title">Kelola Waktu Kehadiran</div>
+                        <div class="menu-desc">Atur batas waktu absensi (Pagi, Siang, Sore)</div>
+                    </div>
+                    <i class="fas fa-chevron-right text-muted"></i>
+                </div>
+
+                <!-- 5. Backup / Restore (Export Data) -->
+                <div class="menu-list-item" onclick="toggleSettingMenu('menu-backup')">
+                    <div class="menu-icon"><i class="fas fa-history"></i></div>
+                    <div class="menu-text">
+                        <div class="menu-title">Backup / Restore (Export)</div>
+                        <div class="menu-desc">Backup dan pulihkan data laporan absensi</div>
+                    </div>
+                    <i class="fas fa-chevron-right text-muted"></i>
+                </div>
+                <div id="menu-backup" class="setting-content">
                     <select id="export-tipe" onchange="toggleExportDate()" style="margin-bottom: 10px;">
                         <option value="harian">Laporan Harian</option>
                         <option value="bulanan">Laporan Bulanan</option>
                     </select>
-                    
                     <input type="date" id="export-date" style="margin-bottom: 10px;">
                     <input type="month" id="export-month" style="margin-bottom: 10px; display: none;">
-                    
-                    <select id="export-kelas" style="margin-bottom: 10px;">
-                        <option value="SEMUA">Semua Kelas</option>
-                    </select>
-                    
-                    <select id="export-mapel" style="margin-bottom: 15px;">
-                        <option value="Umum">Umum</option>
-                    </select>
-                </div>
+                    <select id="export-kelas" style="margin-bottom: 10px;"><option value="SEMUA">Semua Kelas</option></select>
+                    <select id="export-mapel" style="margin-bottom: 15px;"><option value="Umum">Umum</option></select>
 
-                <div class="action-grid mb-15">
-                    <button class="btn-outline" style="border-color: #217346; color: #217346; background: rgba(33, 115, 70, 0.1);" onclick="exportAbsensi('excel')"><i class="fas fa-file-excel"></i> Excel (.xlsx)</button>
-                    <button class="btn-outline" style="border-color: #e74c3c; color: #e74c3c; background: rgba(231, 76, 60, 0.1);" onclick="exportAbsensi('pdf')"><i class="fas fa-file-pdf"></i> Export PDF</button>
-                </div>
-                <button class="btn-outline" style="border-color: #00e5ff; color: #00e5ff; background: rgba(0, 229, 255, 0.1);" onclick="exportAbsensi('html')"><i class="fas fa-globe"></i> Export HTML (Web View)</button>
-            </div>
-
-            <!-- Input Master Data -->
-            <h3 style="font-size: 14px; margin: 20px 0 10px 5px; color: #ffffff; font-weight: 600;">Input Master Data</h3>
-            
-            <div class="glass-card">
-                <h4 style="font-size: 14px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-book"></i> Tambah Mata Pelajaran (Mapel)</h4>
-                <div class="d-flex" style="gap: 10px; margin-bottom: 20px;">
-                    <input type="text" id="input-mapel-nama" placeholder="Nama Mapel (ex: Gambar Teknik)" style="margin-bottom: 0;">
-                    <button class="btn-outline" style="width: auto; border-color: var(--primary); color: var(--primary);" onclick="tambahMapel()">Simpan</button>
-                </div>
-
-                <hr style="border-color: var(--border); margin: 20px 0;">
-
-                <h4 style="font-size: 14px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-layer-group"></i> Tambah Kelas</h4>
-                <div class="d-flex" style="gap: 10px; margin-bottom: 20px;">
-                    <input type="text" id="input-kelas-nama" placeholder="Nama Kelas (ex: XII RPL 1)" style="margin-bottom: 0;">
-                    <button class="btn-outline" style="width: auto; border-color: var(--primary); color: var(--primary);" onclick="tambahKelas()">Simpan</button>
-                </div>
-
-                <hr style="border-color: var(--border); margin: 20px 0;">
-
-                <h4 style="font-size: 14px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-user-plus"></i> Tambah Siswa Baru</h4>
-                <input type="text" id="input-siswa-nis" placeholder="NIS (Opsional)">
-                <input type="text" id="input-siswa-nama" placeholder="Nama Lengkap Siswa">
-                <div class="d-flex" style="gap: 10px;">
-                    <select id="input-siswa-kelas" style="flex: 1;">
-                        <option value="">Pilih Kelas</option>
-                    </select>
-                </div>
-                <button class="btn-primary" onclick="tambahSiswa()">Simpan Siswa</button>
-
-                <hr style="border-color: var(--border); margin: 25px 0;">
-
-                <h4 style="font-size: 14px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-file-excel"></i> Upload Siswa Massal (Excel)</h4>
-                <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 15px;">Gunakan fitur ini untuk menambah banyak siswa sekaligus. Download template, isi datanya, lalu upload kembali ke sini.</p>
-                
-                <div class="action-grid">
-                    <button class="btn-outline" style="border-color: #217346; color: #217346; background: rgba(33, 115, 70, 0.1);" onclick="downloadTemplateSiswa()">
-                        <i class="fas fa-download"></i> Template Excel
-                    </button>
-                    <div style="position: relative; width: 100%;">
-                        <button class="btn-primary" style="width: 100%; background-color: #217346; color: #fff; box-shadow: 0 4px 15px rgba(33, 115, 70, 0.3);">
-                            <i class="fas fa-upload"></i> Upload Excel
-                        </button>
-                        <input type="file" id="input-excel-siswa" accept=".xlsx, .xls" style="position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; width: 100%; margin: 0; padding: 0;" onchange="uploadSiswaExcel()">
+                    <div class="action-grid mb-15">
+                        <button class="btn-outline" style="border-color: #217346; color: #217346; background: rgba(33, 115, 70, 0.1);" onclick="exportAbsensi('excel')"><i class="fas fa-file-excel"></i> Excel (.xlsx)</button>
+                        <button class="btn-outline" style="border-color: #e74c3c; color: #e74c3c; background: rgba(231, 76, 60, 0.1);" onclick="exportAbsensi('pdf')"><i class="fas fa-file-pdf"></i> Export PDF</button>
                     </div>
+                    <button class="btn-outline" style="border-color: #00e5ff; color: #00e5ff; background: rgba(0, 229, 255, 0.1);" onclick="exportAbsensi('html')"><i class="fas fa-globe"></i> Export HTML (Web View)</button>
+                </div>
+
+                <!-- 6. Tentang Aplikasi -->
+                <div class="menu-list-item" onclick="showModal('Aplikasi Presensi dan Rekapan Nilai Terpadu untuk Guru. Versi 2.0 (Offline Mode Support).', 'alert')">
+                    <div class="menu-icon"><i class="fas fa-info-circle"></i></div>
+                    <div class="menu-text">
+                        <div class="menu-title">Tentang Aplikasi</div>
+                        <div class="menu-desc">Rating, bagikan, dan info aplikasi lainnya</div>
+                    </div>
+                    <i class="fas fa-chevron-right text-muted"></i>
                 </div>
             </div>
 
-            <!-- Daftar Master Data -->
-            <h3 style="font-size: 14px; margin: 20px 0 10px 5px; color: #ffffff; font-weight: 600;">Daftar Mapel, Kelas & Siswa</h3>
-            <div class="glass-card" id="list-master-container">
-                <!-- Daftar Dinamis -->
-            </div>
-
-            <button class="btn-outline btn-danger" style="margin-top: 30px;" onclick="logoutRoom()"><i class="fas fa-sign-out-alt"></i> Keluar (Logout Room)</button>
+            <button class="btn-outline btn-danger" onclick="logoutRoom()"><i class="fas fa-sign-out-alt"></i> Keluar (Logout Room)</button>
         </div>
 
     </div>
 
     <!-- Navigasi Bawah -->
     <nav class="bottom-nav">
-        <a class="nav-item active" data-target="beranda" onclick="switchTab('beranda')">
-            <i class="fas fa-home"></i> Beranda
-        </a>
-        <a class="nav-item" data-target="absensi" onclick="switchTab('absensi')">
-            <i class="fas fa-clipboard-list"></i> Absensi
-        </a>
-        <a class="nav-item" data-target="nilai" onclick="switchTab('nilai')">
-            <i class="fas fa-graduation-cap"></i> Nilai
-        </a>
-        <a class="nav-item" data-target="pengaturan" onclick="switchTab('pengaturan')">
-            <i class="fas fa-cog"></i> Pengaturan
-        </a>
+        <a class="nav-item active" data-target="beranda" onclick="switchTab('beranda')"><i class="fas fa-home"></i> Beranda</a>
+        <a class="nav-item" data-target="absensi" onclick="switchTab('absensi')"><i class="fas fa-clipboard-list"></i> Absensi</a>
+        <a class="nav-item" data-target="nilai" onclick="switchTab('nilai')"><i class="fas fa-graduation-cap"></i> Nilai</a>
+        <a class="nav-item" data-target="pengaturan" onclick="switchTab('pengaturan')"><i class="fas fa-cog"></i> Pengaturan</a>
     </nav>
 
     <!-- Modals -->
@@ -492,10 +509,8 @@
             <h3 style="margin-bottom: 20px;" id="modal-edit-title">Edit Data</h3>
             <input type="hidden" id="modal-edit-type">
             <input type="hidden" id="modal-edit-id">
-            
             <input type="text" id="modal-edit-val1" placeholder="Nilai 1">
             <input type="text" id="modal-edit-val2" placeholder="Nilai 2" style="display: none;">
-            
             <div class="d-flex" style="gap: 10px;">
                 <button class="btn-outline" onclick="document.getElementById('modal-edit-data').style.display='none'">Batal</button>
                 <button class="btn-primary" onclick="simpanEditData()">Simpan</button>
@@ -503,55 +518,44 @@
         </div>
     </div>
 
-    <!-- --- STREAMING_CHUNK:Javascript Logic --- -->
+    <!-- --- STREAMING_CHUNK:Javascript Core Logic --- -->
     <script>
         let activeRoomKey = null;
-        let DB = {
-            guru: { nama: "Guru Pengajar", nip: "-", mapel: "-", foto: "" },
-            mapelList: [],
-            kelas: [],
-            siswa: [],
-            absensi: {},
-            nilai: {}
-        };
+        let DB = { guru: { nama: "Guru Pengajar", nip: "-", mapel: "-", foto: "" }, mapelList: [], kelas: [], siswa: [], absensi: {}, nilai: {} };
         let chartInstance = null;
 
-        // Inisialisasi
         window.onload = () => {
             initClock();
             initOfflineSupport();
             loadRoomHistory();
             
             const savedRoom = localStorage.getItem('presensi_active_room');
-            if(savedRoom) {
-                activeRoomKey = savedRoom;
-                loadDataRoom();
-            } else {
-                document.getElementById('login-screen').style.display = 'flex';
-            }
+            if(savedRoom) { activeRoomKey = savedRoom; loadDataRoom(); } 
+            else { document.getElementById('login-screen').style.display = 'flex'; }
         };
 
-        // Utilities
         function showToast(message) {
             const toast = document.getElementById('toast-message');
-            toast.innerText = message;
-            toast.style.display = 'block';
+            toast.innerText = message; toast.style.display = 'block';
             setTimeout(() => { toast.style.display = 'none'; }, 2000);
         }
 
-        function autoSaveLokal() {
-            if(activeRoomKey) {
-                localStorage.setItem(activeRoomKey, JSON.stringify(DB));
-            }
+        function toggleSettingMenu(menuId) {
+            const el = document.getElementById(menuId);
+            const isHidden = el.style.display === 'none' || el.style.display === '';
+            document.querySelectorAll('.setting-content').forEach(content => content.style.display = 'none');
+            if (isHidden) el.style.display = 'block';
         }
 
-        // PWA & Offline
+        function autoSaveLokal() {
+            if(activeRoomKey) localStorage.setItem(activeRoomKey, JSON.stringify(DB));
+        }
+
         function initOfflineSupport() {
             const updateOnlineStatus = () => {
                 const statusEl = document.getElementById('network-status');
                 if (!statusEl) return;
-                
-                if(navigator.onLine) {
+                if (navigator.onLine) {
                     statusEl.innerHTML = '<i class="fas fa-wifi"></i> Online';
                     statusEl.className = 'network-status status-online';
                 } else {
@@ -565,94 +569,63 @@
             updateOnlineStatus();
 
             if ('serviceWorker' in navigator) {
-                const swCode = `
-                    self.addEventListener('install', (e) => { self.skipWaiting(); });
-                    self.addEventListener('activate', (e) => { e.waitUntil(self.clients.claim()); });
-                    self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => new Response('Offline'))); });
-                `;
+                const swCode = `self.addEventListener('install', (e) => { self.skipWaiting(); }); self.addEventListener('activate', (e) => { e.waitUntil(self.clients.claim()); }); self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => new Response('Offline'))); });`;
                 const blob = new Blob([swCode], {type: 'application/javascript'});
-                navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => {
-                    console.log("Service worker berjalan dalam mode lokal fallback.");
-                });
+                navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => { console.log("SW offline register handled quietly"); });
             }
         }
 
-        // Clock & Date
         function initClock() {
-            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            
             setInterval(() => {
                 const now = new Date();
                 const clockEl = document.getElementById('clock');
                 const dateEl = document.getElementById('date');
-                
-                if (clockEl) {
-                    clockEl.innerText = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/:/g, '.');
-                }
+                if (clockEl) clockEl.innerText = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/:/g, '.');
                 if (dateEl) {
+                    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
                     dateEl.innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
                 }
             }, 1000);
 
             const today = new Date().toISOString().split('T')[0];
-            const absDate = document.getElementById('absensi-date');
-            if (absDate) absDate.value = today;
-            
-            const expDate = document.getElementById('export-date');
-            if (expDate) expDate.value = today;
-            
-            const expMonth = document.getElementById('export-month');
-            if (expMonth) expMonth.value = today.substring(0, 7);
+            const absDate = document.getElementById('absensi-date'); if (absDate) absDate.value = today;
+            const expDate = document.getElementById('export-date'); if (expDate) expDate.value = today;
+            const expMonth = document.getElementById('export-month'); if (expMonth) expMonth.value = today.substring(0, 7);
         }
 
-        // Room Login System
         function loadRoomHistory() {
             let history = JSON.parse(localStorage.getItem('presensi_room_history') || '[]');
             const container = document.getElementById('login-history-container');
             const list = document.getElementById('login-history-list');
-            
             if(history.length > 0) {
-                container.style.display = 'block';
-                list.innerHTML = '';
+                container.style.display = 'block'; list.innerHTML = '';
                 history.forEach(h => {
-                    list.innerHTML += `
-                        <button class="history-btn" onclick="masukRuangDariHistory('${h.key}')">
-                            <i class="fas fa-user-circle" style="margin-right: 10px; color: var(--primary); font-size: 18px;"></i>
-                            <b>${h.nama}</b>
-                        </button>
-                    `;
+                    list.innerHTML += `<button class="history-btn" onclick="masukRuangDariHistory('${h.key}')"><i class="fas fa-user-circle" style="margin-right: 10px; color: var(--primary); font-size: 18px;"></i><b>${h.nama}</b></button>`;
                 });
             }
         }
 
         function masukRuangDariHistory(roomKey) {
-            localStorage.setItem('presensi_active_room', roomKey);
-            activeRoomKey = roomKey;
-            loadDataRoom();
+            localStorage.setItem('presensi_active_room', roomKey); activeRoomKey = roomKey; loadDataRoom();
         }
 
         function loginRoom() {
             const roomInput = document.getElementById('login-room').value.trim();
             if(!roomInput) return showToast('Nama Guru tidak boleh kosong!');
-            
             const sanitizedRoom = 'presensi_db_' + roomInput.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
-            localStorage.setItem('presensi_active_room', sanitizedRoom);
-            activeRoomKey = sanitizedRoom;
+            localStorage.setItem('presensi_active_room', sanitizedRoom); activeRoomKey = sanitizedRoom;
 
             let history = JSON.parse(localStorage.getItem('presensi_room_history') || '[]');
             history = history.filter(h => h.key !== sanitizedRoom);
             history.unshift({ key: sanitizedRoom, nama: roomInput });
             localStorage.setItem('presensi_room_history', JSON.stringify(history));
-            
             loadDataRoom();
         }
 
         function logoutRoom() {
             showModal('Yakin ingin keluar dari ruangan ini?', 'confirm', () => {
-                localStorage.removeItem('presensi_active_room');
-                localStorage.removeItem('presensi_last_tab');
-                window.location.reload();
+                localStorage.removeItem('presensi_active_room'); localStorage.removeItem('presensi_last_tab'); window.location.reload();
             });
         }
 
@@ -660,47 +633,28 @@
             const savedData = localStorage.getItem(activeRoomKey);
             if(savedData) {
                 DB = JSON.parse(savedData);
-                
                 if(!DB.mapelList) DB.mapelList = [];
                 let migratedAbsensi = {};
                 for (let key in DB.absensi) {
-                    if (key.includes('|')) {
-                        migratedAbsensi[key] = DB.absensi[key];
-                    } else {
-                        migratedAbsensi[key + '|Umum'] = DB.absensi[key];
-                        if (!DB.mapelList.includes('Umum')) DB.mapelList.push('Umum');
-                    }
+                    if (key.includes('|')) migratedAbsensi[key] = DB.absensi[key];
+                    else { migratedAbsensi[key + '|Umum'] = DB.absensi[key]; if (!DB.mapelList.includes('Umum')) DB.mapelList.push('Umum'); }
                 }
                 DB.absensi = migratedAbsensi;
-            } else {
-                DB.guru.nama = document.getElementById('login-room').value || "Guru Pengajar";
-                autoSaveLokal();
-            }
-            
-            document.getElementById('login-screen').style.display = 'none';
-            onDataLoaded();
+            } else { DB.guru.nama = document.getElementById('login-room').value || "Guru Pengajar"; autoSaveLokal(); }
+            document.getElementById('login-screen').style.display = 'none'; onDataLoaded();
         }
 
         function onDataLoaded() {
-            updateKelasDropdowns();
-            renderFotoProfil();
-            
+            updateKelasDropdowns(); renderFotoProfil();
             const savedTheme = localStorage.getItem('presensi_theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
             const btnTheme = document.getElementById('btn-theme');
             if (btnTheme) btnTheme.innerText = savedTheme === 'dark' ? 'Terang' : 'Gelap';
 
             const lastTab = localStorage.getItem('presensi_last_tab') || 'beranda';
-            switchTab(lastTab);
-
-            renderAbsensiList();
-            renderNilaiList();
-            renderPengaturanLists();
-            
-            addRippleEffect();
+            switchTab(lastTab); renderAbsensiList(); renderNilaiList(); renderPengaturanLists(); addRippleEffect();
         }
 
-        // Navigation
         function switchTab(tabId) {
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             const targetNav = document.querySelector(`.nav-item[data-target="${tabId}"]`);
@@ -713,33 +667,21 @@
             localStorage.setItem('presensi_last_tab', tabId);
 
             if(tabId === 'beranda') initBeranda();
-            if(tabId === 'absensi') {
-                document.getElementById('absensi-history-view').style.display = 'block';
-                document.getElementById('absensi-detail-view').style.display = 'none';
-                renderAbsensiHistory();
-            }
+            if(tabId === 'absensi') { document.getElementById('absensi-history-view').style.display = 'block'; document.getElementById('absensi-detail-view').style.display = 'none'; renderAbsensiHistory(); }
             if(tabId === 'nilai') renderNilaiList();
             if(tabId === 'pengaturan') renderPengaturanLists();
         }
 
-        // Modal
         function showModal(message, type = 'alert', onConfirm = null) {
             const modal = document.getElementById('custom-modal');
             document.getElementById('modal-desc').innerText = message;
             const btnContainer = document.getElementById('modal-buttons');
-            
             if(type === 'confirm') {
-                btnContainer.innerHTML = `
-                    <button class="btn-outline" style="flex:1;" onclick="document.getElementById('custom-modal').style.display='none'">Batal</button>
-                    <button class="btn-primary" style="flex:1;" onclick="executeModalAction()">Ya</button>
-                `;
+                btnContainer.innerHTML = `<button class="btn-outline" style="flex:1;" onclick="document.getElementById('custom-modal').style.display='none'">Batal</button><button class="btn-primary" style="flex:1;" onclick="executeModalAction()">Ya</button>`;
                 window.modalConfirmAction = onConfirm;
-            } else {
-                btnContainer.innerHTML = `<button class="btn-primary" onclick="document.getElementById('custom-modal').style.display='none'">Tutup</button>`;
-            }
+            } else { btnContainer.innerHTML = `<button class="btn-primary" onclick="document.getElementById('custom-modal').style.display='none'">Tutup</button>`; }
             modal.style.display = 'flex';
         }
-
         function executeModalAction() { if(window.modalConfirmAction) window.modalConfirmAction(); document.getElementById('custom-modal').style.display='none'; }
 
         // --- STREAMING_CHUNK:Logika Beranda ---
@@ -754,69 +696,26 @@
             let counts = { H: 0, I: 0, S: 0, A: 0, B: 0 };
             
             Object.keys(DB.absensi).forEach(key => {
-                if(key.startsWith(today)) {
-                    Object.values(DB.absensi[key]).forEach(v => {
-                        if(v.status) counts[v.status]++;
-                        if(v.isBolos) counts.B++;
-                    });
-                }
+                if(key.startsWith(today)) { Object.values(DB.absensi[key]).forEach(v => { if(v.status) counts[v.status]++; if(v.isBolos) counts.B++; }); }
             });
-            
-            document.getElementById('stat-h').innerText = counts.H;
-            document.getElementById('stat-i').innerText = counts.I;
-            document.getElementById('stat-s').innerText = counts.S;
-            document.getElementById('stat-a').innerText = counts.A + counts.B;
-
+            document.getElementById('stat-h').innerText = counts.H; document.getElementById('stat-i').innerText = counts.I; document.getElementById('stat-s').innerText = counts.S; document.getElementById('stat-a').innerText = counts.A + counts.B;
             renderChart();
         }
 
         function renderChart() {
             const ctx = document.getElementById('kehadiranChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
-
-            const dates = [];
-            const hadirData = [];
-            const absenData = [];
-            
-            const today = new Date();
+            const dates = []; const hadirData = []; const absenData = []; const today = new Date();
             for(let i=4; i>=0; i--) {
-                const d = new Date(today);
-                d.setDate(today.getDate() - i);
-                const dateStr = d.toISOString().split('T')[0];
-                dates.push(d.toLocaleDateString('id-ID', { weekday: 'short' }));
-
+                const d = new Date(today); d.setDate(today.getDate() - i); const dateStr = d.toISOString().split('T')[0]; dates.push(d.toLocaleDateString('id-ID', { weekday: 'short' }));
                 let h = 0, a = 0;
-                Object.keys(DB.absensi).forEach(key => {
-                    if(key.startsWith(dateStr)) {
-                        Object.values(DB.absensi[key]).forEach(v => {
-                            if(v.status === 'H') h++;
-                            else if(['I','S','A'].includes(v.status) || v.isBolos) a++;
-                        });
-                    }
-                });
-                hadirData.push(h);
-                absenData.push(a);
+                Object.keys(DB.absensi).forEach(key => { if(key.startsWith(dateStr)) { Object.values(DB.absensi[key]).forEach(v => { if(v.status === 'H') h++; else if(['I','S','A'].includes(v.status) || v.isBolos) a++; }); } });
+                hadirData.push(h); absenData.push(a);
             }
-
             const maxVal = Math.max(...hadirData, ...absenData, 5); 
-
             chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: dates,
-                    datasets: [
-                        { label: 'Hadir', data: hadirData, backgroundColor: '#39FF14', borderRadius: 5 },
-                        { label: 'Absen/Izin/Sakit/Bolos', data: absenData, backgroundColor: '#ff4757', borderRadius: 5 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: { beginAtZero: true, max: maxVal, ticks: { color: '#aaaaaa', stepSize: Math.ceil(maxVal/5) }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        x: { ticks: { color: '#aaaaaa' }, grid: { display: false } }
-                    },
-                    plugins: { legend: { labels: { color: '#ffffff' } } }
-                }
+                type: 'bar', data: { labels: dates, datasets: [ { label: 'Hadir', data: hadirData, backgroundColor: '#39FF14', borderRadius: 5 }, { label: 'Absen', data: absenData, backgroundColor: '#ff4757', borderRadius: 5 } ] },
+                options: { responsive: true, scales: { y: { beginAtZero: true, max: maxVal, ticks: { stepSize: Math.ceil(maxVal/5) } } } }
             });
         }
 
@@ -826,61 +725,55 @@
             const filterKelas = document.getElementById('history-kelas-filter').value;
             container.innerHTML = '';
 
-            const todayStr = new Date().toISOString().split('T')[0];
-            const keys = Object.keys(DB.absensi).sort((a, b) => {
-                const dateA = a.split('|')[0];
-                const dateB = b.split('|')[0];
-                return new Date(dateB) - new Date(dateA);
-            });
-
-            if (keys.length === 0) {
-                container.innerHTML = '<p class="text-muted text-center" style="padding: 30px 0; font-size: 13px;">Belum ada riwayat absensi.</p>';
-                return;
-            }
+            const keys = Object.keys(DB.absensi).sort((a, b) => new Date(b.split('|')[0]) - new Date(a.split('|')[0]));
+            let renderedCount = 0;
 
             keys.forEach(key => {
-                const [dateStr, mapelStr] = key.split('|');
-                const dataHarian = DB.absensi[key];
-                let totalSiswa = 0, hadir = 0, alpa = 0;
+                const [dateStr, mapelStr] = key.split('|'); const dataHarian = DB.absensi[key];
+                let totalSiswa = 0, countH = 0, countI = 0, countS = 0, countA = 0, countB = 0;
+                let hasInput = false;
 
                 DB.siswa.forEach(s => {
                     if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
                     totalSiswa++;
                     const stat = dataHarian[s.id];
-                    if (stat && stat.status) {
-                        if (stat.status === 'H') hadir++;
-                        else alpa++;
+                    if (stat) {
+                        if (stat.status === 'H') countH++; else if (stat.status === 'I') countI++; else if (stat.status === 'S') countS++; else if (stat.status === 'A') countA++;
+                        if (stat.isBolos) countB++;
+                        if (stat.status !== '' || stat.isBolos) hasInput = true;
                     }
                 });
 
-                if (totalSiswa === 0) return;
+                if (totalSiswa === 0 || !hasInput) return;
+                renderedCount++;
 
-                const persentase = totalSiswa > 0 ? Math.round((hadir / totalSiswa) * 100) : 0;
-                let badgeHtml = dateStr === todayStr ? '<span class="h-badge today">HARI INI</span>' : `<span class="h-badge">${dateStr}</span>`;
-                const dt = new Date(dateStr);
-                const fullMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-                const dateDisplay = `${dt.getDate()} ${fullMonths[dt.getMonth()]} ${dt.getFullYear()}`;
+                const persentase = totalSiswa > 0 ? Math.round((countH / totalSiswa) * 100) : 0;
+                let badgeHtml = dateStr === new Date().toISOString().split('T')[0] ? '<span class="h-badge today">HARI INI</span>' : `<span class="h-badge">${dateStr}</span>`;
 
                 const html = `
                 <div class="history-card" onclick="openAbsensiDetail('${dateStr}', '${filterKelas}', '${mapelStr}')">
                     <div class="d-flex align-center mb-15">
                         ${badgeHtml}
-                        <span style="font-size: 13px; color: var(--text-muted); flex: 1;">${dateDisplay}</span>
+                        <span style="font-size: 13px; color: var(--text-muted); flex: 1;">${dateStr}</span>
                         <span class="h-badge" style="margin-right:0; background:rgba(0, 229, 255, 0.1); color:var(--accent);">${mapelStr}</span>
                     </div>
                     <div class="d-flex justify-between align-center">
                         <div>
-                            <h1 style="font-size: 42px; font-weight: 700; margin: 0; line-height: 1; color: var(--text-main);">${persentase}%</h1>
-                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">${hadir}/${totalSiswa} siswa</p>
+                            <h1 style="font-size: 42px; font-weight: 700; margin: 0; line-height: 1;">${persentase}%</h1>
+                            <p style="font-size: 12px; color: var(--text-muted);">${countH}/${totalSiswa} siswa</p>
                         </div>
-                        <div style="font-size: 13px; color: var(--text-muted);">
-                            <div style="margin-bottom: 5px;"><span class="dot-status dot-hadir"></span> ${hadir} hadir</div>
-                            <div><span class="dot-status dot-alpa"></span> ${alpa} alpa/absen</div>
+                        <div style="font-size: 11px; color: var(--text-muted); display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px;">
+                            <div><span class="dot-status dot-hadir"></span> ${countH} Hadir</div>
+                            <div><span class="dot-status dot-izin"></span> ${countI} Izin</div>
+                            <div><span class="dot-status dot-sakit"></span> ${countS} Sakit</div>
+                            <div><span class="dot-status dot-alpa"></span> ${countA} Alpa</div>
+                            ${countB > 0 ? `<div style="grid-column: 1 / -1;"><span class="dot-status dot-bolos"></span> ${countB} Bolos</div>` : ''}
                         </div>
                     </div>
                 </div>`;
                 container.insertAdjacentHTML('beforeend', html);
             });
+            if (renderedCount === 0) container.innerHTML = '<p class="text-muted text-center" style="padding: 30px 0; font-size: 13px;">Belum ada data absensi.</p>';
         }
 
         function openNewAbsensi() {
@@ -894,17 +787,13 @@
         function openAbsensiDetail(dateStr, kelasValue, mapelValue) {
             document.getElementById('absensi-history-view').style.display = 'none';
             document.getElementById('absensi-detail-view').style.display = 'block';
-            document.getElementById('absensi-date').value = dateStr;
-            document.getElementById('absensi-kelas').value = kelasValue;
+            document.getElementById('absensi-date').value = dateStr; document.getElementById('absensi-kelas').value = kelasValue;
             if(mapelValue) document.getElementById('absensi-mapel').value = mapelValue;
-            renderAbsensiList();
-            window.scrollTo(0, 0);
+            renderAbsensiList(); window.scrollTo(0, 0);
         }
 
         function closeAbsensiDetail() {
-            document.getElementById('absensi-detail-view').style.display = 'none';
-            document.getElementById('absensi-history-view').style.display = 'block';
-            renderAbsensiHistory();
+            document.getElementById('absensi-detail-view').style.display = 'none'; document.getElementById('absensi-history-view').style.display = 'block'; renderAbsensiHistory();
         }
 
         function renderAbsensiList() {
@@ -914,44 +803,28 @@
             const mapel = document.getElementById('absensi-mapel').value;
             const search = document.getElementById('absensi-search').value.toLowerCase();
             
-            container.innerHTML = '';
-            if(!date || !mapel) return;
-
-            const key = date + '|' + mapel;
-            if(!DB.absensi[key]) DB.absensi[key] = {};
+            container.innerHTML = ''; if(!date || !mapel) return;
+            const key = date + '|' + mapel; if(!DB.absensi[key]) DB.absensi[key] = {};
             const dataAbsensi = DB.absensi[key];
 
             let filteredSiswa = DB.siswa.filter(s => {
-                const matchKelas = filterKelas === 'SEMUA' || s.kelas === filterKelas;
-                const matchSearch = s.nama.toLowerCase().includes(search);
-                return matchKelas && matchSearch;
+                return (filterKelas === 'SEMUA' || s.kelas === filterKelas) && s.nama.toLowerCase().includes(search);
             });
-
-            if(filteredSiswa.length === 0) {
-                container.innerHTML = '<p class="text-muted" style="text-align:center; padding:20px;">Tidak ada data siswa.</p>';
-                return;
-            }
+            if(filteredSiswa.length === 0) return container.innerHTML = '<p class="text-muted text-center">Tidak ada data siswa.</p>';
 
             filteredSiswa.forEach(s => {
                 const stat = dataAbsensi[s.id] || { status: '', isBolos: false, hadirTime: '', bolosTime: '', lateMinutes: 0 };
-                
                 let infoText = '';
-                if(stat.hadirTime) {
-                    infoText += `<div style="color:var(--primary); font-size:11px; margin-top:4px;">Hadir: ${stat.hadirTime} ${stat.lateMinutes > 0 ? `<span class="text-danger">(Telat ${stat.lateMinutes}m)</span>` : ''}</div>`;
-                }
-                if(stat.isBolos && stat.bolosTime) {
-                    infoText += `<div style="color:var(--purple); font-size:11px; margin-top:2px;">Bolos: ${stat.bolosTime}</div>`;
-                }
+                if(stat.hadirTime) infoText += `<div style="color:var(--primary); font-size:11px;">Hadir: ${stat.hadirTime} ${stat.lateMinutes > 0 ? `<span class="text-danger">(Telat ${stat.lateMinutes}m)</span>` : ''}</div>`;
+                if(stat.isBolos && stat.bolosTime) infoText += `<div style="color:var(--purple); font-size:11px;">Bolos: ${stat.bolosTime}</div>`;
 
                 const html = `
                 <div class="glass-card" style="padding: 15px; margin-bottom: 10px;">
                     <div class="d-flex align-center" style="gap: 15px;">
-                        <div style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: bold; background: rgba(255,255,255,0.1);">
-                            ${s.nama.charAt(0)}
-                        </div>
+                        <div style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: bold; background: rgba(255,255,255,0.1);">${s.nama.charAt(0)}</div>
                         <div style="flex: 1;">
-                            <h4 style="color: var(--text-main); font-size: 15px; margin-bottom: 2px;">${s.nama}</h4>
-                            <p class="text-muted" style="font-size: 11px; margin-bottom: 0;">NIS: ${s.nis || '-'} | ${s.kelas}</p>
+                            <h4 style="color: var(--text-main); font-size: 15px;">${s.nama}</h4>
+                            <p class="text-muted" style="font-size: 11px;">NIS: ${s.nis || '-'} | ${s.kelas}</p>
                             ${infoText}
                         </div>
                     </div>
@@ -969,84 +842,47 @@
 
         function setAbsen(key, siswaId, status) {
             let current = DB.absensi[key][siswaId] || { status: '', isBolos: false, hadirTime: '', bolosTime: '', lateMinutes: 0 };
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' }).replace(':', '.');
-            
-            if(current.status === status) {
-                current.status = '';
-                if(status === 'H') current.hadirTime = '';
-            } else {
+            const now = new Date(); const timeStr = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' }).replace(':', '.');
+            if(current.status === status) { current.status = ''; if(status === 'H') current.hadirTime = ''; } 
+            else {
                 if(current.status === 'H' && status !== 'H') current.hadirTime = '';
                 current.status = status;
-                
                 if(status === 'H' && !current.hadirTime) {
-                    current.hadirTime = timeStr;
-                    const mins = (now.getHours() * 60) + now.getMinutes();
+                    current.hadirTime = timeStr; const mins = (now.getHours() * 60) + now.getMinutes();
                     current.lateMinutes = mins > (8 * 60) ? mins - (8 * 60) : 0;
                 }
             }
-            DB.absensi[key][siswaId] = current;
-            autoSaveLokal(); 
-            renderAbsensiList();
+            DB.absensi[key][siswaId] = current; autoSaveLokal(); renderAbsensiList();
         }
 
         function toggleBolos(key, siswaId) {
             let current = DB.absensi[key][siswaId] || { status: '', isBolos: false, hadirTime: '', bolosTime: '', lateMinutes: 0 };
             current.isBolos = !current.isBolos;
-            if(current.isBolos) {
-                const now = new Date();
-                current.bolosTime = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' }).replace(':', '.');
-            } else {
-                current.bolosTime = '';
-            }
-            DB.absensi[key][siswaId] = current;
-            autoSaveLokal(); 
-            renderAbsensiList();
+            if(current.isBolos) { const now = new Date(); current.bolosTime = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' }).replace(':', '.'); } 
+            else { current.bolosTime = ''; }
+            DB.absensi[key][siswaId] = current; autoSaveLokal(); renderAbsensiList();
         }
 
         function markAll(status) {
-            const date = document.getElementById('absensi-date').value;
-            const mapel = document.getElementById('absensi-mapel').value;
-            const key = date + '|' + mapel;
+            const key = document.getElementById('absensi-date').value + '|' + document.getElementById('absensi-mapel').value;
             const filterKelas = document.getElementById('absensi-kelas').value;
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' }).replace(':', '.');
-            const mins = (now.getHours() * 60) + now.getMinutes();
-            const late = mins > 480 ? mins - 480 : 0;
+            const now = new Date(); const timeStr = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' }).replace(':', '.');
+            const mins = (now.getHours() * 60) + now.getMinutes(); const late = mins > 480 ? mins - 480 : 0;
 
             DB.siswa.forEach(s => {
                 if(filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
-                const prevBolos = DB.absensi[key][s.id] ? DB.absensi[key][s.id].isBolos : false;
-                const prevBolosTime = DB.absensi[key][s.id] ? DB.absensi[key][s.id].bolosTime : '';
-
-                DB.absensi[key][s.id] = {
-                    status: status, 
-                    isBolos: prevBolos,
-                    hadirTime: status === 'H' ? timeStr : '',
-                    bolosTime: prevBolosTime, 
-                    lateMinutes: status === 'H' ? late : 0
-                };
+                const prev = DB.absensi[key][s.id] || { isBolos: false, bolosTime: '' };
+                DB.absensi[key][s.id] = { status: status, isBolos: prev.isBolos, hadirTime: status === 'H' ? timeStr : '', bolosTime: prev.bolosTime, lateMinutes: status === 'H' ? late : 0 };
             });
-            autoSaveLokal(); 
-            showToast('Semua ditandai ' + status + '!'); 
-            renderAbsensiList();
+            autoSaveLokal(); showToast('Semua ditandai ' + status + '!'); renderAbsensiList();
         }
 
         function resetAbsensi() {
-            const date = document.getElementById('absensi-date').value;
-            const mapel = document.getElementById('absensi-mapel').value;
-            const key = date + '|' + mapel;
-            DB.absensi[key] = {};
-            autoSaveLokal(); 
-            renderAbsensiList();
-            showToast('Absensi berhasil direset!');
+            const key = document.getElementById('absensi-date').value + '|' + document.getElementById('absensi-mapel').value;
+            DB.absensi[key] = {}; autoSaveLokal(); renderAbsensiList(); showToast('Absensi berhasil direset!');
         }
 
-        function simpanDataAbsensiButton() {
-            autoSaveLokal(); 
-            showToast(`✅ Data absen berhasil direkam!`);
-            setTimeout(() => { closeAbsensiDetail(); }, 800);
-        }
+        function simpanDataAbsensiButton() { autoSaveLokal(); showToast(`✅ Data absen berhasil direkam!`); setTimeout(() => { closeAbsensiDetail(); }, 800); }
 
         // --- STREAMING_CHUNK:Logika Nilai ---
         function renderNilaiList() {
@@ -1055,85 +891,33 @@
             const search = document.getElementById('nilai-search').value.toLowerCase();
             
             container.innerHTML = '';
-
-            let filteredSiswa = DB.siswa.filter(s => {
-                const matchKelas = filterKelas === 'SEMUA' || s.kelas === filterKelas;
-                const matchSearch = s.nama.toLowerCase().includes(search);
-                return matchKelas && matchSearch;
-            });
-
-            if(filteredSiswa.length === 0) {
-                container.innerHTML = '<p class="text-muted" style="text-align:center; padding:20px;">Tidak ada data siswa.</p>';
-                return;
-            }
+            let filteredSiswa = DB.siswa.filter(s => (filterKelas === 'SEMUA' || s.kelas === filterKelas) && s.nama.toLowerCase().includes(search));
+            if(filteredSiswa.length === 0) return container.innerHTML = '<p class="text-muted text-center">Tidak ada data siswa.</p>';
 
             filteredSiswa.forEach(s => {
-                let n = DB.nilai[s.id];
-                if (!n || !n.tugasList) {
-                     n = { tugasList: Array(10).fill(0), uts: 0, uas: 0, absen: 0 };
-                }
-
-                let totalTugas = 0;
-                let countTugas = 0;
-                for(let i=0; i<10; i++) {
-                    let val = Number(n.tugasList[i] || 0);
-                    if (val > 0) {
-                        totalTugas += val;
-                        countTugas++;
-                    }
-                }
+                let n = DB.nilai[s.id] || { tugasList: Array(10).fill(0), uts: 0, uas: 0, absen: 0 };
+                let totalTugas = 0, countTugas = 0;
+                for(let i=0; i<10; i++) { let val = Number(n.tugasList[i] || 0); if (val > 0) { totalTugas += val; countTugas++; } }
                 const rataTugas = countTugas > 0 ? (totalTugas / countTugas) : 0;
-                
                 const final = (rataTugas * 0.5) + ((n.uts||0) * 0.1) + ((n.uas||0) * 0.2) + ((n.absen||0) * 0.2);
-                let predikat = 'E';
-                if(final >= 90) predikat = 'A';
-                else if(final >= 80) predikat = 'B';
-                else if(final >= 70) predikat = 'C';
-                else if(final >= 60) predikat = 'D';
+                let predikat = final >= 90 ? 'A' : final >= 80 ? 'B' : final >= 70 ? 'C' : final >= 60 ? 'D' : 'E';
 
                 const html = `
                 <div class="glass-card" style="padding: 15px; margin-bottom: 10px;">
                     <div class="d-flex justify-between align-center mb-15">
-                        <div>
-                            <h4 style="color: var(--text-main); font-size: 15px; margin-bottom: 2px;">${s.nama}</h4>
-                            <p class="text-muted" style="font-size: 11px;">${s.kelas}</p>
-                        </div>
-                        <div style="text-align: right;">
-                            <h2 style="color: var(--primary); font-size: 20px;">${final.toFixed(1)} <span style="font-size:12px; color:var(--text-muted);">(${predikat})</span></h2>
-                        </div>
+                        <div><h4 style="color: var(--text-main); font-size: 15px;">${s.nama}</h4><p class="text-muted" style="font-size: 11px;">${s.kelas}</p></div>
+                        <div style="text-align: right;"><h2 style="color: var(--primary); font-size: 20px;">${final.toFixed(1)} <span style="font-size:12px; color:var(--text-muted);">(${predikat})</span></h2></div>
                     </div>
-                    
-                    <p style="font-size: 11px; color: var(--primary); margin-bottom: 5px; font-weight: 600;">Nilai Tugas (1-10)</p>
+                    <p style="font-size: 11px; color: var(--primary); font-weight: 600;">Nilai Tugas (1-10)</p>
                     <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--border);">
-                        ${Array.from({length: 10}).map((_, i) => `
-                            <div style="min-width: 60px;">
-                                <label style="font-size:9px; color:var(--text-muted); display:block; text-align:center;">T${i+1}</label>
-                                <input type="number" value="${n.tugasList[i] || 0}" onchange="updateNilaiTugas(${s.id}, ${i}, this.value)" style="padding: 5px; text-align: center; margin-bottom:0; font-size:12px;">
-                            </div>
-                        `).join('')}
+                        ${Array.from({length: 10}).map((_, i) => `<div style="min-width: 60px;"><label style="font-size:9px; color:var(--text-muted); display:block; text-align:center;">T${i+1}</label><input type="number" value="${n.tugasList[i] || 0}" onchange="updateNilaiTugas(${s.id}, ${i}, this.value)" style="padding: 5px; text-align: center; font-size:12px;"></div>`).join('')}
                     </div>
-
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1.2fr; gap: 6px;">
-                        <div>
-                            <label style="font-size:10px; color:var(--text-muted); display:block; text-align:center;">Tugas(Rata)</label>
-                            <div style="background: rgba(255,255,255,0.05); padding: 8px 4px; text-align: center; border-radius: 12px; font-size: 13px; font-weight: bold; border: 1px solid var(--border);">${rataTugas.toFixed(1)}</div>
-                        </div>
-                        <div>
-                            <label style="font-size:10px; color:var(--text-muted); display:block; text-align:center;">UTS</label>
-                            <input type="number" value="${n.uts || 0}" onchange="updateNilaiLain(${s.id}, 'uts', this.value)" style="padding: 8px 4px; text-align: center; margin-bottom:0;">
-                        </div>
-                        <div>
-                            <label style="font-size:10px; color:var(--text-muted); display:block; text-align:center;">UAS</label>
-                            <input type="number" value="${n.uas || 0}" onchange="updateNilaiLain(${s.id}, 'uas', this.value)" style="padding: 8px 4px; text-align: center; margin-bottom:0;">
-                        </div>
-                        <div>
-                            <label style="font-size:10px; color:var(--text-muted); display:block; text-align:center;">Absen</label>
-                            <input type="number" value="${n.absen || 0}" onchange="updateNilaiLain(${s.id}, 'absen', this.value)" style="padding: 8px 4px; text-align: center; margin-bottom:0;">
-                        </div>
-                        <div>
-                            <label style="font-size:10px; color:var(--text-muted); display:block; text-align:center; white-space:nowrap;">Nilai Akhir</label>
-                            <div style="background: rgba(57, 255, 20, 0.1); color: var(--primary); padding: 8px 4px; text-align: center; border-radius: 12px; font-size: 13px; font-weight: bold; border: 1px solid var(--primary);">${final.toFixed(1)}</div>
-                        </div>
+                        <div><label style="font-size:10px; color:var(--text-muted); display:block; text-align:center;">Tugas(Rata)</label><div style="background: rgba(255,255,255,0.05); padding: 8px 4px; text-align: center; border-radius: 12px; font-size: 13px; font-weight: bold; border: 1px solid var(--border);">${rataTugas.toFixed(1)}</div></div>
+                        <div><label style="font-size:10px; color:var(--text-muted); display:block; text-align:center;">UTS</label><input type="number" value="${n.uts || 0}" onchange="updateNilaiLain(${s.id}, 'uts', this.value)" style="padding: 8px 4px; text-align: center;"></div>
+                        <div><label style="font-size:10px; color:var(--text-muted); display:block; text-align:center;">UAS</label><input type="number" value="${n.uas || 0}" onchange="updateNilaiLain(${s.id}, 'uas', this.value)" style="padding: 8px 4px; text-align: center;"></div>
+                        <div><label style="font-size:10px; color:var(--text-muted); display:block; text-align:center;">Absen</label><input type="number" value="${n.absen || 0}" onchange="updateNilaiLain(${s.id}, 'absen', this.value)" style="padding: 8px 4px; text-align: center;"></div>
+                        <div><label style="font-size:10px; color:var(--text-muted); display:block; text-align:center;">Nilai Akhir</label><div style="background: rgba(57, 255, 20, 0.1); color: var(--primary); padding: 8px 4px; text-align: center; border-radius: 12px; font-size: 13px; font-weight: bold; border: 1px solid var(--primary);">${final.toFixed(1)}</div></div>
                     </div>
                 </div>`;
                 container.insertAdjacentHTML('beforeend', html);
@@ -1141,224 +925,67 @@
         }
 
         function updateNilaiTugas(siswaId, index, value) {
-            if(!DB.nilai[siswaId] || !DB.nilai[siswaId].tugasList) DB.nilai[siswaId] = { tugasList: Array(10).fill(0), uts:0, uas:0, absen:0 };
-            let valNum = Number(value);
-            if(valNum > 100) valNum = 100;
-            if(valNum < 0) valNum = 0;
-            DB.nilai[siswaId].tugasList[index] = valNum;
-            autoSaveLokal(); 
-            renderNilaiList();
+            if(!DB.nilai[siswaId]) DB.nilai[siswaId] = { tugasList: Array(10).fill(0), uts:0, uas:0, absen:0 };
+            let valNum = Number(value); if(valNum > 100) valNum = 100; if(valNum < 0) valNum = 0;
+            DB.nilai[siswaId].tugasList[index] = valNum; autoSaveLokal(); renderNilaiList();
         }
 
         function updateNilaiLain(siswaId, field, value) {
-            if(!DB.nilai[siswaId] || !DB.nilai[siswaId].tugasList) DB.nilai[siswaId] = { tugasList: Array(10).fill(0), uts:0, uas:0, absen:0 };
-            let valNum = Number(value);
-            if(valNum > 100) valNum = 100;
-            if(valNum < 0) valNum = 0;
-            DB.nilai[siswaId][field] = valNum;
-            autoSaveLokal(); 
-            renderNilaiList();
+            if(!DB.nilai[siswaId]) DB.nilai[siswaId] = { tugasList: Array(10).fill(0), uts:0, uas:0, absen:0 };
+            let valNum = Number(value); if(valNum > 100) valNum = 100; if(valNum < 0) valNum = 0;
+            DB.nilai[siswaId][field] = valNum; autoSaveLokal(); renderNilaiList();
         }
 
-        function simpanDataNilaiButton() {
-            autoSaveLokal();
-            showToast('✅ Data nilai berhasil disimpan!');
-        }
+        function simpanDataNilaiButton() { autoSaveLokal(); showToast('✅ Data nilai berhasil disimpan!'); }
 
-        function exportNilaiExcel() {
-            if(DB.siswa.length === 0) return showToast('Tidak ada data siswa');
-            
-            const filterKelas = document.getElementById('nilai-kelas').value;
-            let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas;
-
-            let ws_data = [
-                ["PEMERINTAH PROVINSI GORONTALO"],
-                ["DINAS PENDIDIKAN DAN KEBUDAYAAN"],
-                ["SMK NEGERI 1 MARISA"],
-                ["Jln. Lintas Sulawesi, Marisa"],
-                [],
-                ["REKAPITULASI NILAI SISWA"],
-                [],
-                ["Nama Guru", ":", DB.guru.nama],
-                ["Mata Pelajaran", ":", DB.guru.mapel],
-                ["Kelas", ":", kelasText],
-                [],
-                ["No", "NIS", "Nama Lengkap Siswa", "Kelas", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "Tugas (Rata)", "UTS", "UAS", "Absen", "Nilai Akhir", "Predikat"]
-            ];
-
-            let no = 1;
-            DB.siswa.forEach(s => {
-                if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
-                
-                let n = DB.nilai[s.id] || { tugasList: Array(10).fill(0), uts: 0, uas: 0, absen: 0 };
-                let totalTugas = 0;
-                let countTugas = 0;
-                for(let i=0; i<10; i++) {
-                    let val = Number(n.tugasList[i] || 0);
-                    if (val > 0) {
-                        totalTugas += val;
-                        countTugas++;
-                    }
-                }
-                const rataTugas = countTugas > 0 ? (totalTugas / countTugas) : 0;
-                const final = (rataTugas * 0.5) + ((n.uts||0) * 0.1) + ((n.uas||0) * 0.2) + ((n.absen||0) * 0.2);
-                
-                let predikat = 'E';
-                if(final >= 90) predikat = 'A';
-                else if(final >= 80) predikat = 'B';
-                else if(final >= 70) predikat = 'C';
-                else if(final >= 60) predikat = 'D';
-
-                let rowData = [no++, s.nis, s.nama, s.kelas];
-                for(let i=0; i<10; i++) {
-                    rowData.push(n.tugasList[i] || 0);
-                }
-                rowData.push(rataTugas.toFixed(1), n.uts || 0, n.uas || 0, n.absen || 0, final.toFixed(1), predikat);
-                ws_data.push(rowData);
-            });
-
-            const ws = XLSX.utils.aoa_to_sheet(ws_data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Rekap_Nilai");
-            XLSX.writeFile(wb, `Rekap_Nilai_${kelasText.replace(/ /g, '_')}.xlsx`);
-            showToast('Mengunduh Excel Nilai...');
-        }
-        
-        function exportNilaiCSV() {
-            if(DB.siswa.length === 0) return showToast('Tidak ada data siswa');
-            
-            const filterKelas = document.getElementById('nilai-kelas').value;
-            let csv = "NIS,Nama Lengkap,Kelas,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,Rata-rata Tugas,UTS,UAS,Absen,Nilai Akhir,Predikat\n";
-            
-            DB.siswa.forEach(s => {
-                if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
-                
-                let n = DB.nilai[s.id] || { tugasList: Array(10).fill(0), uts: 0, uas: 0, absen: 0 };
-                let totalTugas = 0; let countTugas = 0;
-                for(let i=0; i<10; i++) {
-                    let val = Number(n.tugasList[i] || 0);
-                    if (val > 0) { totalTugas += val; countTugas++; }
-                }
-                const rataTugas = countTugas > 0 ? (totalTugas / countTugas) : 0;
-                const final = (rataTugas * 0.5) + ((n.uts||0) * 0.1) + ((n.uas||0) * 0.2) + ((n.absen||0) * 0.2);
-                
-                let predikat = 'E';
-                if(final >= 90) predikat = 'A';
-                else if(final >= 80) predikat = 'B';
-                else if(final >= 70) predikat = 'C';
-                else if(final >= 60) predikat = 'D';
-
-                let row = `${s.nis},${s.nama},${s.kelas}`;
-                for(let i=0; i<10; i++) { row += `,${n.tugasList[i] || 0}`; }
-                row += `,${rataTugas.toFixed(1)},${n.uts || 0},${n.uas || 0},${n.absen || 0},${final.toFixed(1)},${predikat}\n`;
-                
-                csv += row;
-            });
-
-            const link = document.createElement("a");
-            link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
-            link.download = `Data_Nilai_${filterKelas.replace(/ /g, '_')}.csv`;
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-            showToast('Mengunduh CSV Nilai...');
-        }
-
-        // --- STREAMING_CHUNK:Logika Pengaturan ---
+        // --- STREAMING_CHUNK:Logika Pengaturan & Master Data ---
         function renderPengaturanLists() {
             document.getElementById('set-nama-guru').innerText = DB.guru.nama;
             document.getElementById('set-nip-guru').innerText = DB.guru.nip;
             document.getElementById('set-mapel-guru').innerText = DB.guru.mapel;
 
-            const container = document.getElementById('list-master-container');
-            container.innerHTML = '';
-            
+            const container = document.getElementById('list-master-kelas-mapel'); container.innerHTML = '';
             if(DB.mapelList && DB.mapelList.length > 0) {
-                let mapelHtml = `<div style="margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
-                    <h4 style="color: var(--accent); margin-bottom: 10px;"><i class="fas fa-book"></i> Daftar Mapel</h4>`;
+                let mapelHtml = `<h4 style="font-size: 13px; color: var(--accent); margin-bottom: 10px;"><i class="fas fa-book"></i> Daftar Mapel</h4>`;
                 DB.mapelList.forEach(m => {
-                    mapelHtml += `
-                    <div class="d-flex justify-between align-center" style="padding: 5px 0; font-size: 13px;">
-                        <span>- ${m}</span>
-                        <span class="list-item-btn btn-delete" style="padding: 3px 8px; font-size: 10px;" onclick="hapusMapel('${m}')"><i class="fas fa-times"></i> Hapus</span>
-                    </div>`;
+                    mapelHtml += `<div class="d-flex justify-between align-center" style="padding: 5px 0; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05);"><span>- ${m}</span><span class="list-item-btn btn-delete" onclick="hapusMapel('${m}')"><i class="fas fa-times"></i> Hapus</span></div>`;
                 });
-                mapelHtml += `</div>`;
-                container.insertAdjacentHTML('beforeend', mapelHtml);
+                container.insertAdjacentHTML('beforeend', mapelHtml + '<hr style="border-color: var(--border); margin: 15px 0;">');
             }
-
-            if(DB.kelas.length === 0) {
-                container.innerHTML += '<p class="text-muted text-center" style="font-size:12px;">Belum ada kelas.</p>';
-                return;
-            }
-
-            DB.kelas.forEach(k => {
-                const muridDiKelas = DB.siswa.filter(s => s.kelas === k);
-                let html = `
-                <div style="margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
-                    <div class="d-flex justify-between align-center mb-15">
-                        <h4 style="color: var(--primary);">${k} <span style="font-size:11px; color:var(--text-muted);">(${muridDiKelas.length} Siswa)</span></h4>
-                        <div class="d-flex" style="gap: 5px;">
-                            <span class="list-item-btn btn-edit" onclick="bukaModalEditKelas('${k}')"><i class="fas fa-edit"></i> Edit</span>
-                            <span class="list-item-btn btn-delete" onclick="hapusKelas('${k}')"><i class="fas fa-trash"></i> Hapus</span>
-                        </div>
-                    </div>
-                `;
-                
-                muridDiKelas.forEach(s => {
-                    html += `
-                    <div class="d-flex justify-between align-center" style="padding: 5px 0; font-size: 13px;">
-                        <span>- ${s.nama} <span style="color:var(--text-muted); font-size:10px;">(${s.nis || 'No NIS'})</span></span>
-                        <div class="d-flex" style="gap: 5px;">
-                            <span class="list-item-btn btn-edit" style="padding: 3px 8px; font-size: 10px;" onclick="bukaModalEditSiswa(${s.id})"><i class="fas fa-pencil-alt"></i></span>
-                            <span class="list-item-btn btn-delete" style="padding: 3px 8px; font-size: 10px;" onclick="hapusSiswa(${s.id})"><i class="fas fa-times"></i></span>
-                        </div>
-                    </div>`;
+            if(DB.kelas.length > 0) {
+                DB.kelas.forEach(k => {
+                    const murid = DB.siswa.filter(s => s.kelas === k);
+                    let html = `<div style="margin-bottom: 15px;"><div class="d-flex justify-between align-center mb-15"><h4 style="color: var(--primary);">${k} <span style="font-size:11px; color:var(--text-muted);">(${murid.length} Siswa)</span></h4><div class="d-flex"><span class="list-item-btn btn-edit" onclick="bukaModalEditKelas('${k}')"><i class="fas fa-edit"></i></span><span class="list-item-btn btn-delete" onclick="hapusKelas('${k}')"><i class="fas fa-trash"></i></span></div></div>`;
+                    murid.forEach(s => { html += `<div class="d-flex justify-between align-center" style="padding: 5px 0; font-size: 13px;"><span>- ${s.nama}</span><div class="d-flex"><span class="list-item-btn btn-edit" onclick="bukaModalEditSiswa(${s.id})"><i class="fas fa-pencil-alt"></i></span><span class="list-item-btn btn-delete" onclick="hapusSiswa(${s.id})"><i class="fas fa-times"></i></span></div></div>`; });
+                    container.insertAdjacentHTML('beforeend', html + '</div>');
                 });
-                
-                html += `</div>`;
-                container.insertAdjacentHTML('beforeend', html);
-            });
+            } else { container.innerHTML += '<p class="text-muted" style="font-size:12px;">Belum ada kelas.</p>'; }
         }
 
         function renderFotoProfil() {
-            const berandaFoto = document.getElementById('beranda-foto-profil');
-            const setFoto = document.getElementById('set-foto-profil');
+            const berandaFoto = document.getElementById('beranda-foto-profil'); const setFoto = document.getElementById('set-foto-profil');
             const inputHtml = `<input type="file" accept="image/*" onchange="handleFotoUpload(event)">`;
-
             if (DB.guru.foto && DB.guru.foto !== "") {
                 const imgTag = `<img src="${DB.guru.foto}" style="width: 100%; height: 100%; object-fit: cover;">`;
-                berandaFoto.innerHTML = imgTag;
-                setFoto.innerHTML = imgTag + inputHtml;
+                berandaFoto.innerHTML = imgTag; setFoto.innerHTML = imgTag + inputHtml;
             } else {
                 const iconTag = `<i class="fas fa-user-tie"></i>`;
-                berandaFoto.innerHTML = iconTag;
-                setFoto.innerHTML = iconTag + inputHtml;
+                berandaFoto.innerHTML = iconTag; setFoto.innerHTML = iconTag + inputHtml;
             }
         }
 
         function handleFotoUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
+            const file = event.target.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_SIZE = 250; 
-                    let width = img.width;
-                    let height = img.height;
-
+                    const MAX_SIZE = 250; let width = img.width, height = img.height;
                     if (width > height) { if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; } } 
                     else { if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; } }
-
-                    canvas.width = width; canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    
-                    DB.guru.foto = canvas.toDataURL('image/jpeg', 0.8);
-                    autoSaveLokal();
-                    renderFotoProfil();
-                    showToast('Foto profil berhasil diperbarui!');
+                    canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                    DB.guru.foto = canvas.toDataURL('image/jpeg', 0.8); autoSaveLokal(); renderFotoProfil(); showToast('Foto profil diperbarui!');
                 }
                 img.src = e.target.result;
             }
@@ -1366,268 +993,131 @@
         }
 
         function updateKelasDropdowns() {
-            const dropdowns = ['history-kelas-filter', 'absensi-kelas', 'nilai-kelas', 'input-siswa-kelas', 'export-kelas'];
-            dropdowns.forEach(id => {
-                const el = document.getElementById(id);
-                if(!el) return;
-                
-                if(id === 'history-kelas-filter') el.innerHTML = '<option value="SEMUA">Semua Kelas / Jurusan</option>';
-                else if (id === 'input-siswa-kelas') el.innerHTML = '<option value="">Pilih Kelas</option>';
-                else el.innerHTML = '<option value="SEMUA">Semua Kelas</option>';
-                
-                DB.kelas.forEach(k => {
-                    el.insertAdjacentHTML('beforeend', `<option value="${k}">${k}</option>`);
-                });
+            ['history-kelas-filter', 'absensi-kelas', 'nilai-kelas', 'export-kelas'].forEach(id => {
+                const el = document.getElementById(id); if(!el) return;
+                el.innerHTML = id === 'history-kelas-filter' ? '<option value="SEMUA">Semua Kelas / Jurusan</option>' : '<option value="SEMUA">Semua Kelas</option>';
+                DB.kelas.forEach(k => el.insertAdjacentHTML('beforeend', `<option value="${k}">${k}</option>`));
             });
-
-            const mapelEls = [document.getElementById('absensi-mapel'), document.getElementById('export-mapel')];
-            mapelEls.forEach(el => {
-                if(!el) return;
-                el.innerHTML = '';
-                if(DB.mapelList.length === 0) {
-                    el.innerHTML = '<option value="">-- Buat Mapel di Pengaturan --</option>';
-                } else {
-                    DB.mapelList.forEach(m => {
-                        el.insertAdjacentHTML('beforeend', `<option value="${m}">${m}</option>`);
-                    });
-                }
+            const inputKelas = document.getElementById('input-siswa-kelas'); if(inputKelas) { inputKelas.innerHTML = '<option value="">Pilih Kelas</option>'; DB.kelas.forEach(k => inputKelas.insertAdjacentHTML('beforeend', `<option value="${k}">${k}</option>`)); }
+            ['absensi-mapel', 'export-mapel'].forEach(id => {
+                const el = document.getElementById(id); if(!el) return; el.innerHTML = '';
+                if(DB.mapelList.length === 0) el.innerHTML = '<option value="">-- Buat Mapel di Pengaturan --</option>';
+                else DB.mapelList.forEach(m => el.insertAdjacentHTML('beforeend', `<option value="${m}">${m}</option>`));
             });
         }
 
-        // Action Handlers
+        // Actions: Master Data
+        function tambahMapel() {
+            const nama = document.getElementById('input-mapel-nama').value.trim();
+            if(!nama) return showToast('Isi nama mapel!'); if(DB.mapelList.includes(nama)) return showToast('Mapel sudah ada!');
+            DB.mapelList.push(nama); document.getElementById('input-mapel-nama').value = '';
+            autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); showToast('Mapel ditambah!');
+        }
+        function hapusMapel(nama) { showModal(`Hapus mapel ${nama}?`, 'confirm', () => { DB.mapelList = DB.mapelList.filter(m => m !== nama); autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); showToast('Mapel dihapus!'); }); }
+        
+        function tambahKelas() {
+            const nama = document.getElementById('input-kelas-nama').value.trim();
+            if(!nama) return showToast('Isi nama kelas!'); if(DB.kelas.includes(nama)) return showToast('Kelas sudah ada!');
+            DB.kelas.push(nama); document.getElementById('input-kelas-nama').value = '';
+            autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); showToast('Kelas ditambah!');
+        }
+        function hapusKelas(nama) { showModal(`Hapus kelas ${nama} dan siswanya?`, 'confirm', () => { DB.kelas = DB.kelas.filter(k => k !== nama); DB.siswa = DB.siswa.filter(s => s.kelas !== nama); autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); showToast('Kelas dihapus!'); }); }
+        
+        function tambahSiswa() {
+            const nis = document.getElementById('input-siswa-nis').value.trim(), nama = document.getElementById('input-siswa-nama').value.trim(), kelas = document.getElementById('input-siswa-kelas').value;
+            if(!nama || !kelas) return showToast('Nama & Kelas wajib diisi!');
+            DB.siswa.push({ id: Date.now(), nis: nis || "-", nama: nama, kelas: kelas });
+            document.getElementById('input-siswa-nis').value = ''; document.getElementById('input-siswa-nama').value = '';
+            autoSaveLokal(); renderPengaturanLists(); initBeranda(); showToast('Siswa ditambahkan!');
+        }
+        function hapusSiswa(id) { showModal('Hapus siswa ini?', 'confirm', () => { DB.siswa = DB.siswa.filter(s => s.id !== id); autoSaveLokal(); renderPengaturanLists(); initBeranda(); showToast('Siswa dihapus!'); }); }
+
         function bukaModalEditKelas(namaLama) {
-            document.getElementById('modal-edit-title').innerText = "Edit Nama Kelas";
-            document.getElementById('modal-edit-type').value = "kelas";
-            document.getElementById('modal-edit-id').value = namaLama;
-            
-            const inputVal1 = document.getElementById('modal-edit-val1');
-            inputVal1.placeholder = "Nama Kelas Baru";
-            inputVal1.value = namaLama;
-            
-            document.getElementById('modal-edit-val2').style.display = 'none';
-            document.getElementById('modal-edit-data').style.display = 'flex';
+            document.getElementById('modal-edit-title').innerText = "Edit Nama Kelas"; document.getElementById('modal-edit-type').value = "kelas"; document.getElementById('modal-edit-id').value = namaLama;
+            const inputVal1 = document.getElementById('modal-edit-val1'); inputVal1.placeholder = "Nama Kelas Baru"; inputVal1.value = namaLama;
+            document.getElementById('modal-edit-val2').style.display = 'none'; document.getElementById('modal-edit-data').style.display = 'flex';
         }
-
         function bukaModalEditSiswa(idSiswa) {
-            const siswa = DB.siswa.find(s => s.id === idSiswa);
-            if(!siswa) return;
-
-            document.getElementById('modal-edit-title').innerText = "Edit Data Siswa";
-            document.getElementById('modal-edit-type').value = "siswa";
-            document.getElementById('modal-edit-id').value = idSiswa;
-            
-            const inputVal1 = document.getElementById('modal-edit-val1');
-            inputVal1.placeholder = "Nama Lengkap Siswa";
-            inputVal1.value = siswa.nama;
-            
-            const inputVal2 = document.getElementById('modal-edit-val2');
-            inputVal2.placeholder = "NIS Siswa";
-            inputVal2.value = (siswa.nis === "-") ? "" : siswa.nis;
-            inputVal2.style.display = 'block';
-
+            const siswa = DB.siswa.find(s => s.id === idSiswa); if(!siswa) return;
+            document.getElementById('modal-edit-title').innerText = "Edit Data Siswa"; document.getElementById('modal-edit-type').value = "siswa"; document.getElementById('modal-edit-id').value = idSiswa;
+            const inputVal1 = document.getElementById('modal-edit-val1'), inputVal2 = document.getElementById('modal-edit-val2');
+            inputVal1.placeholder = "Nama Lengkap Siswa"; inputVal1.value = siswa.nama;
+            inputVal2.placeholder = "NIS Siswa"; inputVal2.value = (siswa.nis === "-") ? "" : siswa.nis; inputVal2.style.display = 'block';
             document.getElementById('modal-edit-data').style.display = 'flex';
         }
-
         function simpanEditData() {
-            const type = document.getElementById('modal-edit-type').value;
-            const val1 = document.getElementById('modal-edit-val1').value.trim();
-            const val2 = document.getElementById('modal-edit-val2').value.trim();
-            const identifier = document.getElementById('modal-edit-id').value;
-
-            if(!val1) return showToast("Nama tidak boleh kosong!");
-
+            const type = document.getElementById('modal-edit-type').value, val1 = document.getElementById('modal-edit-val1').value.trim(), val2 = document.getElementById('modal-edit-val2').value.trim(), identifier = document.getElementById('modal-edit-id').value;
+            if(!val1) return showToast("Data tidak boleh kosong!");
             if (type === 'kelas') {
                 if (identifier !== val1 && DB.kelas.includes(val1)) return showToast("Nama kelas sudah digunakan!");
-                const index = DB.kelas.indexOf(identifier);
-                if (index !== -1) DB.kelas[index] = val1;
+                const index = DB.kelas.indexOf(identifier); if (index !== -1) DB.kelas[index] = val1;
                 DB.siswa.forEach(s => { if (s.kelas === identifier) s.kelas = val1; });
-                showToast("Nama kelas diubah!");
             } else if (type === 'siswa') {
                 const siswaIndex = DB.siswa.findIndex(s => s.id === parseInt(identifier));
                 if(siswaIndex !== -1) { DB.siswa[siswaIndex].nama = val1; DB.siswa[siswaIndex].nis = val2 || "-"; }
-                showToast("Data siswa diubah!");
             }
-
             autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); initBeranda(); renderAbsensiList(); renderNilaiList();
-            document.getElementById('modal-edit-data').style.display = 'none';
-        }
-
-        function tambahMapel() {
-            const nama = document.getElementById('input-mapel-nama').value.trim();
-            if(!nama) return showToast('Nama Mapel wajib diisi!');
-            if(DB.mapelList.includes(nama)) return showToast('Mapel sudah ada!');
-            DB.mapelList.push(nama);
-            document.getElementById('input-mapel-nama').value = '';
-            autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); showToast('Mapel ditambahkan!');
-        }
-
-        function hapusMapel(nama) {
-            showModal(`Hapus mapel ${nama}? Data absen terkait tidak akan terhapus.`, 'confirm', () => {
-                DB.mapelList = DB.mapelList.filter(m => m !== nama);
-                autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); showToast('Mapel dihapus!');
-            });
-        }
-
-        function tambahKelas() {
-            const nama = document.getElementById('input-kelas-nama').value.trim();
-            if(!nama) return showToast('Nama Kelas wajib diisi!');
-            if(DB.kelas.includes(nama)) return showToast('Kelas sudah ada!');
-            DB.kelas.push(nama);
-            document.getElementById('input-kelas-nama').value = '';
-            autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); showToast('Kelas ditambahkan!');
-        }
-
-        function hapusKelas(nama) {
-            showModal(`Hapus kelas ${nama} beserta siswanya?`, 'confirm', () => {
-                DB.kelas = DB.kelas.filter(k => k !== nama);
-                DB.siswa = DB.siswa.filter(s => s.kelas !== nama);
-                autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); showToast('Kelas dihapus!');
-            });
-        }
-
-        function tambahSiswa() {
-            const nis = document.getElementById('input-siswa-nis').value.trim();
-            const nama = document.getElementById('input-siswa-nama').value.trim();
-            const kelas = document.getElementById('input-siswa-kelas').value;
-
-            if(!nama || !kelas) return showToast('Nama dan Kelas wajib diisi!');
-
-            DB.siswa.push({ id: Date.now(), nis: nis || "-", nama: nama, kelas: kelas });
-            document.getElementById('input-siswa-nis').value = ''; document.getElementById('input-siswa-nama').value = '';
-            
-            autoSaveLokal(); renderPengaturanLists(); initBeranda(); showToast('Siswa ditambahkan!');
-        }
-
-        function hapusSiswa(id) {
-            showModal('Hapus siswa ini?', 'confirm', () => {
-                DB.siswa = DB.siswa.filter(s => s.id !== id);
-                autoSaveLokal(); renderPengaturanLists(); initBeranda(); showToast('Siswa dihapus!');
-            });
+            document.getElementById('modal-edit-data').style.display = 'none'; showToast("Perubahan disimpan!");
         }
 
         function downloadTemplateSiswa() {
-            const ws_data = [
-                ["NIS", "Nama Lengkap Siswa", "Kelas"],
-                ["1001", "Budi Santoso", "X TKP"],
-                ["1002", "Siti Aminah", "X TKP"],
-                ["", "Ahmad (Contoh Tanpa NIS)", "XI RPL 1"]
-            ];
-            const ws = XLSX.utils.aoa_to_sheet(ws_data);
-            ws['!cols'] = [{wch: 15}, {wch: 35}, {wch: 15}];
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Template_Siswa");
-            XLSX.writeFile(wb, "Template_Upload_Siswa.xlsx");
-            showToast('Mendownload Template Excel...');
+            const ws_data = [ ["NIS", "Nama Lengkap Siswa", "Kelas"], ["1001", "Budi Santoso", "X TKP"] ];
+            const ws = XLSX.utils.aoa_to_sheet(ws_data); ws['!cols'] = [{wch: 15}, {wch: 35}, {wch: 15}];
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template_Siswa"); XLSX.writeFile(wb, "Template_Upload_Siswa.xlsx");
         }
 
         function uploadSiswaExcel() {
-            const fileInput = document.getElementById('input-excel-siswa');
-            const file = fileInput.files[0];
-            
-            if (!file) return showToast('Pilih file Excel terlebih dahulu!');
-
+            const fileInput = document.getElementById('input-excel-siswa'); const file = fileInput.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, {type: 'array'});
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
-                    
-                    if(jsonData.length <= 1) return showToast('File kosong atau format salah!');
-
-                    let newSiswaCount = 0;
-                    let addedKelasCount = 0;
-
-                    // Iterasi dimulai dari 1 (mengabaikan baris 0 yang merupakan Header)
+                    const data = new Uint8Array(e.target.result); const workbook = XLSX.read(data, {type: 'array'});
+                    const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1});
+                    if(jsonData.length <= 1) return showToast('File kosong/salah format!');
+                    let newSiswaCount = 0, addedKelasCount = 0;
                     for (let i = 1; i < jsonData.length; i++) {
                         const row = jsonData[i];
                         if (row && row.length >= 2) {
-                            let nis = row[0] ? String(row[0]).trim() : "-";
-                            let nama = row[1] ? String(row[1]).trim() : "";
-                            let kelas = row[2] ? String(row[2]).trim() : "Tanpa Kelas";
-
+                            let nis = row[0] ? String(row[0]).trim() : "-", nama = row[1] ? String(row[1]).trim() : "", kelas = row[2] ? String(row[2]).trim() : "Tanpa Kelas";
                             if (nama) {
-                                // Jika kelas di Excel belum ada di sistem, otomatis tambahkan
-                                if (!DB.kelas.includes(kelas) && kelas !== "Tanpa Kelas") {
-                                    DB.kelas.push(kelas);
-                                    addedKelasCount++;
-                                }
-                                
-                                DB.siswa.push({
-                                    id: Date.now() + i, // Generate ID unik
-                                    nis: nis,
-                                    nama: nama,
-                                    kelas: kelas
-                                });
-                                newSiswaCount++;
+                                if (!DB.kelas.includes(kelas) && kelas !== "Tanpa Kelas") { DB.kelas.push(kelas); addedKelasCount++; }
+                                DB.siswa.push({ id: Date.now() + i, nis: nis, nama: nama, kelas: kelas }); newSiswaCount++;
                             }
                         }
                     }
-
-                    if (newSiswaCount > 0) {
-                        autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); initBeranda();
-                        fileInput.value = ""; // Bersihkan kolom upload
-                        showToast(`Berhasil upload ${newSiswaCount} siswa & ${addedKelasCount} kelas baru!`);
-                    } else {
-                        showToast('Tidak ada data siswa valid ditemukan.');
-                    }
-                } catch (error) {
-                    console.error(error);
-                    showToast('Gagal membaca file Excel. Pastikan formatnya benar.');
-                }
-            };
-            reader.readAsArrayBuffer(file);
+                    if (newSiswaCount > 0) { autoSaveLokal(); updateKelasDropdowns(); renderPengaturanLists(); initBeranda(); fileInput.value = ""; showToast(`Berhasil upload ${newSiswaCount} siswa!`); }
+                } catch (error) { showToast('Gagal membaca Excel.'); }
+            }; reader.readAsArrayBuffer(file);
         }
 
         function bukaModalEditProfil() {
-            document.getElementById('edit-nama-guru').value = DB.guru.nama;
-            document.getElementById('edit-nip-guru').value = DB.guru.nip;
-            document.getElementById('edit-mapel-guru').value = DB.guru.mapel;
+            document.getElementById('edit-nama-guru').value = DB.guru.nama; document.getElementById('edit-nip-guru').value = DB.guru.nip; document.getElementById('edit-mapel-guru').value = DB.guru.mapel;
             document.getElementById('modal-edit-profil').style.display = 'flex';
         }
-
         function tutupModalProfil() { document.getElementById('modal-edit-profil').style.display = 'none'; }
-
         function simpanProfilGuru() {
-            DB.guru.nama = document.getElementById('edit-nama-guru').value;
-            DB.guru.nip = document.getElementById('edit-nip-guru').value;
-            DB.guru.mapel = document.getElementById('edit-mapel-guru').value;
+            DB.guru.nama = document.getElementById('edit-nama-guru').value; DB.guru.nip = document.getElementById('edit-nip-guru').value; DB.guru.mapel = document.getElementById('edit-mapel-guru').value;
             tutupModalProfil(); autoSaveLokal(); renderPengaturanLists(); initBeranda(); showToast('Profil diperbarui!');
         }
 
         function toggleTheme() {
-            const root = document.documentElement;
-            const newTheme = (root.getAttribute('data-theme') || 'dark') === 'dark' ? 'light' : 'dark';
-            root.setAttribute('data-theme', newTheme);
-            document.getElementById('btn-theme').innerText = newTheme === 'dark' ? 'Terang' : 'Gelap';
+            const root = document.documentElement; const newTheme = (root.getAttribute('data-theme') || 'dark') === 'dark' ? 'light' : 'dark';
+            root.setAttribute('data-theme', newTheme); document.getElementById('btn-theme').innerText = newTheme === 'dark' ? 'Terang' : 'Gelap';
             localStorage.setItem('presensi_theme', newTheme);
         }
 
         function toggleExportDate() {
             const tipe = document.getElementById('export-tipe').value;
-            if(tipe === 'harian') {
-                document.getElementById('export-date').style.display = 'block';
-                document.getElementById('export-month').style.display = 'none';
-            } else {
-                document.getElementById('export-date').style.display = 'none';
-                document.getElementById('export-month').style.display = 'block';
-            }
+            document.getElementById('export-date').style.display = tipe === 'harian' ? 'block' : 'none';
+            document.getElementById('export-month').style.display = tipe === 'bulanan' ? 'block' : 'none';
         }
 
         function addRippleEffect() {
-            const buttons = document.querySelectorAll('.btn-primary, .history-btn, .fab-btn');
-            buttons.forEach(btn => {
+            document.querySelectorAll('.btn-primary, .history-btn, .fab-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
-                    let ripple = document.createElement('span');
-                    ripple.classList.add('ripple');
-                    this.appendChild(ripple);
-                    let x = e.clientX - e.target.offsetLeft;
-                    let y = e.clientY - e.target.offsetTop;
-                    ripple.style.left = `${x}px`;
-                    ripple.style.top = `${y}px`;
-                    setTimeout(() => { ripple.remove(); }, 600);
+                    let ripple = document.createElement('span'); ripple.classList.add('ripple'); this.appendChild(ripple);
+                    let x = e.clientX - e.target.offsetLeft, y = e.clientY - e.target.offsetTop;
+                    ripple.style.left = `${x}px`; ripple.style.top = `${y}px`; setTimeout(() => { ripple.remove(); }, 600);
                 });
             });
         }
@@ -1635,318 +1125,102 @@
         // --- STREAMING_CHUNK:Logika Export ---
         function exportAbsensi(format) {
             if(DB.siswa.length === 0) return showToast('Tidak ada data siswa');
-            
-            const tipe = document.getElementById('export-tipe').value;
-            const filterKelas = document.getElementById('export-kelas').value;
-            const mapel = document.getElementById('export-mapel').value || 'Umum';
-            
-            let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas;
-            let dateTitle = "";
-            let ws_data = [];
-            let htmlTable = "";
+            const tipe = document.getElementById('export-tipe').value, filterKelas = document.getElementById('export-kelas').value, mapel = document.getElementById('export-mapel').value || 'Umum';
+            let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas, dateTitle = "", ws_data = [], htmlTable = "";
 
             if(tipe === 'harian') {
-                const date = document.getElementById('export-date').value || new Date().toISOString().split('T')[0];
-                dateTitle = date;
-                const key = date + '|' + mapel;
-                const absData = DB.absensi[key] || {};
-
-                ws_data = [
-                    ["PEMERINTAH PROVINSI GORONTALO"],
-                    ["DINAS PENDIDIKAN DAN KEBUDAYAAN"],
-                    ["PEGANGAN GURU MAPEL"],
-                    ["REKAPITULASI KEHADIRAN SISWA (HARIAN)"],
-                    [],
-                    ["Nama Guru", ":", DB.guru.nama],
-                    ["Mata Pelajaran", ":", mapel],
-                    ["Kelas", ":", kelasText],
-                    ["Tanggal", ":", date], 
-                    [],
-                    ["No", "NIS", "Nama Lengkap Siswa", "Status Kehadiran", "Waktu Hadir", "Waktu Bolos"]
-                ];
-
+                const date = document.getElementById('export-date').value || new Date().toISOString().split('T')[0]; dateTitle = date;
+                const absData = DB.absensi[date + '|' + mapel] || {};
+                ws_data = [ ["PEMERINTAH PROVINSI GORONTALO"], ["DINAS PENDIDIKAN DAN KEBUDAYAAN"], ["PEGANGAN GURU MAPEL"], ["REKAPITULASI KEHADIRAN SISWA (HARIAN)"], [], ["Nama Guru", ":", DB.guru.nama], ["Mata Pelajaran", ":", mapel], ["Kelas", ":", kelasText], ["Tanggal", ":", date], [], ["No", "NIS", "Nama Lengkap Siswa", "Status Kehadiran", "Waktu Hadir", "Waktu Bolos"] ];
                 htmlTable = `<tr><th>No</th><th>NIS</th><th style="text-align:left;">Nama Lengkap Siswa</th><th>Status</th><th>Waktu Hadir</th><th>Waktu Bolos</th></tr>`;
-
+                
                 let no = 1;
                 DB.siswa.forEach(s => {
                     if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
                     const abs = absData[s.id] || { status: '-', hadirTime: '-', bolosTime: '-' };
-                    
-                    let st = "-";
-                    if (abs.status === 'H') st = "Hadir";
-                    else if (abs.status === 'I') st = "Izin";
-                    else if (abs.status === 'S') st = "Sakit";
-                    else if (abs.status === 'A') st = "Alpa";
-
+                    let st = abs.status === 'H' ? "Hadir" : abs.status === 'I' ? "Izin" : abs.status === 'S' ? "Sakit" : abs.status === 'A' ? "Alpa" : "-";
                     if(abs.isBolos) st += " (Bolos)";
-
                     ws_data.push([ no, s.nis, s.nama, st, abs.hadirTime||'-', abs.bolosTime||'-' ]);
-                    htmlTable += `<tr><td>${no}</td><td>${s.nis}</td><td style="text-align:left;">${s.nama}</td><td><b>${st}</b></td><td>${abs.hadirTime||'-'}</td><td>${abs.bolosTime||'-'}</td></tr>`;
-                    no++;
+                    htmlTable += `<tr><td>${no}</td><td>${s.nis}</td><td style="text-align:left;">${s.nama}</td><td><b>${st}</b></td><td>${abs.hadirTime||'-'}</td><td>${abs.bolosTime||'-'}</td></tr>`; no++;
                 });
-
             } else {
-                const month = document.getElementById('export-month').value; 
-                if(!month) return showToast('Pilih bulan terlebih dahulu');
-                dateTitle = month;
-
-                ws_data = [
-                    ["PEMERINTAH PROVINSI GORONTALO"],
-                    ["DINAS PENDIDIKAN DAN KEBUDAYAAN"],
-                    ["PEGANGAN GURU MAPEL"],
-                    ["REKAPITULASI KEHADIRAN SISWA (BULANAN)"],
-                    [],
-                    ["Nama Guru", ":", DB.guru.nama],
-                    ["Mata Pelajaran", ":", mapel],
-                    ["Kelas", ":", kelasText],
-                    ["Bulan", ":", month], 
-                    [],
-                    ["No", "NIS", "Nama Lengkap Siswa", "Hadir", "Izin", "Sakit", "Alpa", "Bolos"]
-                ];
-
+                const month = document.getElementById('export-month').value; if(!month) return showToast('Pilih bulan terlebih dahulu'); dateTitle = month;
+                ws_data = [ ["PEMERINTAH PROVINSI GORONTALO"], ["DINAS PENDIDIKAN DAN KEBUDAYAAN"], ["PEGANGAN GURU MAPEL"], ["REKAPITULASI KEHADIRAN SISWA (BULANAN)"], [], ["Nama Guru", ":", DB.guru.nama], ["Mata Pelajaran", ":", mapel], ["Kelas", ":", kelasText], ["Bulan", ":", month], [], ["No", "NIS", "Nama Lengkap Siswa", "Hadir", "Izin", "Sakit", "Alpa", "Bolos"] ];
                 htmlTable = `<tr><th>No</th><th>NIS</th><th style="text-align:left;">Nama Lengkap Siswa</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Alpa</th><th>Bolos</th></tr>`;
-
+                
                 const monthKeys = Object.keys(DB.absensi).filter(k => k.startsWith(month) && k.endsWith('|' + mapel));
-
                 let no = 1;
                 DB.siswa.forEach(s => {
                     if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
-                    
                     let counts = { H: 0, I: 0, S: 0, A: 0, B: 0 };
-                    
                     monthKeys.forEach(k => {
                         const abs = DB.absensi[k][s.id];
-                        if(abs) {
-                            if(abs.status === 'H') counts.H++;
-                            if(abs.status === 'I') counts.I++;
-                            if(abs.status === 'S') counts.S++;
-                            if(abs.status === 'A') counts.A++;
-                            if(abs.isBolos) counts.B++;
-                        }
+                        if(abs) { if(abs.status === 'H') counts.H++; if(abs.status === 'I') counts.I++; if(abs.status === 'S') counts.S++; if(abs.status === 'A') counts.A++; if(abs.isBolos) counts.B++; }
                     });
-
                     ws_data.push([ no, s.nis, s.nama, counts.H, counts.I, counts.S, counts.A, counts.B ]);
-                    htmlTable += `<tr><td>${no}</td><td>${s.nis}</td><td style="text-align:left;">${s.nama}</td><td style="color:#00c853; font-weight:bold;">${counts.H}</td><td>${counts.I}</td><td>${counts.S}</td><td style="color:#ff1744;">${counts.A}</td><td style="color:#aa00ff;">${counts.B}</td></tr>`;
-                    no++;
+                    htmlTable += `<tr><td>${no}</td><td>${s.nis}</td><td style="text-align:left;">${s.nama}</td><td style="color:#00c853; font-weight:bold;">${counts.H}</td><td>${counts.I}</td><td>${counts.S}</td><td style="color:#ff1744;">${counts.A}</td><td style="color:#aa00ff;">${counts.B}</td></tr>`; no++;
                 });
             }
 
             if(format === 'excel') {
-                const ws = XLSX.utils.aoa_to_sheet(ws_data);
-                ws['!cols'] = [ {wch: 5}, {wch: 15}, {wch: 35}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 10}, {wch: 10} ];
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Rekap_Absensi");
-                XLSX.writeFile(wb, `Absensi_${tipe}_${mapel}_${dateTitle}.xlsx`);
-                showToast('Mengunduh Excel...');
+                const ws = XLSX.utils.aoa_to_sheet(ws_data); ws['!cols'] = [ {wch: 5}, {wch: 15}, {wch: 35}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 10}, {wch: 10} ];
+                const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Rekap_Absensi"); XLSX.writeFile(wb, `Absensi_${tipe}_${mapel}_${dateTitle}.xlsx`); showToast('Mengunduh Excel...');
             } 
             else if(format === 'pdf') {
                 showToast('Menyiapkan PDF...');
-                const el = document.createElement('div');
-                el.style.padding = '30px'; el.style.background = '#fff'; el.style.color = '#000'; el.style.fontFamily = 'Arial, sans-serif';
-                
-                let pdfHtml = `
-                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px;">
-                        <h2 style="margin:5px 0; font-size:18px;">DINAS PENDIDIKAN DAN KEBUDAYAAN</h2>
-                        <h1 style="margin:0; font-size:22px;">PEGANGAN GURU MAPEL</h1>
-                    </div>
-                    <h3 style="text-align:center; text-decoration: underline; margin-bottom: 20px;">REKAPITULASI KEHADIRAN SISWA (${tipe.toUpperCase()})</h3>
-                    <table style="width: 100%; margin-bottom: 15px; font-size: 13px;">
-                        <tr><td width="120">Nama Guru</td><td width="10">:</td><td><b>${DB.guru.nama}</b></td></tr>
-                        <tr><td>Mata Pelajaran</td><td>:</td><td>${mapel}</td></tr>
-                        <tr><td>Kelas</td><td>:</td><td>${kelasText}</td></tr>
-                        <tr><td>Periode</td><td>:</td><td>${dateTitle}</td></tr>
-                    </table>
-                    <table border="1" width="100%" cellpadding="6" style="border-collapse:collapse; font-size:12px; text-align:center;">
-                    ${htmlTable}
-                    </table>
-                `;
-                el.innerHTML = pdfHtml;
+                const el = document.createElement('div'); el.style.padding = '30px'; el.style.background = '#fff'; el.style.color = '#000'; el.style.fontFamily = 'Arial, sans-serif';
+                el.innerHTML = `<div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px;"><h2 style="margin:5px 0; font-size:18px;">DINAS PENDIDIKAN DAN KEBUDAYAAN</h2><h1 style="margin:0; font-size:22px;">PEGANGAN GURU MAPEL</h1></div><h3 style="text-align:center; text-decoration: underline; margin-bottom: 20px;">REKAPITULASI KEHADIRAN SISWA (${tipe.toUpperCase()})</h3><table style="width: 100%; margin-bottom: 15px; font-size: 13px;"><tr><td width="120">Nama Guru</td><td width="10">:</td><td><b>${DB.guru.nama}</b></td></tr><tr><td>Mata Pelajaran</td><td>:</td><td>${mapel}</td></tr><tr><td>Kelas</td><td>:</td><td>${kelasText}</td></tr><tr><td>Periode</td><td>:</td><td>${dateTitle}</td></tr></table><table border="1" width="100%" cellpadding="6" style="border-collapse:collapse; font-size:12px; text-align:center;">${htmlTable}</table>`;
                 html2pdf().from(el).set({ margin: 1, filename: `Absen_${tipe}_${mapel}_${dateTitle}.pdf` }).save();
             }
             else if(format === 'html') {
-                let webHtml = `
-                <!DOCTYPE html>
-                <html><head><title>Laporan Absensi</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
-                    .card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 1000px; margin: 0 auto; overflow-x: auto; }
-                    h1, h2, h3 { text-align: center; margin: 5px 0; line-height: 1.3; }
-                    h1 { color: #2c3e50; font-size: 24px; }
-                    h2 { font-size: 16px; font-weight: normal; }
-                    .info-grid { display: grid; grid-template-columns: auto 1fr; gap: 8px 15px; margin: 20px 0; font-size: 14px; background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #00c853; }
-                    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; min-width: 600px; }
-                    th, td { padding: 12px 10px; text-align: center; border: 1px solid #e0e0e0; }
-                    th { background: #00c853; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
-                    tr:nth-child(even) { background: #fcfcfc; }
-                    tr:hover { background: #f1f1f1; }
-                </style>
-                </head><body>
-                <div class="card">
-                    <h2>DINAS PENDIDIKAN DAN KEBUDAYAAN</h2>
-                    <h1>PEGANGAN GURU MAPEL</h1>
-                    <h3 style="color: #666; font-weight: normal; margin-top:15px; text-decoration: underline;">REKAPITULASI KEHADIRAN SISWA (${tipe.toUpperCase()})</h3>
-                    
-                    <div class="info-grid">
-                        <b>Nama Guru</b> <span>: ${DB.guru.nama}</span>
-                        <b>Mata Pelajaran</b> <span>: ${mapel}</span>
-                        <b>Kelas</b> <span>: ${kelasText}</span>
-                        <b>Periode</b> <span>: ${dateTitle}</span>
-                    </div>
-
-                    <table>${htmlTable}</table>
-                </div>
-                </body></html>`;
-
-                const blob = new Blob([webHtml], { type: 'text/html;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Absen_${tipe}_${mapel}_${dateTitle}.html`;
-                a.click();
-                URL.revokeObjectURL(url);
-                showToast('Tampilan HTML Berhasil Diunduh!');
+                let webHtml = `<!DOCTYPE html><html><head><title>Laporan Absensi</title><style>body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 20px; color: #333; } .card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 1000px; margin: 0 auto; overflow-x: auto; } h1, h2, h3 { text-align: center; margin: 5px 0; line-height: 1.3; } h1 { color: #2c3e50; font-size: 24px; } h2 { font-size: 16px; font-weight: normal; } .info-grid { display: grid; grid-template-columns: auto 1fr; gap: 8px 15px; margin: 20px 0; font-size: 14px; background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #00c853; } table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; min-width: 600px; } th, td { padding: 12px 10px; text-align: center; border: 1px solid #e0e0e0; } th { background: #00c853; color: white; text-transform: uppercase; } tr:nth-child(even) { background: #fcfcfc; } tr:hover { background: #f1f1f1; }</style></head><body><div class="card"><h2>DINAS PENDIDIKAN DAN KEBUDAYAAN</h2><h1>PEGANGAN GURU MAPEL</h1><h3 style="color: #666; font-weight: normal; margin-top:15px; text-decoration: underline;">REKAPITULASI KEHADIRAN SISWA (${tipe.toUpperCase()})</h3><div class="info-grid"><b>Nama Guru</b> <span>: ${DB.guru.nama}</span><b>Mata Pelajaran</b> <span>: ${mapel}</span><b>Kelas</b> <span>: ${kelasText}</span><b>Periode</b> <span>: ${dateTitle}</span></div><table>${htmlTable}</table></div></body></html>`;
+                const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([webHtml], { type: 'text/html;charset=utf-8' })); a.download = `Absen_${tipe}_${mapel}_${dateTitle}.html`; a.click();
             }
         }
 
         function exportNilaiExcel() {
             if(DB.siswa.length === 0) return showToast('Tidak ada data siswa');
-            
-            const filterKelas = document.getElementById('nilai-kelas').value;
-            let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas;
-
-            let ws_data = [
-                ["PEMERINTAH PROVINSI GORONTALO"],
-                ["DINAS PENDIDIKAN DAN KEBUDAYAAN"],
-                ["PEGANGAN GURU MAPEL"],
-                ["REKAPITULASI NILAI SISWA"],
-                [],
-                ["Nama Guru", ":", DB.guru.nama],
-                ["Mata Pelajaran", ":", DB.guru.mapel],
-                ["Kelas", ":", kelasText],
-                [],
-                ["No", "NIS", "Nama Lengkap Siswa", "Kelas", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "Tugas (Rata)", "UTS", "UAS", "Absen", "Nilai Akhir", "Predikat"]
-            ];
+            const filterKelas = document.getElementById('nilai-kelas').value; let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas;
+            let ws_data = [ ["PEMERINTAH PROVINSI GORONTALO"], ["DINAS PENDIDIKAN DAN KEBUDAYAAN"], ["PEGANGAN GURU MAPEL"], ["REKAPITULASI NILAI SISWA"], [], ["Nama Guru", ":", DB.guru.nama], ["Mata Pelajaran", ":", DB.guru.mapel], ["Kelas", ":", kelasText], [], ["No", "NIS", "Nama Lengkap Siswa", "Kelas", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "Tugas (Rata)", "UTS", "UAS", "Absen", "Nilai Akhir", "Predikat"] ];
 
             let no = 1;
             DB.siswa.forEach(s => {
                 if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
-                
                 let n = DB.nilai[s.id] || { tugasList: Array(10).fill(0), uts: 0, uas: 0, absen: 0 };
-                let totalTugas = 0;
-                let countTugas = 0;
-                for(let i=0; i<10; i++) {
-                    let val = Number(n.tugasList[i] || 0);
-                    if (val > 0) {
-                        totalTugas += val;
-                        countTugas++;
-                    }
-                }
+                let totalTugas = 0, countTugas = 0;
+                for(let i=0; i<10; i++) { let val = Number(n.tugasList[i] || 0); if (val > 0) { totalTugas += val; countTugas++; } }
                 const rataTugas = countTugas > 0 ? (totalTugas / countTugas) : 0;
                 const final = (rataTugas * 0.5) + ((n.uts||0) * 0.1) + ((n.uas||0) * 0.2) + ((n.absen||0) * 0.2);
-                
-                let predikat = 'E';
-                if(final >= 90) predikat = 'A';
-                else if(final >= 80) predikat = 'B';
-                else if(final >= 70) predikat = 'C';
-                else if(final >= 60) predikat = 'D';
+                let predikat = final >= 90 ? 'A' : final >= 80 ? 'B' : final >= 70 ? 'C' : final >= 60 ? 'D' : 'E';
 
                 let rowData = [no++, s.nis, s.nama, s.kelas];
-                for(let i=0; i<10; i++) {
-                    rowData.push(n.tugasList[i] || 0);
-                }
+                for(let i=0; i<10; i++) rowData.push(n.tugasList[i] || 0);
                 rowData.push(rataTugas.toFixed(1), n.uts || 0, n.uas || 0, n.absen || 0, final.toFixed(1), predikat);
                 ws_data.push(rowData);
             });
-
-            const ws = XLSX.utils.aoa_to_sheet(ws_data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Rekap_Nilai");
-            XLSX.writeFile(wb, `Rekap_Nilai_${kelasText.replace(/ /g, '_')}.xlsx`);
-            showToast('Mengunduh Excel Nilai...');
+            const ws = XLSX.utils.aoa_to_sheet(ws_data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Rekap_Nilai"); XLSX.writeFile(wb, `Rekap_Nilai_${kelasText.replace(/ /g, '_')}.xlsx`); showToast('Mengunduh Excel Nilai...');
         }
         
         function exportNilaiHTML() {
             if(DB.siswa.length === 0) return showToast('Tidak ada data siswa');
-            
-            const filterKelas = document.getElementById('nilai-kelas').value;
-            let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas;
-
+            const filterKelas = document.getElementById('nilai-kelas').value; let kelasText = filterKelas === 'SEMUA' ? 'Semua Kelas' : filterKelas;
             let htmlTable = `<tr><th>No</th><th>NIS</th><th style="text-align:left;">Nama Lengkap</th><th>Tugas (Rata)</th><th>UTS</th><th>UAS</th><th>Absen</th><th>Nilai Akhir</th><th>Predikat</th></tr>`;
             
             let no = 1;
             DB.siswa.forEach(s => {
                 if (filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
-                
                 let n = DB.nilai[s.id] || { tugasList: Array(10).fill(0), uts: 0, uas: 0, absen: 0 };
-                let totalTugas = 0; let countTugas = 0;
-                for(let i=0; i<10; i++) {
-                    let val = Number(n.tugasList[i] || 0);
-                    if (val > 0) { totalTugas += val; countTugas++; }
-                }
+                let totalTugas = 0, countTugas = 0;
+                for(let i=0; i<10; i++) { let val = Number(n.tugasList[i] || 0); if (val > 0) { totalTugas += val; countTugas++; } }
                 const rataTugas = countTugas > 0 ? (totalTugas / countTugas) : 0;
                 const final = (rataTugas * 0.5) + ((n.uts||0) * 0.1) + ((n.uas||0) * 0.2) + ((n.absen||0) * 0.2);
-                
-                let predikat = 'E';
-                if(final >= 90) predikat = 'A';
-                else if(final >= 80) predikat = 'B';
-                else if(final >= 70) predikat = 'C';
-                else if(final >= 60) predikat = 'D';
+                let predikat = final >= 90 ? 'A' : final >= 80 ? 'B' : final >= 70 ? 'C' : final >= 60 ? 'D' : 'E';
 
-                htmlTable += `<tr>
-                    <td>${no++}</td>
-                    <td>${s.nis}</td>
-                    <td style="text-align:left;">${s.nama}</td>
-                    <td><b>${rataTugas.toFixed(1)}</b></td>
-                    <td>${n.uts || 0}</td>
-                    <td>${n.uas || 0}</td>
-                    <td>${n.absen || 0}</td>
-                    <td style="color:#00e5ff; font-weight:bold;">${final.toFixed(1)}</td>
-                    <td><b>${predikat}</b></td>
-                </tr>`;
+                htmlTable += `<tr><td>${no++}</td><td>${s.nis}</td><td style="text-align:left;">${s.nama}</td><td><b>${rataTugas.toFixed(1)}</b></td><td>${n.uts || 0}</td><td>${n.uas || 0}</td><td>${n.absen || 0}</td><td style="color:#00e5ff; font-weight:bold;">${final.toFixed(1)}</td><td><b>${predikat}</b></td></tr>`;
             });
 
-            let webHtml = `
-                <!DOCTYPE html>
-                <html><head><title>Laporan Nilai</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
-                    .card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 1000px; margin: 0 auto; overflow-x: auto; }
-                    h1, h2, h3 { text-align: center; margin: 5px 0; line-height: 1.3; }
-                    h1 { color: #2c3e50; font-size: 24px; }
-                    h2 { font-size: 16px; font-weight: normal; }
-                    .info-grid { display: grid; grid-template-columns: auto 1fr; gap: 8px 15px; margin: 20px 0; font-size: 14px; background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #00e5ff; }
-                    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; min-width: 600px; }
-                    th, td { padding: 12px 10px; text-align: center; border: 1px solid #e0e0e0; }
-                    th { background: #00e5ff; color: #000; text-transform: uppercase; letter-spacing: 0.5px; }
-                    tr:nth-child(even) { background: #fcfcfc; }
-                    tr:hover { background: #f1f1f1; }
-                </style>
-                </head><body>
-                <div class="card">
-                    <h2>DINAS PENDIDIKAN DAN KEBUDAYAAN</h2>
-                    <h1>PEGANGAN GURU MAPEL</h1>
-                    <h3 style="color: #666; font-weight: normal; margin-top:15px; text-decoration: underline;">REKAPITULASI NILAI SISWA</h3>
-                    
-                    <div class="info-grid">
-                        <b>Nama Guru</b> <span>: ${DB.guru.nama}</span>
-                        <b>Mata Pelajaran</b> <span>: ${DB.guru.mapel}</span>
-                        <b>Kelas</b> <span>: ${kelasText}</span>
-                    </div>
-
-                    <table>${htmlTable}</table>
-                </div>
-                </body></html>`;
-
-            const blob = new Blob([webHtml], { type: 'text/html;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Data_Nilai_${kelasText.replace(/ /g, '_')}.html`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('Tampilan HTML Nilai Berhasil Diunduh!');
+            let webHtml = `<!DOCTYPE html><html><head><title>Laporan Nilai</title><style>body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 20px; color: #333; } .card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 1000px; margin: 0 auto; overflow-x: auto; } h1, h2, h3 { text-align: center; margin: 5px 0; line-height: 1.3; } h1 { color: #2c3e50; font-size: 24px; } h2 { font-size: 16px; font-weight: normal; } .info-grid { display: grid; grid-template-columns: auto 1fr; gap: 8px 15px; margin: 20px 0; font-size: 14px; background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #00e5ff; } table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; min-width: 600px; } th, td { padding: 12px 10px; text-align: center; border: 1px solid #e0e0e0; } th { background: #00e5ff; color: #000; text-transform: uppercase; } tr:nth-child(even) { background: #fcfcfc; } tr:hover { background: #f1f1f1; }</style></head><body><div class="card"><h2>DINAS PENDIDIKAN DAN KEBUDAYAAN</h2><h1>PEGANGAN GURU MAPEL</h1><h3 style="color: #666; font-weight: normal; margin-top:15px; text-decoration: underline;">REKAPITULASI NILAI SISWA</h3><div class="info-grid"><b>Nama Guru</b> <span>: ${DB.guru.nama}</span><b>Mata Pelajaran</b> <span>: ${DB.guru.mapel}</span><b>Kelas</b> <span>: ${kelasText}</span></div><table>${htmlTable}</table></div></body></html>`;
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([webHtml], { type: 'text/html;charset=utf-8' })); a.download = `Data_Nilai_${kelasText.replace(/ /g, '_')}.html`; a.click(); showToast('Tampilan HTML Diunduh!');
         }
     </script>
 </body>
