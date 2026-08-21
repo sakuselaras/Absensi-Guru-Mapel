@@ -885,7 +885,7 @@
             const mins = (now.getHours() * 60) + now.getMinutes(); const late = mins > 480 ? mins - 480 : 0;
 
             DB.siswa.forEach(s => {
-                if(filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
+                if(filterKelas !== '' && filterKelas !== 'SEMUA' && s.kelas !== filterKelas) return;
                 const prev = DB.absensi[key][s.id] || { isBolos: false, bolosTime: '' };
                 DB.absensi[key][s.id] = { status: status, isBolos: prev.isBolos, hadirTime: status === 'H' ? timeStr : '', bolosTime: prev.bolosTime, lateMinutes: status === 'H' ? late : 0 };
             });
@@ -894,7 +894,52 @@
 
         function resetAbsensi() {
             const key = document.getElementById('absensi-date').value + '|' + document.getElementById('absensi-mapel').value;
-            DB.absensi[key] = {}; autoSaveLokal(); renderAbsensiList(); showToast('Absensi berhasil direset!');
+            const dataAbsensi = DB.absensi[key];
+            
+            if (!dataAbsensi || Object.keys(dataAbsensi).length === 0) {
+                return showToast('Belum ada data absensi yang tersimpan!');
+            }
+
+            // Cari kelas apa saja yang sudah memiliki data absen di hari tersebut
+            let kelasTerisi = new Set();
+            Object.keys(dataAbsensi).forEach(siswaId => {
+                const stat = dataAbsensi[siswaId];
+                if (stat.status !== '' || stat.isBolos) {
+                    const siswa = DB.siswa.find(s => s.id == siswaId);
+                    if (siswa) kelasTerisi.add(siswa.kelas);
+                }
+            });
+
+            if (kelasTerisi.size === 0) {
+                return showToast('Belum ada data absensi untuk di-reset!');
+            }
+
+            // Render tombol kelas ke dalam Popup Modal
+            const listContainer = document.getElementById('reset-kelas-list');
+            listContainer.innerHTML = '';
+
+            kelasTerisi.forEach(kelasName => {
+                const btnHtml = `<button class="btn-outline" style="border-color: var(--danger); color: var(--danger); padding: 10px; font-size: 13px;" onclick="eksekusiResetKelas('${kelasName}')"><i class="fas fa-trash-alt"></i> Reset Kelas ${kelasName}</button>`;
+                listContainer.insertAdjacentHTML('beforeend', btnHtml);
+            });
+
+            document.getElementById('modal-reset-kelas').style.display = 'flex';
+        }
+
+        function eksekusiResetKelas(kelasName) {
+            const key = document.getElementById('absensi-date').value + '|' + document.getElementById('absensi-mapel').value;
+            
+            if(DB.absensi[key]) {
+                DB.siswa.forEach(s => {
+                    if (s.kelas === kelasName && DB.absensi[key][s.id]) {
+                        delete DB.absensi[key][s.id]; // Hanya hapus absen untuk siswa di kelas terpilih
+                    }
+                });
+                autoSaveLokal();
+                renderAbsensiList();
+                document.getElementById('modal-reset-kelas').style.display = 'none';
+                showToast(`Data absensi Kelas ${kelasName} berhasil dikosongkan!`);
+            }
         }
 
         function simpanDataAbsensiButton() { autoSaveLokal(); showToast(`✅ Data absen berhasil direkam!`); setTimeout(() => { closeAbsensiDetail(); }, 800); }
@@ -1038,10 +1083,21 @@
         function updateDropdowns() {
             ['history-kelas-filter', 'absensi-kelas', 'nilai-kelas', 'export-kelas'].forEach(id => {
                 const el = document.getElementById(id); if(!el) return;
-                el.innerHTML = id === 'history-kelas-filter' ? '<option value="SEMUA">Semua Kelas / Jurusan</option>' : '<option value="SEMUA">Semua Kelas</option>';
+                
+                // Set default option berdasarkan ID elemen
+                if (id === 'history-kelas-filter') el.innerHTML = '<option value="SEMUA">Semua Kelas / Jurusan</option>';
+                else if (id === 'absensi-kelas') el.innerHTML = '<option value="">Pilih Kelas</option>';
+                else el.innerHTML = '<option value="SEMUA">Semua Kelas</option>';
+                
                 DB.kelas.forEach(k => el.insertAdjacentHTML('beforeend', `<option value="${k}">${k}</option>`));
             });
-            const inputKelas = document.getElementById('input-siswa-kelas'); if(inputKelas) { inputKelas.innerHTML = '<option value="">Pilih Kelas</option>'; DB.kelas.forEach(k => inputKelas.insertAdjacentHTML('beforeend', `<option value="${k}">${k}</option>`)); }
+            
+            const inputKelas = document.getElementById('input-siswa-kelas'); 
+            if(inputKelas) { 
+                inputKelas.innerHTML = '<option value="">Pilih Kelas</option>'; 
+                DB.kelas.forEach(k => inputKelas.insertAdjacentHTML('beforeend', `<option value="${k}">${k}</option>`)); 
+            }
+            
             ['absensi-mapel', 'export-mapel'].forEach(id => {
                 const el = document.getElementById(id); if(!el) return; el.innerHTML = '';
                 if(DB.mapelList.length === 0) el.innerHTML = '<option value="">-- Buat Mapel di Pengaturan --</option>';
