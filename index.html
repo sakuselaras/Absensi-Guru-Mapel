@@ -790,6 +790,17 @@
             if (renderedCount === 0) container.innerHTML = '<p class="text-muted text-center" style="padding: 30px 0; font-size: 13px;">Belum ada riwayat absensi.</p>';
         }
 
+        function hapusRiwayatAbsensi(key, event) {
+            event.stopPropagation(); // Mencegah klik menembus hingga membuka kartu detail
+            const [dateStr, mapelStr] = key.split('|');
+            showModal(`Yakin ingin menghapus SELURUH riwayat absensi tanggal ${dateStr} untuk mapel ${mapelStr}?`, 'confirm', () => {
+                delete DB.absensi[key];
+                autoSaveLokal();
+                renderAbsensiHistory();
+                showToast('Riwayat absensi berhasil dihapus!');
+            });
+        }
+
         function openNewAbsensi() {
             const todayStr = new Date().toISOString().split('T')[0];
             const filterEl = document.getElementById('history-kelas-filter');
